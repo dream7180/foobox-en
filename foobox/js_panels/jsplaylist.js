@@ -24,7 +24,7 @@ var show_shadow = fbx_set[28];
 var sys_scrollbar = fbx_set[29];
 var col_by_cover = fbx_set[30];
 // GLOBALS
-var g_script_version = "6.1.4.3a";
+var g_script_version = "6.1.4.5";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -133,6 +133,7 @@ properties = {
 	enablePlaylistFilter: window.GetProperty("SYSTEM.Enable Playlist Filter", false),
 	NetDisableGroup: window.GetProperty("SYSTEM.NetPlaylist Disable Group", true),
 	defaultPlaylistItemAction: window.GetProperty("SYSTEM.Default Playlist Action", "播放"),
+	disableToolbar: window.GetProperty("TOOLBAR: Always Disabled", true),
 	//"Add to playback queue",
 	autocollapse: window.GetProperty("SYSTEM.Auto-Collapse", false),
 	showgroupheaders: window.GetProperty("*GROUP: Show Group Headers", true),
@@ -333,6 +334,7 @@ columns = {
 };
 //toolbar
 oToolbar = function(){
+	this.disabled = properties.disableToolbar;
 	this.state = 0;
 	this.width = 260*zdpi;
 	this.height = 30*zdpi;
@@ -362,6 +364,7 @@ oToolbar = function(){
 	
 	this.draw = function(gr){
 		if(cSettings.visible) return;
+		if(this.disabled) return;
 		if(this.state == 0 && !this.dlmode) gr.DrawImage(images.show_toolbar, (ww - images.show_toolbar.Width)/2, wh- images.show_toolbar.Height, images.show_toolbar.Width, images.show_toolbar.Height, 0, 0, images.show_toolbar.Width, images.show_toolbar.Height, 0, 70);
 		else{
 			var x2=2*zdpi, x3=3*zdpi, x23=23*zdpi, end_x = this.x + this.width, mid_x = this.x+this.width/2, col_activeitem = g_color_dl_txt &0x40ffffff;
@@ -417,6 +420,7 @@ oToolbar = function(){
 	}
 	
 	this.checkState = function(event, x, y){
+		if(this.disabled) return;
 		switch (event) {
 		case "move":
 			if(this.state == 0 && !this.dlmode){
@@ -437,7 +441,7 @@ oToolbar = function(){
 							}
 							toolbar.timer_show && window.ClearTimeout(toolbar.timer_show);
 							toolbar.timer_show = false;
-						}, 250);
+						}, 300);
 					}
 				}
 				//else {
@@ -526,6 +530,7 @@ oToolbar = function(){
 			this.netsearch_type = p.list.name.substring(0, 2);
 			this.netsearch_name = p.list.name.split(" | ")[1];
 			if(properties.NetDisableGroup) nethide_groupheader(true);
+			this.disabled = false;
 		} else{
 			this.is_netsearch = (p.list.name.indexOf("网搜") == 0) ? 1 : 0;
 			if(this.is_netsearch){
@@ -533,10 +538,12 @@ oToolbar = function(){
 				this.netsearch_name = p.list.name.split(" | ")[1];
 				this.netsearch_num = Number(p.list.name.split(" | ")[2]);
 				if(properties.NetDisableGroup) nethide_groupheader(true);
+				this.disabled = false;
 			} else {
 				this.is_netsearch = 0;
 				this.netradio = 0;
 				if(properties.NetDisableGroup) nethide_groupheader(false);
+				this.disabled = properties.disableToolbar;
 			}
 		}
 	}

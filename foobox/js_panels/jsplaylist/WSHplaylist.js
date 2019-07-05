@@ -2743,16 +2743,18 @@ oList = function(object_name, playlist) {
 											p.list.dlitems.splice(0,p.list.dlitems.length);
 											p.list.dl_num -= p.list.dlitems.length;
 											toolbar.dlmode = false;
+											toolbar.disabled = properties.disableToolbar;
 											toolbar.repaint_dl();
 											toolbar.checkState("move", mouse_x, mouse_y);
 										}
 										timer_exit && window.ClearTimeout(timer_exit);
 										timer_exit = false;
-									}, 2000);
+									}, 2500);
 									dl_avoid_flush = false;
 								}
 							}
 							toolbar.dlmode = true;
+							toolbar.disabled = false;
 							toolbar.repaint_dl();
 						} else {
 							window.ClearInterval(toolbar.dl_timer);

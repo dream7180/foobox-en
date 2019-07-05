@@ -30,12 +30,18 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 5:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
+			window.SetProperty("DOWNLOAD: auto skip", status);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 8:
+			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("PLAYBACK: Repeat playlists", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 6:
+		case 9:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
-			window.SetProperty("DOWNLOAD: auto skip", status);
+			toolbar.disabled = properties.disableToolbar;
+			window.SetProperty("TOOLBAR: Always Disabled", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		};
@@ -838,7 +844,7 @@ function settings_textboxes_action(pageId, elementId) {
 	switch (pageId) {
 	case 0:
 		switch (elementId) {
-		case 7:
+		case 6:
 			var prefolder = dl_prefix_folder;
 			var new_prefolder = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_prefolder == "" || !fso.FolderExists(new_prefolder)) new_prefolder = prefolder;
@@ -847,7 +853,7 @@ function settings_textboxes_action(pageId, elementId) {
 				window.SetProperty("DOWNLOAD: prefix output folder", dl_prefix_folder);
 			}
 			break;
-		case 8:
+		case 7:
 			var prern = dl_rename_by;
 			var new_prern = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_prern == "") new_prern = prern;
@@ -1891,7 +1897,7 @@ oPage = function(id, objectName, label, nbrows) {
 			// General
 			var rh = cSettings.rowHeight;
 			// Layout options
-			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "显示标题工具栏 (按 CTRL+T 切换显示)", "cHeaderBar.locked", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "显示分栏标题 (按 CTRL+T 切换显示)", "cHeaderBar.locked", "settings_checkboxes_action", this.id));
 			// Behaviour options
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 4.25, "平滑滚动", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 5.25, "触屏滚动控制 (禁用拖放)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
@@ -1901,10 +1907,11 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
 			// Tagging options
-			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 9.25, "顺序播放时自动播放下一个播放列表 (遇到空列表停止)", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(6, txtbox_x + 30, cSettings.topBarHeight + rh * 11.25, "跳过已存在的文件", "dl_skip", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "预设下载目录，自定义时请确保该路径有效（需提前创建），否则更改将无效", dl_prefix_folder, "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(8, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 14.25), oTextBox_4, cHeaderBar.height, "下载的音频命名格式", dl_rename_by, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, txtbox_x + 30, cSettings.topBarHeight + rh * 9.25, "跳过已存在的文件", "dl_skip", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "预设下载目录，自定义时请确保该路径有效（需提前创建），否则更改将无效", dl_prefix_folder, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "下载的音频命名格式", dl_rename_by, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 15.25, "顺序播放时自动播放下一个播放列表 (遇到空列表停止)", "repeat_pls", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "对非网络播放列表禁用底部工具栏", "properties.disableToolbar", "settings_checkboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -2085,8 +2092,9 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.gdiDrawText("布局", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.gdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.gdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("网络音频下载选项", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 10.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("网络音频下载选项", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			p.settings.viewdl_btn.draw(gr, txtbox_x + 40 + Math.min(500*zdpi - 60, 450*zdpi), cSettings.topBarHeight + rh * 11.05 - (this.offset * cSettings.rowHeight), 255);
+			gr.gdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 1:
 			var listBoxWidth = zoom(120, zdpi);
@@ -2399,6 +2407,29 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 		return state;
 	};
+	
+	this.viewdl_btn_Check = function(event, x, y) {
+		var state = p.settings.viewdl_btn.checkstate(event, x, y);
+		switch (event) {
+		case "up":
+			if (state == ButtonStates.hover) {
+				var WshShell = new ActiveXObject("WScript.Shell");
+				if (!fso.FolderExists(dl_prefix_folder)) {
+					try{
+						fso.CreateFolder(dl_prefix_folder)
+					} catch(e) {
+						fb.trace("Download: Invalid path");
+						break;
+					}
+				}
+				var filepath = dl_prefix_folder;
+				if (dl_prefix_folder.substring(0,1) == "B") filepath = filepath.replace('B:\\', fb.FoobarPath);
+				WshShell.Run("explorer.exe" + " \"" + filepath+ "\"");
+			};
+			break;
+		};
+		return state;
+	};
 
 	this.on_mouse = function(event, x, y, delta) {
 		this.ishover = (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
@@ -2432,6 +2463,14 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 
 		switch (this.id) {
+		case 0:
+			if(this.viewdl_btn_Check(event, x, y) != ButtonStates.hover) {
+				var fin = this.elements.length;
+				for (var i = 0; i < fin; i++) {
+					this.elements[i].on_mouse(event, x, y, delta);
+				};
+			};
+		break;
 		case 1:
 			if (this.delButtonCheck(event, x, y) != ButtonStates.hover) {
 				if (this.newButtonCheck(event, x, y) != ButtonStates.hover) {
@@ -2593,6 +2632,26 @@ oSettings = function() {
 		this.fb2k_ov.ReleaseGraphics(gb);
 
 		this.opt_fb2k_btn = new button(this.fb2k_off, this.fb2k_ov, this.fb2k_ov);
+		
+		// view download folder button
+		rect_w = gpic.CalcTextWidth("查看下载目录", g_font_b) + g_z30;
+		this.viewdl = gdi.CreateImage(rect_w, x32);
+		gb = this.viewdl.GetGraphics();
+		gb.setSmoothingMode(2);
+		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("查看下载目录", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		this.viewdl.ReleaseGraphics(gb);
+
+		this.viewdl_ov = gdi.CreateImage(rect_w, x32);
+		gb = this.viewdl_ov.GetGraphics();
+		gb.setSmoothingMode(2);
+		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("查看下载目录", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		this.viewdl_ov.ReleaseGraphics(gb);
+
+		this.viewdl_btn = new button(this.viewdl, this.viewdl_ov, this.viewdl_ov);
 
 		// Close Settings Button (BACK)
 		this.close_off = gdi.CreateImage(75, 75);
@@ -2665,7 +2724,7 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 16));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 17));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "列", 18));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "分组", 38));
 			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 20));

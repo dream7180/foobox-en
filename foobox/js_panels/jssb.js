@@ -1016,8 +1016,8 @@ oBrowser = function(name) {
 		fb.ActivePlaylist = g_active_playlist;
 		if(!this.list) return;
 		if (ppt.sourceMode == 1) {
-			var ItemIndex = plman.GetPlaylistFocusItemIndex(g_active_playlist);
 			if (ppt.forceSorting) {
+				var ItemIndex = plman.GetPlaylistFocusItemIndex(g_active_playlist);
 				if (ItemIndex > -1 && ItemIndex < this.list.Count) {
 					var gid = this.getItemIndexFromTrackIndex(ItemIndex);
 					if (gid > -1) {
@@ -1040,6 +1040,8 @@ oBrowser = function(name) {
 				}
 			} catch(e) {}
 		}
+		if(brw.selectedIndex > -1)
+			brw.sendItemToPlaylist(brw.selectedIndex);
 	}
 
 	this.showItemFromItemHandle = function(metadb, isplaying) {
@@ -1109,7 +1111,11 @@ oBrowser = function(name) {
 			catch (e) {};
 		};
 		else try {
-			if (initial) return;
+			if (initial) {
+				var handle = plman.GetPlaylistFocusItemHandle(g_active_playlist);
+				this.showItemFromItemHandle(handle);
+				return;
+			}
 			var index = this.selectedIndex;
 			if (ppt.showAllItem && index == 0) index += 1;
 			var row = Math.floor(index / this.totalColumns);
@@ -1962,7 +1968,7 @@ oBrowser = function(name) {
 					}
 					this.change_active_item();
 				};
-				this.repaint(); // avirer
+				if(ppt.sourceMode == 0) this.repaint();
 			};
 			else {
 				if (cScrollBar.enabled && cScrollBar.visible) {
@@ -2000,8 +2006,9 @@ oBrowser = function(name) {
 		case "right":
 			g_rightClickedIndex = this.activeIndex;
 			if (this.ishover && this.activeIndex > -1) {
-				this.activateItem(this.activeIndex);
-				this.change_active_item();
+				//if (this.activeIndex != this.selectedIndex && fb.ActivePlaylist != g_active_playlist)
+				//	this.activateItem(this.activeIndex);
+				//this.change_active_item();
 				this.item_context_menu(x, y, this.activeIndex);
 			};
 			else {
@@ -2455,8 +2462,7 @@ oBrowser = function(name) {
 		};
 
 		if (pid >= 0) { // found
-			g_focus_id = pid;
-			this.showItemFromItemIndex(g_focus_id);
+			this.showItemFromItemIndex(pid);
 		};
 		else { // not found on "album artist" TAG, new search on "artist" TAG
 			cList.inc_search_noresult = true;
@@ -3569,7 +3575,7 @@ function on_playback_stop(reason) {
 
 function on_playback_new_track(metadb) {
 	g_metadb = metadb;
-	if(ppt.sourceMode == 0) return;
+	if(ppt.sourceMode == 0 || !window.IsVisible) return;
 	try {
 		if (!ppt.locklibpl) {//pure playlist mode
 			if (plman.PlayingPlaylist != plman.ActivePlaylist) {
@@ -3696,6 +3702,7 @@ function on_playlist_items_reordered(playlist_idx) {
 
 
 function on_item_focus_change(playlist_idx, from, to) {
+	if(!window.IsVisible) return;
 	if (g_avoid_on_item_focus_change) {
 		g_avoid_on_item_focus_change = false;
 		return;
@@ -3715,6 +3722,8 @@ function on_item_focus_change(playlist_idx, from, to) {
 				var handle = plman.GetPlaylistFocusItemHandle(g_active_playlist);
 				brw.showItemFromItemHandle(handle);
 			}
+			if(brw.selectedIndex > -1)
+				brw.sendItemToPlaylist(brw.selectedIndex);
 		};
 	};
 	/*else {
@@ -3740,13 +3749,13 @@ function on_metadb_changed(metadb_or_metadbs, fromhook) {
 		};
 	//};
 };
-
+/*
 function on_item_selection_change() {
 	if (ppt.sourceMode == 1) brw.repaint();
 };
-
+*/
 function on_playlist_items_selection_change() {
-	if (ppt.sourceMode == 1) brw.repaint();
+	if (ppt.sourceMode == 1 && window.IsVisible) brw.repaint();
 };
 
 function on_focus(is_focused) {

@@ -299,8 +299,20 @@ function on_notify_data(name, info) {
 		break;
 	case "get cover color":
 		if(col_by_color){
+			if(rr != info[0] || gg != info[1] || bb != info[2]){
 			rr = info[0], gg = info[1], bb = info[2];
 			set_color(rr, gg, bb);
+			window.NotifyOthers("set_random_color", color_arr);
+			}
+		}
+		break;
+	case "none cover color":
+		if(random_color == 0){
+			get_random_color();
+			set_color(rr, gg, bb);
+			window.NotifyOthers("set_random_color", color_arr);
+		} else if(random_color == 1){
+			reset_color();
 			window.NotifyOthers("set_random_color", color_arr);
 		}
 		break;

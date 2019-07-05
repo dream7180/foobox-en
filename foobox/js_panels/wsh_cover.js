@@ -56,7 +56,6 @@ var dl_id = 0;
 //menu of online search links
 var SearchItems = [];
 var getColor = false;
-var initPlay = true;
 
 function getRed(color) {
 	return ((color >> 16) & 0xff);
@@ -1842,7 +1841,6 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 
 	this.OnPlaybackStop = function(reason) {
-		initPlay = true;
 		this.cycle.Stop();
 		if (reason == 2) {
 			CollectGarbage(); // Release memory.
@@ -1859,7 +1857,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	function OnNewTrack(metadb) {
 		if (metadb && currentMetadb && currentMetadb.Compare(metadb)) {
 			_this.SwitchCover(0);
-			if(col_by_cover && initPlay && getColor) getColorSchemeFromImage(currentImage);
+			if(col_by_cover && getColor) getColorSchemeFromImage();
 		}
 		else {
 			isNewgroup = false;
@@ -1885,9 +1883,11 @@ function Controller(imgArray, imgDisplay, prop) {
 			currentPathItem = null;
 			currentImage = null;
 			imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
-		} //else {
+			if(col_by_cover && getColor) getColorSchemeFromImage();
+		} else {
 			//isNewgroup && imgDisplay.ChangeImage(1, currentImage, 2);
-		//}
+			if(col_by_cover && getColor) getColorSchemeFromImage();
+		}
 		SetMenuButtonCaption();
 	}
 
@@ -1895,26 +1895,29 @@ function Controller(imgArray, imgDisplay, prop) {
 		currentImage = img;
 		imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
 		if (imgArray.length > 1) _this.cycle.Active();
-		if(col_by_cover && getColor) getColorSchemeFromImage(currentImage);
+		if(col_by_cover && getColor) getColorSchemeFromImage();
 	}
 
-	getColorSchemeFromImage = function(image) {
-	if(!image) return;
-	var left_img = gdi.CreateImage(30, 50);
-	var gb = left_img.GetGraphics();
-	var colorScheme_array = Array();
-	gb.DrawImage(image, 0, 0, image.Width, image.Height, 7, 7, image.Width-14, image.Height-14, 0, 255);
-	left_img.ReleaseGraphics(gb);
-	var myVBArray = left_img.GetColorScheme(1);
-	colorScheme_array.splice(0, colorScheme_array.length);
-	colorScheme_array = myVBArray.toArray();
-	var gRed = getRed(colorScheme_array[0]);
-	var gGreen = getGreen(colorScheme_array[0]);
-	var gBlue = getBlue(colorScheme_array[0]);
-	var col_info = new Array(gRed, gGreen, gBlue);
-	window.NotifyOthers("get cover color", col_info);
-	getColor = false;
-	initPlay = false;
+	getColorSchemeFromImage = function() {
+		if(!currentImage || currentImage == null) {
+			window.NotifyOthers("none cover color", true);
+			getColor = false;
+		}else{
+			var left_img = gdi.CreateImage(30, 50);
+			var gb = left_img.GetGraphics();
+			var colorScheme_array = Array();
+			gb.DrawImage(currentImage, 0, 0, currentImage.Width, currentImage.Height, 7, 7, currentImage.Width-14, currentImage.Height-14, 0, 255);
+			left_img.ReleaseGraphics(gb);
+			var myVBArray = left_img.GetColorScheme(1);
+			colorScheme_array.splice(0, colorScheme_array.length);
+			colorScheme_array = myVBArray.toArray();
+			var gRed = getRed(colorScheme_array[0]);
+			var gGreen = getGreen(colorScheme_array[0]);
+			var gBlue = getBlue(colorScheme_array[0]);
+			var col_info = new Array(gRed, gGreen, gBlue);
+			window.NotifyOthers("get cover color", col_info);
+			getColor = false;
+		}
 	}
 	//------------------------------------------
 

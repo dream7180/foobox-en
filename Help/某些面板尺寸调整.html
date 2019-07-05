@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>某些面板尺寸调整</title>
+<title>Resize panels</title>
 <style type="text/css">
 body
 {
@@ -18,16 +18,17 @@ font-size: 16px;
 </style>
 </head>
 <body>
-<p align="center"><font size="+1", style="font-weight:bold;">某些面板尺寸调整</font></p>
+<p align="center"><font size="+1", style="font-weight:bold;">Reszing the panels</font></p>
 <hr>
-<p>受 CUI+PSS 功能限制，foobox 手动调整面板尺寸的功能不多。上一章 "高分屏适配指南" 里用到的第一个面板栈分离器配置对话框这里继续使用。</p>
+<p>Based on CUI+PSS, function for resizing the panels is very limited in foobox. Same with section "Adapt to high resolution screen", we goto CUI Layout dialog, pick the first PSS splitter, press Configure... button.
+</p>
 <img src="images/panel01.png" width="588" height="555" /><br />
-<p><font color="#0d7d0f" style="font-weight:bold;">【左栏播放列表管理器面板宽度微调】</font></p>
-<p>第二个变量 PlmanWidth 是控制左栏播放列表管理器面板宽度的，如果你觉得太小，可以把195改大点。<br /><br /><br /></p>
-<p><font color="#0d7d0f" style="font-weight:bold;">【删除右栏下部的频谱面板】</font></p>
-<p>有些用户不喜欢频谱或不喜欢它占用右栏面板空间，下面两步可以删掉它：</p>
-<p>1. 到 \Foobar2000\components 目录下删掉foo_uie_vis_channel_spectrum.dll这个组件。</p>
-<p>2. 把上图第三个变量定义<font color="#d70c0c"> $set_ps_global(Spectrum_h,$mul($div($mul(%FontSize_px%,3),12),20)) </font>这行改成<font color="#d70c0c"> $set_ps_global(Spectrum_h,5) </font>即可。</p>
+<p><font color="#0d7d0f" style="font-weight:bold;">[Adjust the width of Playlists Manager Panel (left)]</font></p>
+<p>The second variable PlmanWidth is the value to control the width of this panel.<br /><br /><br /></p>
+<p><font color="#0d7d0f" style="font-weight:bold;">[To delete the Spectrum Panle (right bottom)]</font></p>
+<p>Two steps to delete the spectrum panel if you don't like it:</p>
+<p>1. Delete the foo_uie_vis_channel_spectrum.dll component under \Foobar2000\components.</p>
+<p>2. Revise the third variable:<font color="#d70c0c"> $set_ps_global(Spectrum_h,$mul($div($mul(%FontSize_px%,3),12),20)) </font>to:<font color="#d70c0c"> $set_ps_global(Spectrum_h,5) </font>Done!</p>
 <br />
 <p>---The End---</p>
 </body>

@@ -892,7 +892,7 @@ function crc32(str) {
 
 	return crc ^ (-1);
 };
- 
+/* 
 function RefreshBG() {
 	if(fb.IsPlaying||fb.IsPaused) {
 		fb.RunMainMenuCommand("Playback/Play or Pause");
@@ -902,7 +902,7 @@ function RefreshBG() {
 		fb.Stop()
 	};
 };
-
+*/
 // --- UIHacks
 
 MainMenuState = {

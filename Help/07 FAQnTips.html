@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>FAQ and Tips</title>
+<script type="text/javascript">
+function altRows(id){
+	if(document.getElementsByTagName){
+		var table = document.getElementById(id);
+		var rows = table.getElementsByTagName("tr");
+		for(i = 0; i < rows.length; i++){      
+			if(i % 2 == 0){
+			rows[i].className = "evenrowcolor";
+			}else{
+				rows[i].className = "oddrowcolor";
+			}      
+		}
+	}
+}
+window.onload=function(){
+altRows('alternatecolor');
+}
+</script>
+<style type="text/css">
+body
+{
+margin:0;
+padding:0;
+}
+p{
+font-family:  Tahoma, Verdana, 微软雅黑, Arial,sans-serif;
+font-size: 16px;
+color: #0d7d0f;
+}
+
+table.altrowstable {
+	border-collapse: collapse;  
+	font-family: Tahoma, Verdana, 微软雅黑, Arial,sans-serif;
+	font-size: 16px;
+	border: 0;
+} 
+table.altrowstable th {
+	border: 0;
+}  
+table.altrowstable td {
+	padding-left:20px;
+	padding-top:10px;
+	padding-right:20px;
+	padding-bottom:10px
+	border: 0;
+}
+.oddrowcolor{
+background-color:#eeeeee;
+}
+.evenrowcolor{
+background-color:#ffffff;
+}
+</style>
+</head>
+<body>
+<p align="center"><br /><font size="+1", style="font-weight:bold;" color="#000000">FAQ and Tips</font></p>
+<hr>
+<table class="altrowstable" id="alternatecolor" width="100%">
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Invalid inputbox?]</font></p>
+<p>Very important: after input in the inputbox of all panels, you must press ENTER to validate the input. Press ENTER key, not click the mouse outside the inputbox.</p>
+<img src="images/tip01.png" border="1" width="575" height="217" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Why mounted to B drive?]</font></p>
+<p>Foobar2000 folder will be mounted to B drive by default. This make foobox full portable. Please don't change this setting, otherwise some functions may not work properly. B drive only, not A or others.</p>
+<img src="images/tip08.png" border="0" width="754" height="552" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Add QAAC encoder to foobox]</font></p>
+<p>Converter presets include Apple QAAC settings, but you need to manually add QAAC encoders to foobox. Below is the link of encoder pack for QAAC with runtime envrionment integrated.</p>
+<p><a href="http://www.foobar2000.com.cn/component/showdownload.php?lang=cn&id=25" target="blank">http://www.foobar2000.com.cn/component/showdownload.php?lang=cn&id=25</a></p>
+<p>Use：Coppy all files of qaac folder (32bit) or qaac64 folder (64位)to encoders directory under foobar2000.</p><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Preset autoplaylists]</font></p>
+<p> You can create preset autoplaylists easily in the right click menu of palylist manager panel.</p>
+<img src="images/tip02.png" border="1" width="630" height="502" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[On screen display search]</font></p>
+<p>On-screen search on main panels of foobox help you locate the track easily by keyboard input.<br />
+Keywords of on-screen search for each panels are different:<br />
+- Playlist view: Title, Artist, Album.<br />
+- Lib tree: node name of current mode.<br />
+- Cover art panel: group name of current mode.
+</p>
+<img src="images/tip03.png" border="1" width="795" height="526" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Searchbox in topbar]</font></p>
+<p>Powerful searchbox. There are three(3) search modes: Playlist, Library, Internet.<br />
+Left click the icon to swith the search mode, right click the icon to pop-up the option menu.
+</p>
+<img src="images/tip04.png" border="1" width="666" height="376" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Internet search]</font></p>
+<p>Right-click popup menu in the internet search mode as below:<br />
+You can switch the search source, search format, open music boards and radio. For page switch and update of the search results, download, please refer to section "Playlist view toolbar".
+</p>
+<img src="images/tip11.png" border="1" width="688" height="496" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Playlist view tips]</font></p>
+<p>* Press F2 key to locate the playing track.<br />
+* Tab key to collapse all groups.<br />
+* Control + Tab to expand all groups.<br />
+* Control + T to hide/display header topbar or search bar<br />
+* Other mouse clicking hot areas are indicated below.<br />
+</p>
+<img src="images/tip05.png" border="1" width="1010" height="602" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Tips for Cover Browser]</font></p>
+<p>* Can create autoplaylist easily in the popup menu if the cover.<br />
+* Other mouse clicking hot areas are indicated below.<br />
+</p>
+<img src="images/tip06.png" border="1" width="1008" height="600" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[About ratings]</font></p>
+<p>Retrieve rating information for the audio files' tags:<br />
+</p>
+<p>In foobox, ratings are recorded by playcount component, not writing to files' tags. If you want to change the setting, please go to "foobox settings" - "Ratings Data"
+<br />
+</p>
+<img src="images/tip07.png" border="1" width="703" height="490" /><br /><br /><br />
+</td></tr>
+<tr>
+<td>
+<p><font size="+1", style="font-weight:bold;">[Minimize or close foobox to system tray]</font></p>
+<p>foobox is based on CUI, not default user interface (DUI), if you want to close foobar2000 to the system tray, please follow below to make it work.</p>
+<img src="images/tip09.png" border="0" width="754" height="552" /><br /><br />
+<img src="images/tip10.png" border="0" width="754" height="552" /><br /><br /><br />
+</td></tr>
+<tr>
+<td><br /><p>---Check this file when updated. And you will find more during using foobox---</p><br />
+</td></tr>
+</table>
+</body>
+</html>

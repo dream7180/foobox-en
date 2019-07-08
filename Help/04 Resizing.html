@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Resize panels</title>
+<style type="text/css">
+body
+{
+padding-left:20px;
+padding-top:10px;
+padding-right:20px;
+padding-bottom:20px;
+}
+p{
+font-family: Tahoma, Verdana, 微软雅黑, Arial,sans-serif;
+font-size: 16px;
+}
+</style>
+</head>
+<body>
+<p align="center"><font size="+1", style="font-weight:bold;">Reszing the panels</font></p>
+<hr>
+<p>Based on CUI+PSS, function for resizing the panels is very limited in foobox. Same with section "Adapt to high resolution screen", we goto CUI Layout dialog, pick the first PSS splitter, press Configure... button.
+</p>
+<img src="images/panel01.png" width="588" height="555" /><br />
+<p><font color="#0d7d0f" style="font-weight:bold;">[Adjust the width of Playlists Manager Panel (left)]</font></p>
+<p>The second variable PlmanWidth is the value to control the width of this panel.<br /><br /><br /></p>
+<p><font color="#0d7d0f" style="font-weight:bold;">[To delete the Spectrum Panle (right bottom)]</font></p>
+<p>Two steps to delete the spectrum panel if you don't like it:</p>
+<p>1. Delete the foo_uie_vis_channel_spectrum.dll component under \Foobar2000\components.</p>
+<p>2. Revise the third variable:<font color="#d70c0c"> $set_ps_global(Spectrum_h,$mul($div($mul(%FontSize_px%,3),12),20)) </font>to:<font color="#d70c0c"> $set_ps_global(Spectrum_h,5) </font>Done!</p>
+<br />
+<p>---The End---</p>
+</body>
+</html>

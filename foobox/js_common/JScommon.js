@@ -729,14 +729,14 @@ function DrawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, l
 function zoom(value, factor) {
 	return Math.ceil(value * factor);
 };
-
+/*
 function Syscolor(color_n) {
 	var Shell = new ActiveXObject("WScript.Shell");
 	var tempc;
 	tempc = Shell.RegRead("HKEY_CURRENT_USER\\Control Panel\\Colors\\" + color_n).split(" ");
 	return (0xff000000|(tempc[0]<<16)|(tempc[1]<<8)|(tempc[2]));
 };
-/*
+
 function get_system_dpi_percent() {
 	// get windows version
 	var wbemFlagReturnImmediately = 0x10;
@@ -832,19 +832,19 @@ function TimeFmt(t) {
 	var zpad = function(n) {
 		var str = n.toString();
 		return (str.length < 2) ? "0" + str : str;
-		return str;
+		//return str;
 	}
 	if (t > 3600){
 		var h = Math.floor(t / 3600);
 		t -= h * 3600;
 		m = Math.floor(t / 60);
 		t -= m * 60, s = Math.floor(t);
-		return h.toString() + "小时" + m.toString() + "分 " + zpad(s) + "秒";	
+		return h.toString() + (h > 1 ? " hours " : " hour ") + m.toString() + (m > 1 ? " minutes " : " minute ") + zpad(s) + (s > 1 ? " seconds" : " second");	
 	}
 	else{
 		m = Math.floor(t / 60);
 		t -= m * 60, s = Math.floor(t);
-		return m.toString() + "分" + zpad(s)+ "秒";	
+		return m.toString() + (m > 1 ? " minutes " : " minute ") + zpad(s) + (s > 1 ? " seconds" : " second");	
 	}
 }
 

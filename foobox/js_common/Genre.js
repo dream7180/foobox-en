@@ -21,7 +21,7 @@
 	"纯乐器演奏": "Instrumental",
 	"器乐": "Instrumental",
 	"说唱": "Rap",
-	"西哈": "Hip-Hop",
+	"嘻哈": "Hip-Hop",
 	"疯克": "Funk",
 	"新世纪音乐": "NewAge",
 	"New Age": "NewAge",

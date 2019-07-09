@@ -46,7 +46,7 @@
 	this.getImages();
 
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "过滤", g_color_normal_txt, 0, 0, fbx_set[6] & 0xb9ffffff, g_sendResponse, "brw");
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter", g_color_normal_txt, 0, 0, fbx_set[6] & 0xb9ffffff, g_sendResponse, "brw");
 		this.inputbox.autovalidation = true;
 	};
 	this.on_init();

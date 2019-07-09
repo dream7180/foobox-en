@@ -21,7 +21,7 @@ try {
 	WshShell = new ActiveXObject("WScript.Shell");
 } catch (e) {
 	fb.trace("----------------------------------------------------------------------");
-	fb.trace(e + "\n修正: 在参数选项 > 工具 > WSH 面板增强版中禁用安全模式");
+	fb.trace(e + "\nfix: Disable Safe mode in Preferences > Tools > WSH Panel Mod Plus");
 	fb.trace("----------------------------------------------------------------------");
 	safeMode = true;
 }

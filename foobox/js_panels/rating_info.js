@@ -297,32 +297,32 @@ function on_mouse_lbtn_up(x, y) {
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
-	if (g_metadb && TextBtn_info.isXYInButton(x, y)) fb.RunContextCommandWithMetadb("属性", g_metadb);
+	if (g_metadb && TextBtn_info.isXYInButton(x, y)) fb.RunContextCommandWithMetadb("Properties", g_metadb);
 }
 
 function on_mouse_rbtn_up(x, y) {
 	if (TextBtn_info.isXYInButton(x, y)) {
 		var rMenu = window.CreatePopupMenu();
-		rMenu.AppendMenuItem(MF_STRING, 3, "显示喜爱按钮");
+		rMenu.AppendMenuItem(MF_STRING, 3, "Show Mood");
 		rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
 		rMenu.AppendMenuSeparator();
-		rMenu.AppendMenuItem(MF_STRING, 1, "激活正在播放项目");
+		rMenu.AppendMenuItem(MF_STRING, 1, "Activate now playing");
 		var fso = new ActiveXObject("Scripting.FileSystemObject");
 		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (tracktype < 2) && (follow_cursor || !fb.IsPlaying))
-			rMenu.AppendMenuItem(MF_STRING, 4, "用Mp3tag编辑");
-		rMenu.AppendMenuItem(MF_STRING, 2, "属性");
+			rMenu.AppendMenuItem(MF_STRING, 4, "Edit with Mp3tag");
+		rMenu.AppendMenuItem(MF_STRING, 2, "Properties");
 		rMenu.AppendMenuSeparator();
-		rMenu.AppendMenuItem(MF_STRING, 5, "面板属性");
+		rMenu.AppendMenuItem(MF_STRING, 5, "Panel properties");
 		var a = rMenu.TrackPopupMenu(x, y);
 		switch (a) {
 		case 1:
 			if (fb.IsPlaying) {
-				fb.RunMainMenuCommand("激活正在播放项目");
+				fb.RunMainMenuCommand("Activate now playing");
 				window.NotifyOthers("show_Now_Playing", 1);
 			}
 			break;
 		case 2:
-			if (g_metadb) fb.RunContextCommandWithMetadb("属性", g_metadb);
+			if (g_metadb) fb.RunContextCommandWithMetadb("Properties", g_metadb);
 			break;
 		case 3:
 			is_mood = !is_mood;
@@ -343,12 +343,12 @@ function on_mouse_rbtn_up(x, y) {
 	}
 	if (TextBtn_spec.isXYInButton(x, y) && foo_spec) {
 		var specMenu = window.CreatePopupMenu();
-		specMenu.AppendMenuItem(MF_STRING, 11, "显示网格线");
+		specMenu.AppendMenuItem(MF_STRING, 11, "Show grid");
 		specMenu.CheckMenuItem(11, spec_show_grid ? 1 : 0);
-		specMenu.AppendMenuItem(MF_STRING, 12, "填充背景色");
+		specMenu.AppendMenuItem(MF_STRING, 12, "Fill background Color");
 		specMenu.CheckMenuItem(12, spec_show_bg ? 1 : 0);
 		specMenu.AppendMenuSeparator();
-		specMenu.AppendMenuItem(MF_STRING, 13, "面板属性");
+		specMenu.AppendMenuItem(MF_STRING, 13, "Panel properties");
 		var b = specMenu.TrackPopupMenu(x, y);
 		switch (b) {
 		case 11:
@@ -395,7 +395,8 @@ function on_metadb_changed() {
 	}
 	txt_title = g_tfo.title.EvalWithMetadb(g_metadb);
 	txt_info = g_tfo.artist.EvalWithMetadb(g_metadb) + g_tfo.album.EvalWithMetadb(g_metadb);
-	if(foo_playcount) txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K | " + g_tfo.playcount.EvalWithMetadb(g_metadb) + "次";
+	var _playcount = g_tfo.playcount.EvalWithMetadb(g_metadb);
+	if(foo_playcount) txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
 	else txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K";
 	var l_mood = g_tfo.mood.EvalWithMetadb(g_metadb);
 	if (l_mood != null && l_mood != "?") {
@@ -515,12 +516,12 @@ function ButtonUI_R() {
 				if (derating_flag) {
 					if (foo_playcount) {
 						if (rating_to_tag && tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", "");
-						fb.RunContextCommandWithMetadb("Rating" + "/" + "<not set>", g_metadb) || fb.RunContextCommandWithMetadb("等级" + "/" + "<不设置>", g_metadb);
+						fb.RunContextCommandWithMetadb("Rating" + "/" + "<not set>", g_metadb);// || fb.RunContextCommandWithMetadb("等级" + "/" + "<不设置>", g_metadb);
 					} else if (tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", "");
 				} else {
 					if (foo_playcount) {
 						if (rating_to_tag && tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", i);
-						fb.RunContextCommandWithMetadb("Rating" + "/" + i, g_metadb) || fb.RunContextCommandWithMetadb("等级" + "/" + i, g_metadb);;
+						fb.RunContextCommandWithMetadb("Rating" + "/" + i, g_metadb);// || fb.RunContextCommandWithMetadb("等级" + "/" + i, g_metadb);;
 					} else if (tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", i);
 				}
 			}

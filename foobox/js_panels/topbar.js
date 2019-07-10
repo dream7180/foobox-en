@@ -39,9 +39,9 @@ function PopMessage(method, text, type) {
 
 function AboutFoobox() {
 	var shellObj = new ActiveXObject("Shell.Application");
-	var HelpFile = fb.FoobarPath + "foobox帮助.chm";
+	var HelpFile = fb.FoobarPath + "foobox help.chm";
 	if (utils.FileTest(HelpFile, "e")) shellObj.ShellExecute('"' + HelpFile + '"', "", "", "open", 1);
-	else PopMessage(1, "找不到文件: \'" + HelpFile + "\'", 16);
+	else PopMessage(1, "File not found: \'" + HelpFile + "\'", 16);
 }
 //===============
 var show_playlist = window.GetProperty("Panel.show.playlist", true);
@@ -359,7 +359,7 @@ function on_mouse_lbtn_up(x, y) {
 		}
 	}
 	if (btn_fullscr && buttons[12 + show_vis].MouseUp()) {
-		fb.RunMainMenuCommand("视图/全屏显示");
+		fb.RunMainMenuCommand("View/Fullscreen");
 	}
 	buttons[3].MouseUp();
 	if (ui_noborder) {
@@ -379,7 +379,7 @@ function on_mouse_lbtn_up(x, y) {
 		}
 		if (buttons[2].MouseUp()) {
 			UIHacks.DisableSizing = false;
-			fb.RunMainMenuCommand("视图/隐藏");
+			fb.RunMainMenuCommand("View/Hide");
 		}
 	}
 	if (g_searchbox.inputbox.visible) {
@@ -591,18 +591,18 @@ function init_buttons() {
 	buttons[0] = new ButtonUI(img_close, "");
 	buttons[1] = new ButtonUI(img_max, "");
 	buttons[2] = new ButtonUI(img_min, "");
-	buttons[3] = new ButtonUI(img_menu, "菜单");
-	buttons[4] = new ButtonUI(img_open, "打开...");
+	buttons[3] = new ButtonUI(img_menu, "Menu");
+	buttons[4] = new ButtonUI(img_open, "Open...");
 	//buttons[5] = new ButtonUI(img_add, "添加...");
-	buttons[5] = new ButtonUI(img_playlist, "播放列表");
-	buttons[6] = new ButtonUI(img_artist, "艺术家");
-	buttons[7] = new ButtonUI(img_album, "专辑");
-	buttons[8] = new ButtonUI(img_genre, "流派 | 目录");
-	buttons[9] = new ButtonUI(img_settings, "设置");
-	buttons[10] = new ButtonUI(img_lrc, "歌曲信息");
-	if(show_libtree) buttons[11] = new ButtonUI(img_lib, "媒体库");
-	else buttons[11] = new ButtonUI(img_lib_2, "列表视图");
-	if(show_vis) buttons[12] = new ButtonUI(img_shp, "可视化");
+	buttons[5] = new ButtonUI(img_playlist, "Playlists");
+	buttons[6] = new ButtonUI(img_artist, "Artist");
+	buttons[7] = new ButtonUI(img_album, "Album");
+	buttons[8] = new ButtonUI(img_genre, "Genre | Directory");
+	buttons[9] = new ButtonUI(img_settings, "Settings");
+	buttons[10] = new ButtonUI(img_lrc, "Track Info");
+	if(show_libtree) buttons[11] = new ButtonUI(img_lib, "Library");
+	else buttons[11] = new ButtonUI(img_lib_2, "Listview");
+	if(show_vis) buttons[12] = new ButtonUI(img_shp, "Visualization");
 	buttons[12 + show_vis] = new ButtonUI(img_fullscreen, "");
 
 	buttons[3].OnClick = function(x, y) {
@@ -623,12 +623,12 @@ function init_buttons() {
 		var menuman5 = fb.CreateMainMenuManager();
 		var menuman6 = fb.CreateMainMenuManager();
 
-		child1.AppendTo(basemenu, MF_STRING | MF_POPUP, "文件");
-		child2.AppendTo(basemenu, MF_STRING | MF_POPUP, "编辑");
-		child3.AppendTo(basemenu, MF_STRING | MF_POPUP, "视图");
-		child4.AppendTo(basemenu, MF_STRING | MF_POPUP, "播放");
-		child5.AppendTo(basemenu, MF_STRING | MF_POPUP, "媒体库");
-		child6.AppendTo(basemenu, MF_STRING | MF_POPUP, "帮助");
+		child1.AppendTo(basemenu, MF_STRING | MF_POPUP, "File");
+		child2.AppendTo(basemenu, MF_STRING | MF_POPUP, "Edit");
+		child3.AppendTo(basemenu, MF_STRING | MF_POPUP, "View");
+		child4.AppendTo(basemenu, MF_STRING | MF_POPUP, "Playback");
+		child5.AppendTo(basemenu, MF_STRING | MF_POPUP, "Library");
+		child6.AppendTo(basemenu, MF_STRING | MF_POPUP, "Help");
 
 		menuman1.Init("file");
 		menuman2.Init("edit");
@@ -650,7 +650,7 @@ function init_buttons() {
 			basemenu.AppendMenuItem(MF_STRING, 1319, "Mp3tag");
 		}
 		basemenu.AppendMenuSeparator();
-		basemenu.AppendMenuItem(MF_STRING, 1311, "foobox 帮助");
+		basemenu.AppendMenuItem(MF_STRING, 1311, "foobox help");
 
 		ret = 0;
 		ret = basemenu.TrackPopupMenu(x, y);//, 0x0008);
@@ -726,11 +726,12 @@ function BtnSetSize_onsize(){
 function update_libBtn(){
 	if(show_libtree){
 		buttons[11].img = img_lib;
-		buttons[11].Tooltip.Text = "媒体库";
+		buttons[11].Tooltip.Text = "Library";
 	} else{
 		buttons[11].img = img_lib_2;
-		buttons[11].Tooltip.Text = "列表视图";
+		buttons[11].Tooltip.Text = "Listview";
 	}
+	buttons[11].Tooltip.Deactivate();
 	buttons[11].Repaint();
 }
 

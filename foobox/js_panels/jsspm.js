@@ -209,7 +209,7 @@ oPlaylist = function(idx, rowId, name) {
 	this.name = name;
 	this.isAutoPlaylist = plman.IsAutoPlaylist(idx);
 	this.islocked = false;
-	if (ppt.lockReservedPlaylist && this.name == "媒体库" && this.idx == 0) this.islocked = true;
+	if (ppt.lockReservedPlaylist && this.name == "Library" && this.idx == 0) this.islocked = true;
 };
 
 oBrowser = function(name) {
@@ -515,7 +515,7 @@ oBrowser = function(name) {
 			gr.DrawLine(0, new_bt_y, ww, new_bt_y, 1, g_color_line);
 			this.new_bt.draw(gr, 0, new_bt_y + 1, 255);
 			var new_bt_txt_x = this.marginLR + Math.floor(27*zdpi) + this.paddingLeft + 4;
-			gr.GdiDrawText("新建播放列表", g_font, g_color_normal_txt, new_bt_txt_x, ppt.showHeaderBar ? ppt.headerBarHeight + 1 : 0, ww - new_bt_txt_x - 10, ppt.rowHeight - 2, lc_txt);
+			gr.GdiDrawText("New playlist", g_font, g_color_normal_txt, new_bt_txt_x, ppt.showHeaderBar ? ppt.headerBarHeight + 1 : 0, ww - new_bt_txt_x - 10, ppt.rowHeight - 2, lc_txt);
 			// draw scrollbar
 			if (cScrollBar.enabled) {
 				brw.scrollbar && brw.scrollbar.draw(gr);
@@ -747,7 +747,7 @@ oBrowser = function(name) {
 						var insert_index = fb.PlaylistItemCount(row_current);
 						plman.InsertPlaylistItems(row_current, insert_index, g_handles, false);
 					} else {
-						fb.RunMainMenuCommand("文件/新建播放列表");
+						fb.RunMainMenuCommand("File/New playlist");
 						var insert_index = fb.PlaylistItemCount(fb.PlaylistCount - 1);
 						plman.InsertPlaylistItems(fb.PlaylistCount - 1, insert_index, g_handles, false);
 					}
@@ -938,68 +938,68 @@ oBrowser = function(name) {
 		var total = plman.PlaylistCount;
 		
 		if (!add_mode) {
-			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 8, "移除");
+			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 8, "Remove");
 			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 3, "重命名");
-			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 9, "自动命名");
-			_menu.AppendMenuItem(MF_STRING, 5, "复制");
+			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 3, "Rename");
+			_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 9, "Auto rename");
+			_menu.AppendMenuItem(MF_STRING, 5, "Copy");
 			if (plman.IsAutoPlaylist(id)) {
 				_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-				_menu.AppendMenuItem(MF_STRING, 6, "智能列表属性...");
-				_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 7, "转换为普通列表");
+				_menu.AppendMenuItem(MF_STRING, 6, "Autoplaylist properties...");
+				_menu.AppendMenuItem(this.rows[this.activeRow].islocked ? MF_DISABLED : MF_STRING, 7, "Convert to a normal playlist");
 			};
 			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		}
 
 		if (!add_mode) {
 			var pl_idx = this.rows[id].idx;
-			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "插入 ...");
+			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "Insert...");
 		};
 		else {
 			id = this.rowsCount;
 			var pl_idx = total;
-			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "添加 ...");
+			_newplaylist.AppendTo(_menu, (g_filterbox.inputbox.text.length > 0 ? MF_GRAYED | MF_DISABLED : MF_STRING), "Add...");
 		};
-		_newplaylist.AppendMenuItem(MF_STRING, 100, "新建播放列表");
-		_newplaylist.AppendMenuItem(MF_STRING, 101, "新建智能列表");
-		_autoplaylist.AppendTo(_newplaylist, MF_STRING, "预设智能列表");
-		_autoplaylist.AppendMenuItem(MF_STRING, 200, "媒体库 (完整)");
-		_autoplaylist.AppendMenuItem(MF_STRING, 204, "未播放过的音轨");
-		_autoplaylist.AppendMenuItem(MF_STRING, 205, "历史记录 (一个星期内播放过的音轨)");
-		_autoplaylist.AppendMenuItem(MF_STRING, 206, "最常播放的音轨");
-		_autoplaylist.AppendMenuItem(MF_STRING, 210, "最近添加的音轨");
+		_newplaylist.AppendMenuItem(MF_STRING, 100, "New playlist");
+		_newplaylist.AppendMenuItem(MF_STRING, 101, "New autoplaylist");
+		_autoplaylist.AppendTo(_newplaylist, MF_STRING, "Preset autoplaylists");
+		_autoplaylist.AppendMenuItem(MF_STRING, 200, "Library (full)");
+		_autoplaylist.AppendMenuItem(MF_STRING, 204, "Tracks never played");
+		_autoplaylist.AppendMenuItem(MF_STRING, 205, "History (tracks played in one week)");
+		_autoplaylist.AppendMenuItem(MF_STRING, 206, "Tracks played often");
+		_autoplaylist.AppendMenuItem(MF_STRING, 210, "Tracks recently added");
 /*		_autoplaylist.AppendMenuItem(MF_STRING, 211, "网络广播");
 		_autoplaylist.AppendMenuItem(MF_STRING, 212, "External Files");
 		_autoplaylist.AppendMenuItem(MF_STRING, 213, "Podcasts");*/
 		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_autoplaylist.AppendMenuItem(MF_STRING, 250, "喜爱的音轨");
+		_autoplaylist.AppendMenuItem(MF_STRING, 250, "Favorites (mood)");
 		_autoplaylist.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_autoplaylist.AppendMenuItem(MF_STRING, 225, "音轨评级为 5");
-		_autoplaylist.AppendMenuItem(MF_STRING, 224, "音轨评级为 4");
-		_autoplaylist.AppendMenuItem(MF_STRING, 223, "音轨评级为 3");
-		_autoplaylist.AppendMenuItem(MF_STRING, 222, "音轨评级为 2");
-		_autoplaylist.AppendMenuItem(MF_STRING, 221, "音轨评级为 1");
-		_autoplaylist.AppendMenuItem(MF_STRING, 220, "音轨未评级");
+		_autoplaylist.AppendMenuItem(MF_STRING, 225, "Tracks rated 5");
+		_autoplaylist.AppendMenuItem(MF_STRING, 224, "Tracks rated 4");
+		_autoplaylist.AppendMenuItem(MF_STRING, 223, "Tracks rated 3");
+		_autoplaylist.AppendMenuItem(MF_STRING, 222, "Tracks rated 2");
+		_autoplaylist.AppendMenuItem(MF_STRING, 221, "Tracks rated 1");
+		_autoplaylist.AppendMenuItem(MF_STRING, 220, "Tracks unrated");
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 2, "载入播放列表");
-		_menu.AppendMenuItem(MF_STRING, 13, "保存所有播放列表");
+		_menu.AppendMenuItem(MF_STRING, 2, "Load playlist");
+		_menu.AppendMenuItem(MF_STRING, 13, "Save all playlists");
 		if (!add_mode) {
-			_menu.AppendMenuItem(MF_STRING, 4, "保存播放列表");
+			_menu.AppendMenuItem(MF_STRING, 4, "Save this playlist");
 			_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-			_restorepl.AppendTo(_menu, PLRecManager.Count >= 1 ? MF_STRING : MF_GRAYED | MF_DISABLED, "列表记录");
+			_restorepl.AppendTo(_menu, PLRecManager.Count >= 1 ? MF_STRING : MF_GRAYED | MF_DISABLED, "Playlist history");
 			if (PLRecManager.Count >= 1) {
 				for (var irm = 0; irm < PLRecManager.Count; irm++) {
 					_restorepl.AppendMenuItem(MF_STRING, 2001 + irm, PLRecManager.Name(irm));
 				}
 				_restorepl.AppendMenuItem(MF_SEPARATOR, 0, 0);
-				_restorepl.AppendMenuItem(MF_STRING, 2000, "清除列表记录");
+				_restorepl.AppendMenuItem(MF_STRING, 2000, "Clear history");
 			}
 
 			if (!fb.IsAutoPlaylist(id)) {
 				_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-				_menu.AppendMenuItem((fb.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 10, "清空列表");
-				_menu.AppendMenuItem((fb.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 11, "移除重复项");
-				_menu.AppendMenuItem((fb.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 12, "移除无效项");
+				_menu.AppendMenuItem((fb.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 10, "Clear");
+				_menu.AppendMenuItem((fb.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 11, "Remove duplicates");
+				_menu.AppendMenuItem((fb.PlaylistItemCount(id) >= 1) ? MF_STRING : MF_GRAYED | MF_DISABLED, 12, "Remove dead items");
 			}
 
 		};
@@ -1041,7 +1041,7 @@ oBrowser = function(name) {
 			var new_label = plman.GetPlaylistName(total);
 			plman.RemovePlaylist(total);
 			g_avoid_on_playlists_changed = false;
-			plman.CreateAutoPlaylist(total, new_label, "在这里输入你的查询", "", 0);
+			plman.CreateAutoPlaylist(total, new_label, "Enter your query here", "", 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			plman.ShowAutoPlaylistUI(pl_idx);
@@ -1069,10 +1069,10 @@ oBrowser = function(name) {
 			this.repaint();
 			break;
 		case (idx == 2):
-			fb.RunMainMenuCommand("文件/载入播放列表...");
+			fb.RunMainMenuCommand("File/Load playlist...");
 			break;
 		case (idx == 13):
-			fb.RunMainMenuCommand("文件/保存所有播放列表");
+			fb.RunMainMenuCommand("File/Save all playlists");
 			break;
 		case (idx == 3):
 			// set rename it
@@ -1099,10 +1099,10 @@ oBrowser = function(name) {
 			this.repaint();
 			break;
 		case (idx == 4):
-			fb.RunMainMenuCommand("文件/保存播放列表...");
+			fb.RunMainMenuCommand("File/Save playlist...");
 			break;
 		case (idx == 5):
-			plman.DuplicatePlaylist(pl_idx, plman.GetPlaylistName(pl_idx) + " (复件)");
+			plman.DuplicatePlaylist(pl_idx, plman.GetPlaylistName(pl_idx) + " (copy)");
 			plman.ActivePlaylist = pl_idx + 1;
 			break;
 		case (idx == 6):
@@ -1148,19 +1148,19 @@ oBrowser = function(name) {
 			plman.RenamePlaylist(id, plman.GetPlaylistAutoName(id));
 			break;
 		case (idx == 10):
-			fb.RunMainMenuCommand("编辑/清除");
+			fb.RunMainMenuCommand("Edit/Clear");
 			break;
 		case (idx == 11):
-			fb.RunMainMenuCommand("编辑/移除重复项");
+			fb.RunMainMenuCommand("Edit/Remove duplicates");
 			break;
 		case (idx == 12):
-			fb.RunMainMenuCommand("编辑/移除无效项");
+			fb.RunMainMenuCommand("Edit/Remove dead items");
 			break;
 		case (idx == 200):
 			if (ppt.lockReservedPlaylist) checkMediaLibrayPlaylist();
 			else {
 				var total = plman.PlaylistCount;
-				plman.CreateAutoPlaylist(total, "媒体库", "ALL", default_sort, 0);
+				plman.CreateAutoPlaylist(total, "Library", "ALL", default_sort, 0);
 				plman.MovePlaylist(total, pl_idx);
 				plman.ActivePlaylist = pl_idx;
 				window.NotifyOthers("reload_cover_folder", 1);
@@ -1169,28 +1169,28 @@ oBrowser = function(name) {
 		case (idx == 204):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			plman.CreateAutoPlaylist(total, "未播放过的音轨", "%play_count% IS 0", default_sort, 1);
+			plman.CreateAutoPlaylist(total, "Never played", "%play_count% IS 0", default_sort, 1);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 205):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			plman.CreateAutoPlaylist(total, "历史记录", "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", "", 1);
+			plman.CreateAutoPlaylist(total, "History", "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", "", 1);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 206):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			plman.CreateAutoPlaylist(total, "最常播放", "%play_count% GREATER 0 SORT DESCENDING BY %play_count%", "", 1);
+			plman.CreateAutoPlaylist(total, "Played often", "%play_count% GREATER 0 SORT DESCENDING BY %play_count%", "", 1);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 210):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			plman.CreateAutoPlaylist(total, "最近添加", "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", "", 1);
+			plman.CreateAutoPlaylist(total, "Recently added", "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", "", 1);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
@@ -1205,49 +1205,49 @@ oBrowser = function(name) {
 		case (idx == 220):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			fb.CreateAutoPlaylist(total, "音轨未评级", "%rating% MISSING", default_sort, 0);
+			fb.CreateAutoPlaylist(total, "Unrated", "%rating% MISSING", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 221):
 			var total = plman.PlaylistCount;
 			//brw.inputboxID = -1;
-			fb.CreateAutoPlaylist(total, "音轨评级为 1", "%rating% IS 1", default_sort, 0);
+			fb.CreateAutoPlaylist(total, "Rated 1", "%rating% IS 1", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 222):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			fb.CreateAutoPlaylist(total, "音轨评级为 2", "%rating% IS 2", default_sort, 0);
+			fb.CreateAutoPlaylist(total, "Rated 2", "%rating% IS 2", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 223):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			fb.CreateAutoPlaylist(total, "音轨评级为 3", "%rating% IS 3", default_sort, 0);
+			fb.CreateAutoPlaylist(total, "Rated 3", "%rating% IS 3", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 224):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			fb.CreateAutoPlaylist(total, "音轨评级为 4", "%rating% IS 4", default_sort, 0);
+			fb.CreateAutoPlaylist(total, "Rated 4", "%rating% IS 4", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 225):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			fb.CreateAutoPlaylist(total, "音轨评级为 5", "%rating% IS 5", default_sort, 0);
+			fb.CreateAutoPlaylist(total, "Rated 5", "%rating% IS 5", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 250):
 			var total = plman.PlaylistCount;
 			//p.playlistManager.inputboxID = -1;
-			plman.CreateAutoPlaylist(total, "喜爱的音轨", "%mood% GREATER 0", default_sort, 0);
+			plman.CreateAutoPlaylist(total, "Favorites", "%mood% GREATER 0", default_sort, 0);
 			plman.MovePlaylist(total, pl_idx);
 			plman.ActivePlaylist = pl_idx;
 			break;
@@ -1275,14 +1275,14 @@ oBrowser = function(name) {
 		var _menu1 = window.CreatePopupMenu();
 		var idx;
 
-		_menu.AppendMenuItem(MF_STRING, 910, "过滤器");
+		_menu.AppendMenuItem(MF_STRING, 910, "Filter");
 		_menu.CheckMenuItem(910, ppt.showHeaderBar);
 
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 992, "显示网格线");
+		_menu.AppendMenuItem(MF_STRING, 992, "Show grids");
 		_menu.CheckMenuItem(992, ppt.showGrid);
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 991, "面板属性");
+		_menu.AppendMenuItem(MF_STRING, 991, "Panel properties");
 
 		idx = _menu.TrackPopupMenu(x, y);
 
@@ -1669,43 +1669,43 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 	if (ui_mode < 3) {
 		if (playing_playlist) {
 			if (auto_playlist){
-				if (name == "媒体库") return images.library_icon_hl;
-				if (name == "最近添加") return images.newly_added_icon_hl;
-				if (name == "历史记录") return images.history_icon_hl;
-				if (name == "最常播放") return images.most_played_icon_hl;
-				if (name == "喜爱的音轨") return images.mood_icon_hl;
+				if (name == "Library") return images.library_icon_hl;
+				if (name == "Recently added") return images.newly_added_icon_hl;
+				if (name == "History") return images.history_icon_hl;
+				if (name == "Played often") return images.most_played_icon_hl;
+				if (name == "Favorites") return images.mood_icon_hl;
 				else return images.icon_auto_pl_hl;
 			}else{
-				if (name.substr(0, 2) == "电台") return images.radios_icon_hl;
-				if (name.substr(0, 2) == "榜单") return images.board_icon_hl;
+				if (name.substr(0, 5) == "Radio") return images.radios_icon_hl;
+				if (name.substr(0, 5) == "Board") return images.board_icon_hl;
 				else return images.icon_normal_pl_playing_hl;
 			}
 		} else {
 			if (auto_playlist){
-				if (name == "媒体库") return images.library_icon;
-				if (name == "最近添加") return images.newly_added_icon;
-				if (name == "历史记录") return images.history_icon;
-				if (name == "最常播放") return images.most_played_icon;
-				if (name == "喜爱的音轨") return images.mood_icon;
+				if (name == "Library") return images.library_icon;
+				if (name == "Recently added") return images.newly_added_icon;
+				if (name == "History") return images.history_icon;
+				if (name == "Played often") return images.most_played_icon;
+				if (name == "Favorites") return images.mood_icon;
 				else return images.icon_auto_pl;
 			}else{
-				if (name.substr(0, 2) == "电台") return images.radios_icon;
-				if (name.substr(0, 2) == "榜单") return images.board_icon;
+				if (name.substr(0, 5) == "Radio") return images.radios_icon;
+				if (name.substr(0, 5) == "Board") return images.board_icon;
 				else return images.icon_normal_pl;
 			}
 		}
 	} else {
 		if (auto_playlist){
-		if (name == "媒体库") return images.library_icon;
-		if (name == "最近添加") return images.newly_added_icon;
-		if (name == "历史记录") return images.history_icon;
+		if (name == "Library") return images.library_icon;
+		if (name == "Recently added") return images.newly_added_icon;
+		if (name == "History") return images.history_icon;
 		
-		if (name == "最常播放") return images.most_played_icon;
-		if (name == "喜爱的音轨") return images.mood_icon;
+		if (name == "Played often") return images.most_played_icon;
+		if (name == "Favorites") return images.mood_icon;
 		else return images.icon_auto_pl;
 		} else{
-			if (name.substr(0, 2) == "电台") return images.radios_icon;
-			if (name.substr(0, 2) == "榜单") return images.board_icon;
+			if (name.substr(0, 5) == "Radio") return images.radios_icon;
+			if (name.substr(0, 5) == "Board") return images.board_icon;
 			if (playing_playlist) return images.icon_normal_pl_playing;
 			else return images.icon_normal_pl;
 		}
@@ -2202,22 +2202,22 @@ function on_key_down(vkey) {
 
 					};
 					if (vkey == 70) { // CTRL+F
-						fb.RunMainMenuCommand("编辑/搜索");
+						fb.RunMainMenuCommand("Edit/Search");
 					};
 					if (vkey == 73) { // CTRL+I
 
 					};
 					if (vkey == 78) { // CTRL+N
-						fb.RunMainMenuCommand("文件/新建播放列表");
+						fb.RunMainMenuCommand("File/New playlist");
 					};
 					if (vkey == 79) { // CTRL+O
-						fb.RunMainMenuCommand("文件/打开...");
+						fb.RunMainMenuCommand("File/Open...");
 					};
 					if (vkey == 80) { // CTRL+P
-						fb.RunMainMenuCommand("文件/参数选项");
+						fb.RunMainMenuCommand("File/Preferences");
 					};
 					if (vkey == 83) { // CTRL+S
-						fb.RunMainMenuCommand("文件/保存播放列表...");
+						fb.RunMainMenuCommand("File/Save playlist...");
 					};
 					if (vkey == 84) { // CTRL+T
 						ppt.showHeaderBar = !ppt.showHeaderBar;
@@ -2230,7 +2230,7 @@ function on_key_down(vkey) {
 					switch (vkey) {
 					case 65:
 						// ALT+A
-						fb.RunMainMenuCommand("视图/总在最上面");
+						fb.RunMainMenuCommand("View/Always on Top");
 						break;
 					case VK_ALT:
 						// ALT key alone
@@ -2378,7 +2378,7 @@ function checkMediaLibrayPlaylist() {
 	var isMediaLibraryFound = false;
 	var total = plman.PlaylistCount;
 	for (var i = 0; i < total; i++) {
-		if (plman.GetPlaylistName(i) == "媒体库") {
+		if (plman.GetPlaylistName(i) == "Library") {
 			var mediaLibraryIndex = i;
 			isMediaLibraryFound = true;
 			break;
@@ -2389,7 +2389,7 @@ function checkMediaLibrayPlaylist() {
 		// > sort: sort string expression.
 		// > flags: 1 - always sort.
 		// > boolean CreateAutoPlaylist(idx, name, query, sort = "", flags = 0);
-		plman.CreateAutoPlaylist(total, "媒体库", "%path% PRESENT", default_sort, 0);
+		plman.CreateAutoPlaylist(total, "Library", "%path% PRESENT", default_sort, 0);
 		// Move it to the top
 		plman.MovePlaylist(total, 0);
 	};
@@ -2567,7 +2567,7 @@ function on_drag_drop(action, x, y, mask) {
 		else {
 			drop_done = true;
 			var total_pl = plman.PlaylistCount;
-			plman.CreatePlaylist(total_pl, "新建播放列表 (" + total_pl + ")");
+			plman.CreatePlaylist(total_pl, "New playlist (" + total_pl + ")");
 			action.ToPlaylist();
 			action.Playlist = total_pl;
 			action.ToSelect = true;

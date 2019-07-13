@@ -343,7 +343,7 @@ function on_mouse_rbtn_up(x, y) {
 	}
 	if (TextBtn_spec.isXYInButton(x, y) && foo_spec) {
 		var specMenu = window.CreatePopupMenu();
-		specMenu.AppendMenuItem(MF_STRING, 11, "Show grid");
+		specMenu.AppendMenuItem(MF_STRING, 11, "Show grids");
 		specMenu.CheckMenuItem(11, spec_show_grid ? 1 : 0);
 		specMenu.AppendMenuItem(MF_STRING, 12, "Fill background Color");
 		specMenu.CheckMenuItem(12, spec_show_bg ? 1 : 0);

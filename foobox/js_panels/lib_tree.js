@@ -72,7 +72,7 @@ function userinterface() {
 	this.node_sz = 11;
 	this.trace = function(message) {
 		var trace = true;
-		if (trace) fb.trace("媒体库目录树: " + message);
+		if (trace) fb.trace("Library Tree: " + message);
 	} // true enables fb.trace
 	if (custom_col) {
 		if (cust_icon_font.length) {
@@ -84,7 +84,7 @@ function userinterface() {
 				icon_f_name = cust_icon_font[0];
 				icon_f_style = st;
 			} catch (e) {
-				this.trace("无法使用您的节点图标字体。将使用 Segoe UI 代替");
+				this.trace("Unable to use your node icon font. Using Segoe UI instead.");
 			}
 		}
 	}
@@ -506,7 +506,7 @@ function scrollbar() {
 var sbar = new scrollbar();
 
 function panel_operations() {
-	var def_ppt = window.GetProperty(" View by Folder Structure: Name // Pattern", "按文件夹结构 // 无需配置模版");
+	var def_ppt = window.GetProperty(" View by Folder Structure: Name // Pattern", "View by folder structure // Pattern not configurable");
 	var DT_LEFT = 0x00000000,
 		DT_CENTER = 0x00000001,
 		DT_RIGHT = 0x00000002,
@@ -519,16 +519,16 @@ function panel_operations() {
 		i = 0,
 		sort = "";
 	var view_ppt = [
-		window.GetProperty(" View 01: Name // Pattern", "按艺术家 // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 02: Name // Pattern", "按专辑艺术家 // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 03: Name // Pattern", "按艺术家(简单) // %artist%|%title%"), 
-		window.GetProperty(" View 04: Name // Pattern", "按专辑艺术家 - 专辑 // [%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 05: Name // Pattern", "按专辑[专辑艺术家] // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 06: Name // Pattern", "按专辑 // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 07: Name // Pattern", "按流派 // %<genre>%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 08: Name // Pattern", "按年份 // $year($replace(%date%,/,-,.,-))|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 09: Name // Pattern", "按日期 // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 10: Name // Pattern", "按目录名称 // %directory%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")];
+		window.GetProperty(" View 01: Name // Pattern", "View by artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 02: Name // Pattern", "View by album artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 03: Name // Pattern", "View by artist (simple) // %artist%|%title%"), 
+		window.GetProperty(" View 04: Name // Pattern", "View by album artist - album // [%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 05: Name // Pattern", "View by album [album artist] // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 06: Name // Pattern", "View by album // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 07: Name // Pattern", "View by Genre // %<genre>%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 08: Name // Pattern", "View by year // $year($replace(%date%,/,-,.,-))|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 09: Name // Pattern", "View by date // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+		window.GetProperty(" View 10: Name // Pattern", "View by directory // %directory%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")];
 	var nm = "",
 		ppt_l = view_ppt.length + 1;
 	for (i = ppt_l; i < ppt_l + 93; i++) {
@@ -538,19 +538,19 @@ function panel_operations() {
 	if (!window.GetProperty("SYSTEM.View Update", false)) {
 		i = view_ppt.length + 1;
 		window.SetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", null);
-		view_ppt.push(window.GetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", "按文件路径 // $directory_path(%path%)|%filename_ext%"));
+		view_ppt.push(window.GetProperty(" View " + (i < 10 ? "0" + i : i) + ": Name // Pattern", "View by path // $directory_path(%path%)|%filename_ext%"));
 		window.SetProperty("SYSTEM.View Update", true);
 	}
 	var filter_ppt = [
-	window.GetProperty(" View Filter 01: Name // Query", "过滤 // Query Not Configurable"),
-		window.GetProperty(" View Filter 02: Name // Query", "无损 // \"$info(encoding)\" IS lossless"),
-		window.GetProperty(" View Filter 03: Name // Query", "有损 // \"$info(encoding)\" IS lossy"),
-		window.GetProperty(" View Filter 04: Name // Query", "无增益 // %replaygain_track_gain% MISSING"),
-		window.GetProperty(" View Filter 05: Name // Query", "从未播放 // %play_count% MISSING"),
-		window.GetProperty(" View Filter 06: Name // Query", "经常播放 // %play_count% GREATER 9"),
-		window.GetProperty(" View Filter 07: Name // Query", "最近添加 // %added% DURING LAST 2 WEEKS"),
-		window.GetProperty(" View Filter 08: Name // Query", "最近播放 // %last_played% DURING LAST 2 WEEKS"),
-		window.GetProperty(" View Filter 09: Name // Query", "最高评级 // %rating% IS 5")];
+	window.GetProperty(" View Filter 01: Name // Query", "Filter // Query not configurable"),
+		window.GetProperty(" View Filter 02: Name // Query", "Lossless // \"$info(encoding)\" IS lossless"),
+		window.GetProperty(" View Filter 03: Name // Query", "Lossy // \"$info(encoding)\" IS lossy"),
+		window.GetProperty(" View Filter 04: Name // Query", "Missing replaygain // %replaygain_track_gain% MISSING"),
+		window.GetProperty(" View Filter 05: Name // Query", "Never played // %play_count% MISSING"),
+		window.GetProperty(" View Filter 06: Name // Query", "Played often // %play_count% GREATER 9"),
+		window.GetProperty(" View Filter 07: Name // Query", "Recently added // %added% DURING LAST 2 WEEKS"),
+		window.GetProperty(" View Filter 08: Name // Query", "Recently played // %last_played% DURING LAST 2 WEEKS"),
+		window.GetProperty(" View Filter 09: Name // Query", "Top rated // %rating% IS 5")];
 	var filt_l = filter_ppt.length + 1;
 	for (i = filt_l; i < filt_l + 90; i++) {
 		nm = window.GetProperty(" View Filter " + (i < 10 ? "0" + i : i) + ": Name // Query");
@@ -718,7 +718,7 @@ function panel_operations() {
 		this.set_statistics_mode();
 		window.SetProperty("SYSTEM.Filter By", filter);
 		window.SetProperty("SYSTEM.View By", view);
-		this.baseName = this.base == 2 ? this.grp[view].name : "所有音乐";
+		this.baseName = this.base == 2 ? this.grp[view].name : "All music";
 		this.f_menu = [];
 		this.menu = [];
 		for (i = 0; i < this.grp.length; i++) this.menu.push(this.grp[i].name);
@@ -908,7 +908,7 @@ function library_manager() {
 			pop.tree = [];
 			pop.line_l = 0;
 			sbar.set_rows(0);
-			this.empty = "没有可以显示的项目\n\n请先配置好媒体库\n\n文件>参数选项>媒体库";
+			this.empty = "Nothing to show\n\nConfigure Media Library first\n\nFile>Preferences>Media library";
 			p.tree_paint();
 			return;
 		}
@@ -919,7 +919,7 @@ function library_manager() {
 			pop.tree = [];
 			pop.line_l = 0;
 			sbar.set_rows(0);
-			this.none = "没有与搜索条件匹配的项";
+			this.none = "Nothing found";
 			p.tree_paint();
 			return;
 		}
@@ -1007,7 +1007,7 @@ function library_manager() {
 				pop.tree = [];
 				pop.line_l = 0;
 				sbar.set_rows(0);
-				this.none = "没有与搜索条件匹配的项";
+				this.none = "Nothing found";
 				p.tree_paint();
 				return;
 			}
@@ -1155,7 +1155,7 @@ function populate() {
 		mbtn_pl = btn_pl[5] == 1 ? true : false;
 	var custom_sort = window.GetProperty(" Playlist: Custom Sort", "");
 	this.dbl_action = window.GetProperty(" Text Double-Click: ExplorerStyle-0 Play-1 Send-2", 1);
-	var lib_playlist = "媒体库视图"; //window.GetProperty(" Playlist", "媒体库视图");
+	var lib_playlist = "Library View"; //window.GetProperty(" Playlist", "媒体库视图");
 	var sgl_fill = window.GetProperty(" Text Single-Click: AutoFill Playlist", true);
 	this.line_l = 0;
 	this.sel_items = [];
@@ -1710,7 +1710,7 @@ function populate() {
 			if (np_item != -1 && pl_chk && pid == -1 && items.Count < 5000) {
 				if (ui.dui) plman.SetActivePlaylistContext();
 				for (i = 0; i < 20; i++) {
-					fb.RunMainMenuCommand("编辑/撤消");
+					fb.RunMainMenuCommand("Edit/Undo");
 					var np = plman.GetPlayingItemLocation();
 					if (np.IsValid) {
 						pid = np.PlaylistItemIndex;
@@ -2591,7 +2591,7 @@ function searchLibrary() {
 				drawsel(gr);
 				get_offset(gr);
 				gr.GdiDrawText(p.s_txt.substr(offset), ui.font, ui.searchcol, p.s_x, 1, p.s_w2, p.s_sp, p.l);
-			} else gr.GdiDrawText("搜索", ui.s_font, ui.txt_box, p.s_x, 1, p.s_w2, p.s_sp, p.l);
+			} else gr.GdiDrawText("Search", ui.s_font, ui.txt_box, p.s_x, 1, p.s_w2, p.s_sp, p.l);
 			drawcursor(gr);
 			if (p.s_show > 1) {
 				var l_x = p.f_x1 - 9,
@@ -2730,7 +2730,7 @@ function button_manager() {
 	this.btns = [];
 	this.b = null;
 	var browser = function(c) {
-		if (!but.run(c)) fb.ShowPopupMessage("无法启动默认浏览器。", "媒体库目录树");
+		if (!but.run(c)) fb.ShowPopupMessage("Unable to launch your default browser.", "Library Tree");
 	}
 	var tooltip = function(n) {
 			if (but_tt.text == n) return;
@@ -2944,7 +2944,7 @@ function button_manager() {
 				hover: s_img[1]
 			}, false, function() {
 				browser("\"" + fb.FoobarPath + "Query Syntax Help.html");
-			}, "", "打开查询语法帮助");
+			}, "", "Open Query Syntax Help");
 			this.btns.cross1 = new btn(bx, by, bh, bh, 4, "", "", "", {
 				normal: "150",
 				hover: "220"
@@ -2989,8 +2989,8 @@ function menu_object() {
 	this.r_up = false;
 	this.ConfigTypeMenu = function(Menu, StartIndex) {
 		var Index = StartIndex,
-			n = ["面板属性"];
-		if (p.syncType) n.push("刷新");
+			n = ["Panel properties"];
+		if (p.syncType) n.push("Refresh");
 		for (var i = 0; i < n.length; i++) {
 			this.NewMenuItem(Index, "Config", i + 1);
 			Menu.AppendMenuItem(MF_STRING, Index, n[i]);
@@ -3011,7 +3011,7 @@ function menu_object() {
 	}
 	this.PlaylistTypeMenu = function(Menu, StartIndex) {
 		var Index = StartIndex,
-			n = ["发送到当前列表", "插入到当前列表", "添加到当前列表", "折叠全部", "展开"];
+			n = ["Send to current playlist", "Insert in current playlist", "Add to current playlist", "Collapse all", "Expand"];
 		for (i = 0; i < 5; i++) {
 			this.NewMenuItem(Index, "Playlist", i + 1);
 			Menu.AppendMenuItem(i != 4 || xp ? MF_STRING : MF_GRAYED, Index, n[i]);
@@ -3024,7 +3024,7 @@ function menu_object() {
 		var Index = StartIndex;
 		for (i = 0; i < p.f_menu.length + 1; i++) {
 			this.NewMenuItem(Index, "Filter", i + 1);
-			Menu.AppendMenuItem(MF_STRING, Index, i != p.f_menu.length ? (!i ? "不" : "") + p.f_menu[i] : "总是重置滚动");
+			Menu.AppendMenuItem(MF_STRING, Index, i != p.f_menu.length ? (!i ? "No " : "") + p.f_menu[i] : "Always reset scroll");
 			if (i == p.f_menu.length) Menu.CheckMenuItem(Index++, p.reset);
 			else Index++;
 			if (i == p.f_menu.length - 1) Menu.AppendMenuItem(MF_SEPARATOR, 0, 0);
@@ -3064,7 +3064,7 @@ function menu_object() {
 
 	this.search = function(Menu, StartIndex, s, f, paste) {
 		var Index = StartIndex,
-			n = ["复制", "剪切", "粘贴"];
+			n = ["Copy", "Cut", "Paste"];
 		for (i = 0; i < 3; i++) {
 			this.NewMenuItem(Index, "Search", i + 1);
 			Menu.AppendMenuItem(s == f && i < 2 || i == 2 && !paste ? MF_GRAYED : MF_STRING, Index, n[i]);
@@ -3138,33 +3138,33 @@ function menu_object() {
 			menu.AppendMenuSeparator();
 			show_context = true;
 		}
-		SettingMenu.AppendTo(menu, MF_STRING, "常用设定"); {
-			SettingMenu.AppendMenuItem(MF_STRING, 5801, "自动折叠");
+		SettingMenu.AppendTo(menu, MF_STRING, "Common settings"); {
+			SettingMenu.AppendMenuItem(MF_STRING, 5801, "Auto collapse");
 			SettingMenu.CheckMenuItem(5801, pop.auto ? 1 : 0);
-			SettingMenu.AppendMenuItem(MF_STRING, 5802, "显示根节点");
+			SettingMenu.AppendMenuItem(MF_STRING, 5802, "Show nodes");
 			SettingMenu.CheckMenuItem(5802, p.base ? 1 : 0);
-			SettingMenu.AppendMenuItem(MF_STRING, 5803, "显示节点音轨");
+			SettingMenu.AppendMenuItem(MF_STRING, 5803, "Show tracks");
 			SettingMenu.CheckMenuItem(5803, p.show_tracks ? 1 : 0);
-			SettingMenu.AppendMenuItem(MF_STRING, 5804, "发送后自动播放");
+			SettingMenu.AppendMenuItem(MF_STRING, 5804, "Play on send from menu");
 			SettingMenu.CheckMenuItem(5804, pop.autoplay ? 1 : 0);
 			SettingMenu.AppendMenuSeparator();
-			CountMenu.AppendTo(SettingMenu, MF_STRING, "数目显示设置");{
-				CountMenu.AppendMenuItem(MF_STRING, 5805, "不显示数目");
-				CountMenu.AppendMenuItem(MF_STRING, 5806, "显示音轨数");
-				CountMenu.AppendMenuItem(MF_STRING, 5807, "显示子项目数");
+			CountMenu.AppendTo(SettingMenu, MF_STRING, "Item counts");{
+				CountMenu.AppendMenuItem(MF_STRING, 5805, "Hide");
+				CountMenu.AppendMenuItem(MF_STRING, 5806, "Show track counts");
+				CountMenu.AppendMenuItem(MF_STRING, 5807, "Show sub-item counts");
 				CountMenu.CheckMenuRadioItem(5805, 5807, p.show_counts + 5805);
 			}
 			SettingMenu.AppendMenuSeparator();
-			DClickMenu.AppendTo(SettingMenu, MF_STRING, "双击操作设置");{
-				DClickMenu.AppendMenuItem(MF_STRING, 5808, "双击展开/折叠");
-				DClickMenu.AppendMenuItem(MF_STRING, 5809, "双击播放");
-				DClickMenu.AppendMenuItem(MF_STRING, 5810, "双击发送到播放列表");
+			DClickMenu.AppendTo(SettingMenu, MF_STRING, "Double click action");{
+				DClickMenu.AppendMenuItem(MF_STRING, 5808, "Expand / Collapse");
+				DClickMenu.AppendMenuItem(MF_STRING, 5809, "Play");
+				DClickMenu.AppendMenuItem(MF_STRING, 5810, "Send to current playlist");
 				DClickMenu.CheckMenuRadioItem(5808, 5810, pop.dbl_action + 5808);
 			}
 		}
 		if (show_context) {
 			Index = this.OptionsTypeMenu(OptionsMenu, Index);
-			OptionsMenu.AppendTo(menu, MF_STRING, "选项");
+			OptionsMenu.AppendTo(menu, MF_STRING, "Options");
 			Index = this.ConfigTypeMenu(OptionsMenu, Index);
 			menu.AppendMenuSeparator();
 			var items = fb.CreateHandleList();
@@ -3174,13 +3174,13 @@ function menu_object() {
 			Context.InitContext(items);
 			Context.BuildMenu(menu, 5000, -1);
 		} else {
-			menu.AppendMenuItem(MF_STRING, 5820, "折叠全部");
+			menu.AppendMenuItem(MF_STRING, 5820, "Collapse all");
 			menu.AppendMenuSeparator();
 			Index = this.OptionsTypeMenu(menu, Index);
 			Index = this.ConfigTypeMenu(menu, Index);
 		}
 		menu.AppendMenuSeparator();
-		menu.AppendMenuItem(MF_STRING, 5900, "切换到简单播放列表");
+		menu.AppendMenuItem(MF_STRING, 5900, "Switch to Playlist View");
 		idx = menu.TrackPopupMenu(x, y);
 		if (idx >= 1 && idx <= Index) {
 			i = MenuMap[idx].value;

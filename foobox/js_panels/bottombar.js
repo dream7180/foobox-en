@@ -12,7 +12,7 @@ var fontcolor = RGB(235, 235, 235);
 //play back order
 var MF_STRING = 0x00000000;
 var MF_DISABLED = 0x00000002;
-var PBOTips = new Array("默认", "重复(列表)", "重复(音轨)", "随机", "乱序(音轨)", "乱序(专辑)", "乱序(目录)");
+var PBOTips = new Array("Default", "Repeat (playlist)", "Repeat (track)", "Random", "Shuffle (tracks)", "Shuffle (albums)", "Shuffle (folders)");
 var hbtn = false;
 var ww = 0,
 	wh = 0;

@@ -42,13 +42,13 @@ searchbox = function() {
 	this.getTooltip = function(){
 		switch (ppt.source){
 			case 1:
-				return "列表";
+				return "Playlist";
 				break;
 			case 2:
-				return "媒体库";
+				return "Media library";
 				break;
 			case 3:
-				return "网络";
+				return "Internet";
 				break;
 		}
 	}
@@ -386,7 +386,7 @@ function g_sendResponse() {
 		var isFound = false;
 		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i).substr(0, 4) == "搜索 [") {
+			if (plman.GetPlaylistName(i).substr(0, 4) == "Search [") {
 				if (!ppt.multiple) {
 					if (!isFound) {
 						var plIndex = i;
@@ -418,13 +418,13 @@ function g_sendResponse() {
 			6: "%comment% HAS "
 		};
 		if (scopecases[ppt.scope]) {
-			fb.CreateAutoPlaylist(plIndex, "搜索 [" + s1 + "]", scopecases[ppt.scope] + s1, "", 0);
+			fb.CreateAutoPlaylist(plIndex, "Search [" + s1 + "]", scopecases[ppt.scope] + s1, "", 0);
 		} else {
-			fb.CreateAutoPlaylist(plIndex, "搜索 [" + s1 + "]", s1, "", 0);
+			fb.CreateAutoPlaylist(plIndex, "Search [" + s1 + "]", s1, "", 0);
 		};
 
 		// 转换自动列表为普通列表
-		plman.DuplicatePlaylist(plIndex, "搜索 [" + s1 + "]");
+		plman.DuplicatePlaylist(plIndex, "Search [" + s1 + "]");
 		plman.RemovePlaylist(plIndex);
 		plman.ActivePlaylist = plIndex;
 	}
@@ -444,65 +444,65 @@ function Show_Menu_Searchbox(x, y) {
 	if (typeof x == "undefined") x = ww;
 	if (typeof y == "undefined") y = 30;
 	var SearchModeMenu = window.CreatePopupMenu();
-	SearchModeMenu.AppendMenuItem(MF_STRING, 21, "列表");
-	SearchModeMenu.AppendMenuItem(MF_STRING, 22, "媒体库");
-	SearchModeMenu.AppendMenuItem(MF_STRING, 23, "网络");
+	SearchModeMenu.AppendMenuItem(MF_STRING, 21, "Playlist");
+	SearchModeMenu.AppendMenuItem(MF_STRING, 22, "Media library");
+	SearchModeMenu.AppendMenuItem(MF_STRING, 23, "Internet");
 	SearchModeMenu.CheckMenuRadioItem(21, 23, ppt.source + 20);
-	SearchModeMenu.AppendTo(_menu, MF_STRING, "搜索模式");
+	SearchModeMenu.AppendTo(_menu, MF_STRING, "Search mode");
 	var SearchHistoryMenu = window.CreatePopupMenu();
 
 	for (var i = g_searchbox.historylist.length - 1; i >= 0; i--) {
 		SearchHistoryMenu.AppendMenuItem(MF_STRING, i + 51, g_searchbox.historylist[i][0].replace("&", "&&"));
 	}
 	if (g_searchbox.historylist.length == 0) {
-		SearchHistoryMenu.AppendMenuItem(MF_GRAYED, 40, "无记录");
+		SearchHistoryMenu.AppendMenuItem(MF_GRAYED, 40, "No history");
 	} else {
 		SearchHistoryMenu.AppendMenuSeparator();
-		SearchHistoryMenu.AppendMenuItem(MF_STRING, ppt.historymaxitems + 60, "清除记录");
+		SearchHistoryMenu.AppendMenuItem(MF_STRING, ppt.historymaxitems + 60, "Clear history");
 	}
 
-	SearchHistoryMenu.AppendTo(_menu, MF_STRING, "搜索记录");
+	SearchHistoryMenu.AppendTo(_menu, MF_STRING, "Search history");
 
 	_menu.AppendMenuSeparator();
 
 	if (ppt.source == 1) {
-		_menu.AppendMenuItem(MF_STRING, 1, "启用自动搜索");
+		_menu.AppendMenuItem(MF_STRING, 1, "Auto-validation");
 		_menu.CheckMenuItem(1, ppt.autosearch ? 1 : 0);
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 2, "搜索:智能");
-		_menu.AppendMenuItem(MF_STRING, 3, "搜索:艺术家");
-		_menu.AppendMenuItem(MF_STRING, 4, "搜索:专辑");
-		_menu.AppendMenuItem(MF_STRING, 5, "搜索:标题");
-		_menu.AppendMenuItem(MF_STRING, 6, "搜索:流派");
-		_menu.AppendMenuItem(MF_STRING, 7, "搜索:日期");
+		_menu.AppendMenuItem(MF_STRING, 2, "Search: Auto");
+		_menu.AppendMenuItem(MF_STRING, 3, "Search: Artist");
+		_menu.AppendMenuItem(MF_STRING, 4, "Search: Album");
+		_menu.AppendMenuItem(MF_STRING, 5, "Search: Title");
+		_menu.AppendMenuItem(MF_STRING, 6, "Search: Genre");
+		_menu.AppendMenuItem(MF_STRING, 7, "Search: Date");
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 8, "搜索:注释");
+		_menu.AppendMenuItem(MF_STRING, 8, "Search: Comment");
 		_menu.CheckMenuRadioItem(2, 8, ppt.scope + 2);
 	} else if (ppt.source == 3) {
-		_menu.AppendMenuItem(MF_STRING, 9, "保留之前的搜索列表");
+		_menu.AppendMenuItem(MF_STRING, 9, "Keep previous search playlist");
 		_menu.CheckMenuItem(9, ppt.multiple ? 1 : 0);
 	} else if (ppt.source == 2) {
 		var now_playing_track = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
 		var quickSearchMenu = window.CreatePopupMenu();
-		quickSearchMenu.AppendMenuItem(MF_STRING, 36, "相同艺术家");
-		quickSearchMenu.AppendMenuItem(MF_STRING, 37, "相同专辑");
-		quickSearchMenu.AppendMenuItem(MF_STRING, 38, "相同流派");
-		quickSearchMenu.AppendMenuItem(MF_STRING, 39, "相同日期");
-		quickSearchMenu.AppendTo(_menu, MF_STRING, "快速搜索...");
+		quickSearchMenu.AppendMenuItem(MF_STRING, 36, "Same artist");
+		quickSearchMenu.AppendMenuItem(MF_STRING, 37, "Same album");
+		quickSearchMenu.AppendMenuItem(MF_STRING, 38, "Same genre");
+		quickSearchMenu.AppendMenuItem(MF_STRING, 39, "Same date");
+		quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search...");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 1, "启用自动搜索");
+		_menu.AppendMenuItem(MF_STRING, 1, "Auto-validation");
 		_menu.CheckMenuItem(1, ppt.autosearch ? 1 : 0);
-		_menu.AppendMenuItem(MF_STRING, 9, "保留之前的搜索列表");
+		_menu.AppendMenuItem(MF_STRING, 9, "Keep previous search playlist");
 		_menu.CheckMenuItem(9, ppt.multiple ? 1 : 0);
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 2, "搜索:智能");
-		_menu.AppendMenuItem(MF_STRING, 3, "搜索:艺术家");
-		_menu.AppendMenuItem(MF_STRING, 4, "搜索:专辑");
-		_menu.AppendMenuItem(MF_STRING, 5, "搜索:标题");
-		_menu.AppendMenuItem(MF_STRING, 6, "搜索:流派");
-		_menu.AppendMenuItem(MF_STRING, 7, "搜索:日期");
+		_menu.AppendMenuItem(MF_STRING, 2, "Search: Auto");
+		_menu.AppendMenuItem(MF_STRING, 3, "Search: Artist");
+		_menu.AppendMenuItem(MF_STRING, 4, "Search: Album");
+		_menu.AppendMenuItem(MF_STRING, 5, "Search: Title");
+		_menu.AppendMenuItem(MF_STRING, 6, "Search: Genre");
+		_menu.AppendMenuItem(MF_STRING, 7, "Search: Date");
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
-		_menu.AppendMenuItem(MF_STRING, 8, "搜索:注释");
+		_menu.AppendMenuItem(MF_STRING, 8, "Search: Comment");
 		_menu.CheckMenuRadioItem(2, 8, ppt.scope + 2);
 	}
 
@@ -562,13 +562,13 @@ function Show_Menu_Searchbox(x, y) {
 function quickSearch(metadb, search_function) {
 	var playlist_index = -1;
 	for (i = 0; i < plman.PlaylistCount; i++) {
-		if (plman.GetPlaylistName(i) == "搜索结果") {
+		if (plman.GetPlaylistName(i) == "Search result") {
 			playlist_index = i;
 			break;
 		}
 	}
 	if (playlist_index < 0) {
-		plman.CreatePlaylist(plman.PlaylistCount, "搜索结果");
+		plman.CreatePlaylist(plman.PlaylistCount, "Search result");
 		playlist_index = plman.PlaylistCount - 1
 	}
 	plman.ActivePlaylist = playlist_index;
@@ -614,7 +614,7 @@ function clean_name(n) {
 function NetSearch(searchtext, pageid, switchpage) {
 	SearchListName = clean_name(searchtext);
 	g_searchbox.inputbox.edit = false;
-	SetBoxText("正在搜索网络...");
+	SetBoxText("Net searching...");
 	cachefile = fb.ProfilePath + "\\cache\\KWSearch.asx";
 	try {fso.DeleteFile(cachefile);}catch(e) {};
 	KWSearch(searchtext, pageid, switchpage);
@@ -633,7 +633,7 @@ function KWSearch(searchtext, pageid, switchpage){
 					var songid = [];
 					var filedata = '<asx version="3.0">\r\n\r\n';
 					var ret = json(xmlHttp.responseText.replace(/'/g, '"'))["list"];
-					if(!ret){UpdateDone("已经是最后一页");return;}
+					if(!ret){UpdateDone("Last page");return;}
 					for (var i = 0; i < ret.length; i++) {
 						songid[i] = {
 							artist:ret[i].artist,
@@ -643,7 +643,7 @@ function KWSearch(searchtext, pageid, switchpage){
 					}
 					l = 0;
 					//debug && fb.trace(songid.length);
-					if(songid.length == 0){UpdateDone("已经是最后一页");return;}
+					if(songid.length == 0){UpdateDone("Last page");return;}
 					url = songid[l].url;
 					debug && fb.trace(l,url);
 					xmlHttp2.open("GET", url, true);
@@ -672,7 +672,7 @@ function KWSearch(searchtext, pageid, switchpage){
 							if (l == songid.length) {
 								filedata = filedata + "</asx>";
 								SaveAs(filedata, cachefile);
-								DisposeList("网搜", 4, SearchListName, pageid, switchpage);
+								DisposeList("Netsearch", 4, SearchListName, pageid, switchpage);
 								SetBoxText(null);
 							}
 						}
@@ -681,7 +681,7 @@ function KWSearch(searchtext, pageid, switchpage){
 			}
 		}
 	} catch(e) {
-		fb.trace("搜索失败");
+		fb.trace("Search failed");
 		SetBoxText(null);
 		return;
 	}
@@ -783,7 +783,7 @@ function SaveAs(str, file) {
 		ado.WriteText(str);
 		ado.SaveToFile(file);
 	} catch (e) {
-		fb.trace("ADODB.Stream:写入文件失败。");
+		fb.trace("ADODB.Stream: failed to write in file.");
 	}
 	ado.flush();
 	ado.Close();

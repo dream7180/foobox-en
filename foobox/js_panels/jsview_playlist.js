@@ -25,10 +25,10 @@ var show_active_pl = window.GetProperty("List: Show active playlist", false);
 var playing_ico, imgw = Math.floor(16 * zdpi), imgh = Math.floor(14 * zdpi);
 var tf_string = [];
 tf_string[0] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%");
-tf_string[1] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%album%,单曲)");
-tf_string[2] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%album artist%,未知艺术家)");
-tf_string[3] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%artist%,未知艺术家)");
-tf_string[4] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%genre%,未知流派)");
+tf_string[1] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%album%,Single)");
+tf_string[2] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%album artist%,Unknown artist)");
+tf_string[3] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%artist%,Unknown artist)");
+tf_string[4] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^$if2(%genre%,Unknown genre)");
 tf_string[5] = fb.TitleFormat("$if2(%tracknumber%,)^^%title%^^%length%^^%directory%");
 var m_x = 0, m_y = 0, ww = 0, wh = 0, scroll = 0, scroll_ = 0, scroll__ = 0, scroll___ = 0, time_dl = 0;
 var time222 = (new Date()).getTime();
@@ -87,10 +87,10 @@ olist = function() {
 		var len_w = gr.CalcTextWidth("00:00:00", g_font);
 		var len_w_rx = 10 + len_w + (gcursor.vis * gcursor.bar_w);
 		var _x30 = 30 * zdpi;
-		if (show_active_pl) _title = "当前列表：" + plman.GetPlaylistName(pidx);
+		if (show_active_pl) _title = "Playlist: " + plman.GetPlaylistName(pidx);
 		else {
 			try {
-				if (this.list_dr[0].string[string_n].toUpperCase() != this.list_dr[_dr_len - 1].string[string_n].toUpperCase()) _title = "所有项目";
+				if (this.list_dr[0].string[string_n].toUpperCase() != this.list_dr[_dr_len - 1].string[string_n].toUpperCase()) _title = "All items";
 				else _title = this.list_dr[this.start_].string[string_n];
 			} catch(e) {}
 		}
@@ -127,16 +127,16 @@ olist = function() {
 		var _menu = window.CreatePopupMenu();
 		var Context = fb.CreateContextMenuManager();
 		var _child01 = window.CreatePopupMenu();
-		_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "播放队列")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "移除");
+		_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "Playback queue")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "Remove");
 		_menu.AppendMenuSeparator();
 		this.metadblist_selection = plman.GetPlaylistSelectedItems(pidx);
 		Context.InitContext(this.metadblist_selection);
 		Context.BuildMenu(_menu, 1, -1);
-		_menu.AppendMenuItem(MF_STRING, 803, "用Mp3tag编辑");
-		_child01.AppendTo(_menu, MF_STRING, "发送到...");
-		_child01.AppendMenuItem(MF_STRING, 801, "新播放列表");
+		_menu.AppendMenuItem(MF_STRING, 803, "Edit with Mp3tag");
+		_child01.AppendTo(_menu, MF_STRING, "Send to...");
+		_child01.AppendMenuItem(MF_STRING, 801, "New playlist");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 802, "切换到树形媒体库");
+		_menu.AppendMenuItem(MF_STRING, 802, "Switch Library Tree");
 		var pl_count = plman.PlaylistCount;
 		if (pl_count > 1) {
 			_child01.AppendMenuItem(MF_SEPARATOR, 0, "");
@@ -156,7 +156,7 @@ olist = function() {
 				plman.RemovePlaylistSelection(pidx, false);
 				break;
 			case 801:
-				fb.RunMainMenuCommand("文件/新建播放列表");
+				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount - 1, 0, this.metadblist_selection, false);
 				break;
 			case 802:
@@ -275,8 +275,8 @@ btn_h = Math.floor(12 * zdpi) + 12;
 get_imgs();
 get_imgs_static();
 
-if (show_active_pl) btn_sw = new ButtonUI(img_plsw_2, "切换到视图列表");
-else btn_sw = new ButtonUI(img_plsw, "切换到当前列表");
+if (show_active_pl) btn_sw = new ButtonUI(img_plsw_2, "Switch to lib view list");
+else btn_sw = new ButtonUI(img_plsw, "Switch to current playlist");
 
 if (g_timer) {
 	window.KillTimer(g_timer);
@@ -407,7 +407,7 @@ function check_pidx() {
 	if (show_active_pl) pidx = plman.ActivePlaylist;
 	else {
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i) == "媒体库视图") {
+			if (plman.GetPlaylistName(i) == "Library View") {
 				pidx = i;
 			}
 		}
@@ -451,10 +451,10 @@ function SelectAtoB(start_id, end_id) {
 function update_swBtn(){
 	if(show_active_pl){
 		btn_sw.img = img_plsw_2;
-		btn_sw.Tooltip.Text = "切换到视图列表";
+		btn_sw.Tooltip.Text = "Switch to lib view list";
 	} else{
 		btn_sw.img = img_plsw;
-		btn_sw.Tooltip.Text = "切换到当前列表";
+		btn_sw.Tooltip.Text = "Switch to current playlist";
 	}
 	btn_sw.Repaint();
 }

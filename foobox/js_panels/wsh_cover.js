@@ -13,13 +13,13 @@ var genre_cover_dir = fbx_set[24];
 var show_shadow = fbx_set[28];
 var col_by_cover = fbx_set[30];
 var tracktype = 8;
-var Caption_Pack = {
-	"Front": "封面",
-	"Back": "封底",
-	"Disc": "碟片",
-	"Icon": "图标",
-	"Artist": "艺术家"
-}
+var Caption_Pack = [
+	"Front",//: "封面",
+	"Back",//: "封底",
+	"Disc",//: "碟片",
+	"Icon",//: "图标",
+	"Artist"//: "艺术家"
+]
 var currentMetadb = null;
 
 function GetCaption(name) {
@@ -1410,26 +1410,26 @@ function Controller(imgArray, imgDisplay, prop) {
 				baseMenu = window.CreatePopupMenu();
 
 				funcs[id] = [_this.SwitchCyclePause, null];
-				baseMenu.AppendMenuItem(_this.cycle.paused ? MF_STRING : MF_CHECKED, id++, "循环开启");
+				baseMenu.AppendMenuItem(_this.cycle.paused ? MF_STRING : MF_CHECKED, id++, "Cycle on");
 				baseMenu.AppendMenuSeparator();
 				funcs[id] = [_this.SwitchCover, this.matchResult[0][0]];
-				baseMenu.AppendMenuItem(this.matchResult[0].length ? MF_STRING : MF_DISABLED, id++, "封面");
+				baseMenu.AppendMenuItem(this.matchResult[0].length ? MF_STRING : MF_DISABLED, id++, "Front");
 				funcs[id] = [_this.SwitchCover, this.matchResult[1][0]];
-				baseMenu.AppendMenuItem(this.matchResult[1].length ? MF_STRING : MF_DISABLED, id++, "封底");
+				baseMenu.AppendMenuItem(this.matchResult[1].length ? MF_STRING : MF_DISABLED, id++, "Back");
 				funcs[id] = [_this.SwitchCover, this.matchResult[2][0]];
-				baseMenu.AppendMenuItem(this.matchResult[2].length ? MF_STRING : MF_DISABLED, id++, "碟片");
+				baseMenu.AppendMenuItem(this.matchResult[2].length ? MF_STRING : MF_DISABLED, id++, "Disc");
 				id++;
 				funcs[id] = [_this.SwitchCover, this.matchResult[4][0]];
-				baseMenu.AppendMenuItem(this.matchResult[4].length ? MF_STRING : MF_DISABLED, id--, "艺术家");
+				baseMenu.AppendMenuItem(this.matchResult[4].length ? MF_STRING : MF_DISABLED, id--, "Artist");
 				funcs[id] = [_this.SwitchCover, this.matchResult[3][0]];
-				baseMenu.AppendMenuItem(this.matchResult[3].length ? MF_STRING : MF_DISABLED, id++, "图标");
+				baseMenu.AppendMenuItem(this.matchResult[3].length ? MF_STRING : MF_DISABLED, id++, "Icon");
 				id++;
 				if (currentPathItem && this.matchResult[-1].length) {
 					var flag = currentPathItem.artId == -1 ? MF_CHECKED : MF_STRING;
 					funcs[id] = [_this.SwitchCover, this.matchResult[-1][0]];
-					baseMenu.AppendMenuItem(flag, id++, "流派");
+					baseMenu.AppendMenuItem(flag, id++, "Genre");
 				}
-				else baseMenu.AppendMenuItem(MF_DISABLED, id++, "流派");
+				else baseMenu.AppendMenuItem(MF_DISABLED, id++, "Genre");
 				if (currentPathItem && currentPathItem.artId != -1) baseMenu.CheckMenuItem(currentPathItem.artId + 2, true);
 				/*var check;
 				if (this.matchResult[-1].length) {
@@ -1483,17 +1483,17 @@ function Controller(imgArray, imgDisplay, prop) {
 
 		this.Build = function() {
 			var id = 1;
-			var dl_menu = new Array("下载专辑封面", "下载艺术家封面", "下载专辑和艺术家封面");
+			var dl_menu = new Array("Download album cover", "Download artist cover", "Download album and artist covers");
 			baseMenu = window.CreatePopupMenu();
 
 			funcs[id] = [_this.AboutCurrentImage, null];
-			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "关于当前图片");
+			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "About current picture");
 			funcs[id] = [_this.ViewWithExternalViewer, null];
-			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "在外部查看器中查看");
+			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "View in external application");
 			funcs[id] = [_this.OpenContainingFolder, null];
-			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "打开图片所在目录");
+			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "Open file directory");
 			funcs[id] = [_this.Refresh, true];
-			baseMenu.AppendMenuItem(MF_STRING, id++, "刷新");
+			baseMenu.AppendMenuItem(MF_STRING, id++, "Refresh");
 			//funcs[id] = [_this.ShowMatchLog, true];
 			//baseMenu.AppendMenuItem(currentMetadb ? MF_STRING : MF_DISABLED, id++, GetText("Show match log"));
 
@@ -1502,14 +1502,14 @@ function Controller(imgArray, imgDisplay, prop) {
 				dl_id = 3;
 				var subMenu_MAP = window.CreatePopupMenu();
 				subMenus.push(subMenu_MAP);
-				subMenu_MAP.AppendTo(baseMenu, MF_POPUP, "管理内嵌图像");
+				subMenu_MAP.AppendTo(baseMenu, MF_POPUP, "Manage attached pictures");
 
 				funcs[id] = [_this.ManageAttachedImages, [0, currentMetadb]];
-				subMenu_MAP.AppendMenuItem(MF_STRING, id++, "编辑内嵌图像");
+				subMenu_MAP.AppendMenuItem(MF_STRING, id++, "Manage attached pictures");
 				funcs[id] = [_this.ManageAttachedImages, [1, currentMetadb]];
-				subMenu_MAP.AppendMenuItem(MF_STRING, id++, "批量内嵌图像");
+				subMenu_MAP.AppendMenuItem(MF_STRING, id++, "Batch attach pictures");
 				funcs[id] = [_this.ManageAttachedImages, [2, currentMetadb]];
-				subMenu_MAP.AppendMenuItem(MF_STRING, id++, "移除所有图像");
+				subMenu_MAP.AppendMenuItem(MF_STRING, id++, "Remove all pictures");
 				if (imgArray.length){
 					for (var i = 0; i < imgArray.length; i++){
 						if(imgArray.pathArray[i].artId == 0) dl_id -= 1;
@@ -1518,7 +1518,7 @@ function Controller(imgArray, imgDisplay, prop) {
 				}
 			} else {
 				dl_id = 0;
-				baseMenu.AppendMenuItem(MF_DISABLED, id++, "管理内嵌图像");
+				baseMenu.AppendMenuItem(MF_DISABLED, id++, "Manage attached pictures");
 			}
 			funcs[id] = [_this.downcover, currentMetadb];
 			if(dl_id) baseMenu.AppendMenuItem(MF_STRING, id++, dl_menu[dl_id - 1]);
@@ -1526,7 +1526,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			if (currentMetadb && _this.Properties.SearchScriptPresets.length) {
 				var subMenu_SPFI = window.CreatePopupMenu();
 				subMenus.push(subMenu_SPFI);
-				subMenu_SPFI.AppendTo(baseMenu, MF_POPUP, "从网络搜索图片");
+				subMenu_SPFI.AppendTo(baseMenu, MF_POPUP, "Search picture from internet");
 				var caption;
 				for (var i = 0; i < _this.Properties.SearchScriptPresets.length; i++) {
 					funcs[id] = [_this.SearchFromWeb, [i, currentMetadb]];
@@ -1534,29 +1534,29 @@ function Controller(imgArray, imgDisplay, prop) {
 					if (caption.length > 42) caption = caption.slice(0, 40) + "...";
 					subMenu_SPFI.AppendMenuItem(MF_STRING, id++, caption);
 				}
-			} else baseMenu.AppendMenuItem(MF_DISABLED, id++, "从网络搜索图片");
+			} else baseMenu.AppendMenuItem(MF_DISABLED, id++, "Search picture from internet");
 			
 			baseMenu.AppendMenuSeparator();
 
 			var subMenu_IS = window.CreatePopupMenu();
 			subMenus.push(subMenu_IS);
-			subMenu_IS.AppendTo(baseMenu, MF_POPUP, "图像拉伸");
+			subMenu_IS.AppendTo(baseMenu, MF_POPUP, "Stretch properties");
 
 			funcs[id] = [_this.SetStretchProperties, 0];
-			subMenu_IS.AppendMenuItem(imgArray.Properties.Stretch ? MF_CHECKED : MF_STRING, id++, "拉大图像");
+			subMenu_IS.AppendMenuItem(imgArray.Properties.Stretch ? MF_CHECKED : MF_STRING, id++, "Stretch picture");
 			funcs[id] = [_this.SetStretchProperties, 1];
-			subMenu_IS.AppendMenuItem(imgArray.Properties.KeepAspectRatio ? MF_CHECKED : MF_STRING, id++, "保持比例");
+			subMenu_IS.AppendMenuItem(imgArray.Properties.KeepAspectRatio ? MF_CHECKED : MF_STRING, id++, "Keep aspect ratio");
 			subMenu_IS.AppendMenuSeparator();
 			funcs[id] = [_this.SetStretchProperties, 2];
-			subMenu_IS.AppendMenuItem(imgArray.Properties.Fill ? MF_CHECKED : MF_STRING, id++, "充满面板");
+			subMenu_IS.AppendMenuItem(imgArray.Properties.Fill ? MF_CHECKED : MF_STRING, id++, "Fill panel");
 
 			funcs[id] = [_this.SetGenreBackup, null];
-			baseMenu.AppendMenuItem(imgArray.Properties.TreatGenrePathAsBackup ? MF_CHECKED : MF_STRING, id++, "流派图片仅作备用");
+			baseMenu.AppendMenuItem(imgArray.Properties.TreatGenrePathAsBackup ? MF_CHECKED : MF_STRING, id++, "Genre cover as backup only");
 			funcs[id] = [_this.ClearCache, null];
-			baseMenu.AppendMenuItem(MF_STRING, id++, "清除缓存");
+			baseMenu.AppendMenuItem(MF_STRING, id++, "Clear caches");
 			baseMenu.AppendMenuSeparator();
 			funcs[id] = [_this.ShowProperties, null];
-			baseMenu.AppendMenuItem(MF_STRING, id++, "面板参数设置...");
+			baseMenu.AppendMenuItem(MF_STRING, id++, "Panel properties");
 			//funcs[id] = [_this.ShowHelp, null];
 			//baseMenu.AppendMenuItem(MF_STRING, id++, "帮助...");
 		}
@@ -1670,8 +1670,8 @@ function Controller(imgArray, imgDisplay, prop) {
 	function SetMenuButtonCaption() {
 		if (!imgDisplay.menuButton) return;
 		var caption;
-		if (currentPathItem) caption = currentPathItem.artId == -1 ? "流派" : GetCaption(AlbumArtId.GetName(currentPathItem.artId).capitalize());
-		else caption = "无封面";
+		if (currentPathItem) caption = currentPathItem.artId == -1 ? "Genre" : GetCaption(AlbumArtId.GetName(currentPathItem.artId).capitalize());
+		else caption = "No cover";
 		imgDisplay.menuButton.caption = GetCaption(caption);
 	}
 
@@ -1679,16 +1679,16 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!currentPathItem) return;
 		var str = [];
 
-		str.push("-- 当前图片信息 --------------------\n");
+		str.push("-- Picture information --\n");
 
-		str.push("\n" + "管理内嵌图像" + ":\t");
-		str.push(currentPathItem.artId == -1 ? "流派" : GetCaption(AlbumArtId.GetName(currentPathItem.artId).capitalize()));
+		str.push("\n" + "Picture type" + ":\t");
+		str.push(currentPathItem.artId == -1 ? "Genre" : GetCaption(AlbumArtId.GetName(currentPathItem.artId).capitalize()));
 
-		str.push("\n" + "文件路径" + ":\t");
-		if (currentPathItem.embed) str.push("(内嵌) ");
+		str.push("\n" + "File path" + ":\t");
+		if (currentPathItem.embed) str.push("(Embedded) ");
 		str.push(currentPathItem.path);
 
-		str.push("\n" + "分辨率	" + ":\t");
+		str.push("\n" + "Resolution" + ":\t");
 		str.push(imgArray.currentImageItem ? (imgArray.currentImageItem.srcW + "×" + imgArray.currentImageItem.srcH) : "Invalid");
 
 		PopMessage(0, str.join(""), 0);
@@ -1698,13 +1698,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!currentMetadb) return;
 		switch (arr[0]) {
 		case 0:
-			fb.RunContextCommandWithMetadb("管理内嵌图像", arr[1]) || fb.RunContextCommandWithMetadb("Manage attached pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Manage attached pictures", arr[1]) || fb.RunContextCommandWithMetadb("Manage attached pictures", arr[1]);
 			break;
 		case 1:
-			fb.RunContextCommandWithMetadb("批量内嵌图像", arr[1]) || fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]) || fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
 			break;
 		case 2:
-			fb.RunContextCommandWithMetadb("移除所有图像", arr[1]) || fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]) || fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
 			break;
 		}
 	}
@@ -1712,8 +1712,8 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.downcover = function(metadb){
 		if (!metadb || !dl_id) return;
 		var til = fb.TitleFormat("%title%").EvalWithMetadb(metadb).replace(/(\\|:|\*|\?|"|<|>|\/|\|)/g, "");
-		var alb = fb.TitleFormat("$if2(%album%,单曲)").EvalWithMetadb(metadb).replace(/(\\|:|\*|\?|"|<|>|\/|\|)/g, "");
-		var art = fb.TitleFormat("$if2(%album artist%,未知艺术家)").EvalWithMetadb(metadb).replace(/(\\|:|\*|\?|"|<|>|\/|\|)/g, "");
+		var alb = fb.TitleFormat("$if2(%album%,Single)").EvalWithMetadb(metadb).replace(/(\\|:|\*|\?|"|<|>|\/|\|)/g, "");
+		var art = fb.TitleFormat("$if2(%album artist%,Unknown artist)").EvalWithMetadb(metadb).replace(/(\\|:|\*|\?|"|<|>|\/|\|)/g, "");
 		var info = new Array(dl_id, metadb, til, art, alb);
 		window.NotifyOthers("search this cover", info);
 	}
@@ -1768,7 +1768,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.ViewWithExternalViewer = function() {
 		if (!currentPathItem) return;
 		if (currentPathItem.embed) {
-			PopMessage(1, "当前图片为内嵌图片，无法用外部查看器打开。", 48);
+			PopMessage(1, "Embedded picture, unable to open with external application.", 48);
 			return;
 		}
 		var filepath = currentPathItem.path;

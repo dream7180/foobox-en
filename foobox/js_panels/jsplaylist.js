@@ -24,7 +24,7 @@ var show_shadow = fbx_set[28];
 var sys_scrollbar = fbx_set[29];
 var col_by_cover = fbx_set[30];
 // GLOBALS
-var g_script_version = "6.1.4.5";
+var g_script_version = "6.1.4.6";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -132,7 +132,7 @@ properties = {
 	collapseGroupsByDefault: window.GetProperty("SYSTEM.Collapse Groups by default", false),
 	enablePlaylistFilter: window.GetProperty("SYSTEM.Enable Playlist Filter", false),
 	NetDisableGroup: window.GetProperty("SYSTEM.NetPlaylist Disable Group", true),
-	defaultPlaylistItemAction: window.GetProperty("SYSTEM.Default Playlist Action", "播放"),
+	defaultPlaylistItemAction: window.GetProperty("SYSTEM.Default Playlist Action", "Play"),
 	disableToolbar: window.GetProperty("TOOLBAR: Always Disabled", true),
 	//"Add to playback queue",
 	autocollapse: window.GetProperty("SYSTEM.Auto-Collapse", false),
@@ -179,8 +179,8 @@ system_init();
 // Titleformat field
 var tf_group_key = null;
 // tf fields used in incremental search feature
-var tf_artist = fb.TitleFormat("$if(%length%,%artist%,'流媒体')");
-var tf_albumartist = fb.TitleFormat("$if(%length%,%album artist%,'流媒体')");
+var tf_artist = fb.TitleFormat("$if(%length%,%artist%,'Stream')");
+var tf_albumartist = fb.TitleFormat("$if(%length%,%album artist%,'Stream')");
 var tf_bitrate = fb.TitleFormat("$if(%__bitrate_dynamic%,$if(%el_isplaying%,%__bitrate_dynamic%'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))");
 var tf_bitrate_playing = fb.TitleFormat("$if(%__bitrate_dynamic%,$if(%_isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%),%__bitrate_dynamic%),%__bitrate%)'K'");
 // Sort pattern
@@ -397,15 +397,15 @@ oToolbar = function(){
 				if(this.netsearch_num > 1) {
 					this.searchbt_prev.draw(gr, mid_x - _w, this.y+x2, 255);
 					this.searchbt_next.draw(gr, mid_x, this.y+x2, 255);
-					gr.gdiDrawText("上一页", g_font, g_color_dl_txt, mid_x - _w, this.y+x2, _w, imgh, ccs_txt);
-					gr.gdiDrawText("下一页", g_font, g_color_dl_txt, mid_x, this.y+x2, _w, imgh, ccs_txt);
+					gr.gdiDrawText("Previous", g_font, g_color_dl_txt, mid_x - _w, this.y+x2, _w, imgh, ccs_txt);
+					gr.gdiDrawText("Next", g_font, g_color_dl_txt, mid_x, this.y+x2, _w, imgh, ccs_txt);
 				}else{
 					this.searchbt_next.draw(gr, mid_x - _w/2, this.y+x2, 255);
-					gr.gdiDrawText("下一页", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x2, _w, imgh, ccs_txt);
+					gr.gdiDrawText("Next", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x2, _w, imgh, ccs_txt);
 				}
 			}else if(this.netradio) {
 				this.radiobt.draw(gr, mid_x - _w/2, this.y+x2, 255);
-				gr.gdiDrawText("更新", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x2, _w,imgh, ccs_txt);
+				gr.gdiDrawText("Refresh", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x2, _w,imgh, ccs_txt);
 			}
 		}
 	}
@@ -524,7 +524,7 @@ oToolbar = function(){
 	}
 	
 	this.init_netsearch_bt = function() {
-		this.netradio = (p.list.name.indexOf("电台") == 0 || p.list.name.indexOf("榜单") == 0) ? 1 : 0;
+		this.netradio = (p.list.name.indexOf("Radio") == 0 || p.list.name.indexOf("Board") == 0) ? 1 : 0;
 		if(this.netradio) {
 			this.is_netsearch = 0;
 			this.netsearch_type = p.list.name.substring(0, 2);
@@ -532,7 +532,7 @@ oToolbar = function(){
 			if(properties.NetDisableGroup) nethide_groupheader(true);
 			this.disabled = false;
 		} else{
-			this.is_netsearch = (p.list.name.indexOf("网搜") == 0) ? 1 : 0;
+			this.is_netsearch = (p.list.name.indexOf("NetSearch") == 0) ? 1 : 0;
 			if(this.is_netsearch){
 				this.netradio = 0;
 				this.netsearch_name = p.list.name.split(" | ")[1];
@@ -1270,17 +1270,17 @@ function on_paint(gr) {
 
 					if (fb.PlaylistCount > 0) {
 						var text_top = p.list.name;
-						var text_bot = "空列表";
+						var text_bot = "This playlist is empty.";
 					};
 					else {
-						var text_top = "从播放列表管理面板创建一个新的播放列表开始！";
-						var text_bot = "当前无播放列表";
+						var text_top = "Create a playlist to start!";
+						var text_bot = "No playlist";
 					};
 					// if Search Playlist, draw image "No Result"
-					if (text_top.substr(0, 4) == "搜索 [") {
+					if (text_top.substr(0, 4) == "Search [") {
 						gr.SetTextRenderingHint(4);
 						var search_text = text_top.substr(4, text_top.length - 5);
-						gr.DrawString("搜索 \"" + search_text + "\" 无结果", g_font_blank, g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, zdpi), ww, wh, cc_stringformat);
+						gr.DrawString("No Result for \"" + search_text + "\"", g_font_blank, g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, zdpi), ww, wh, cc_stringformat);
 						gr.DrawString(text_bot, g_font_group2, g_color_normal_txt & 0x40ffffff, 0, 0 + zoom(20, zdpi), ww, wh, cc_stringformat);
 						gr.FillGradRect(40, Math.floor(wh / 2), ww - 80, 1, 0, 0, g_color_normal_txt & 0x40ffffff, 0.5);
 					};
@@ -2139,7 +2139,7 @@ function on_key_down(vkey) {
 		g_textbox_tabbed = false;
 		if (mask == KMask.ctrl) {
 			if (vkey == 80) { // CTRL+P
-				fb.RunMainMenuCommand("文件/参数选项");
+				fb.RunMainMenuCommand("File/Preferences");
 			};
 		};
 		var fin = p.settings.pages[p.settings.currentPageId].elements.length;
@@ -2399,7 +2399,7 @@ function on_key_down(vkey) {
 				// play/enqueue focused item
 				if (!isQueuePlaylistActive()) {
 					var cmd = properties.defaultPlaylistItemAction;
-					if (cmd == "播放") {
+					if (cmd == "Play") {
 						plman.ExecutePlaylistDefaultAction(act_pls, p.list.focusedTrackId);
 					};
 					else {
@@ -2533,7 +2533,7 @@ function on_key_down(vkey) {
 					}
 				}
 				if (vkey == 65) { // CTRL+A
-					fb.RunMainMenuCommand("编辑/全选");
+					fb.RunMainMenuCommand("Edit/Select all");
 					p.list.metadblist_selection = plman.GetPlaylistSelectedItems(p.list.playlist);
 					full_repaint();
 				};
@@ -2585,25 +2585,25 @@ function on_key_down(vkey) {
 								};
 							};
 							catch (e) {
-								fb.trace("WSH 播放列表警告: 剪贴板无法粘贴,无效的剪贴板内容。");
+								fb.trace("WSH Playlist WARNING: Clipboard can't be pasted, invalid clipboard content.");
 							};
 						};
 					};
 				};
 				if (vkey == 70) { // CTRL+F
-					fb.RunMainMenuCommand("编辑/搜索");
+					fb.RunMainMenuCommand("Edit/Search");
 				};
 				if (vkey == 78) { // CTRL+N
-					fb.RunMainMenuCommand("文件/新建播放列表");
+					fb.RunMainMenuCommand("File/New playlist");
 				};
 				if (vkey == 79) { // CTRL+O
-					fb.RunMainMenuCommand("文件/打开...");
+					fb.RunMainMenuCommand("File/Open...");
 				};
 				if (vkey == 80) { // CTRL+P
-					fb.RunMainMenuCommand("文件/参数选项");
+					fb.RunMainMenuCommand("File/Preferences");
 				};
 				if (vkey == 83) { // CTRL+S
-					fb.RunMainMenuCommand("文件/保存播放列表...");
+					fb.RunMainMenuCommand("File/Save playlist...");
 				};
 				if (vkey == 84) { // CTRL+T
 					// Toggle headerbar
@@ -2626,7 +2626,7 @@ function on_key_down(vkey) {
 				switch (vkey) {
 				case 65:
 					// ALT+A
-					fb.RunMainMenuCommand("视图/总在最上面");
+					fb.RunMainMenuCommand("View/Always on Top");
 					break;
 				case VK_ALT:
 					// ALT key alone
@@ -3279,7 +3279,7 @@ function isQueuePlaylistActive() {
 
 function isQueuePlaylistPresent() {
 	for (var i = 0; i < plman.PlaylistCount; i++) {
-		if (plman.GetPlaylistName(i) == "播放队列") return i;
+		if (plman.GetPlaylistName(i) == "Queue Content") return i;
 	};
 	return -1;
 };
@@ -3332,7 +3332,7 @@ function ShowPlaylistQueue(focus_id) {
 	var total_pl = plman.PlaylistCount;
 	var queue_pl_idx = isQueuePlaylistPresent();
 	if (queue_pl_idx < 0) {
-		plman.CreatePlaylist(total_pl, "播放队列");
+		plman.CreatePlaylist(total_pl, "Queue Content");
 		queue_pl_idx = total_pl;
 		plman.ActivePlaylist = queue_pl_idx;
 	};
@@ -3368,12 +3368,12 @@ function CheckPlaylistQueue() {
 	var total_pl = plman.PlaylistCount;
 	var queue_pl_idx = isQueuePlaylistPresent();
 	if (queue_pl_idx < 0) {
-		plman.CreatePlaylist(total_pl, "播放队列");
+		plman.CreatePlaylist(total_pl, "Queue Content");
 		queue_pl_idx = total_pl;
 	};
 	else {
 		plman.RemovePlaylist(queue_pl_idx);
-		plman.CreatePlaylist(queue_pl_idx, "播放队列");
+		plman.CreatePlaylist(queue_pl_idx, "Queue Content");
 	};
 	var queue_total = plman.GetPlaybackQueueCount();
 	var vbarr = plman.GetPlaybackQueueContents();
@@ -3403,7 +3403,7 @@ function on_playback_queue_changed(origin) {
 			var total_pl = plman.PlaylistCount;
 			var queue_pl_idx = isQueuePlaylistPresent();
 			if (queue_pl_idx < 0) {
-				plman.CreatePlaylist(total_pl, "播放队列");
+				plman.CreatePlaylist(total_pl, "Queue Content");
 				queue_pl_idx = total_pl;
 			};
 			else {
@@ -3412,7 +3412,7 @@ function on_playback_queue_changed(origin) {
 				};
 				else {
 					plman.RemovePlaylist(queue_pl_idx);
-					plman.CreatePlaylist(queue_pl_idx, "播放队列");
+					plman.CreatePlaylist(queue_pl_idx, "Queue Content");
 				};
 			};
 			// fill it
@@ -3440,7 +3440,7 @@ function on_playback_queue_changed(origin) {
 				};
 				else {
 					plman.RemovePlaylist(queue_pl_idx);
-					plman.CreatePlaylist(queue_pl_idx, "播放队列");
+					plman.CreatePlaylist(queue_pl_idx, "Queue Content");
 				};
 			};
 			// fill it
@@ -3475,7 +3475,7 @@ function on_playback_queue_changed(origin) {
 					};
 					else {
 						plman.RemovePlaylist(queue_pl_idx);
-						plman.CreatePlaylist(queue_pl_idx, "播放队列");
+						plman.CreatePlaylist(queue_pl_idx, "Queue Content");
 					};
 					// fill it
 					var queue_total = plman.GetPlaybackQueueCount();
@@ -3645,7 +3645,7 @@ function on_drag_drop(action, x, y, mask) {
 	// We are going to process the dropped items to a playlist
 	var total_pl = plman.PlaylistCount;
 	if (total_pl < 1) {
-		plman.CreatePlaylist(0, "拖放项目");
+		plman.CreatePlaylist(0, "Dropped Items");
 		plman.ActivePlaylist = 0;
 		action.ToPlaylist();
 		action.Playlist = plman.ActivePlaylist;

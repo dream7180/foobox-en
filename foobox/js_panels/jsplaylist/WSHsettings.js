@@ -291,13 +291,13 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 3:
 			p.settings.pages[pid].elements[3].status = true;
 			p.settings.pages[pid].elements[4].status = false;
-			properties.defaultPlaylistItemAction = "播放";
+			properties.defaultPlaylistItemAction = "Play";
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
 		case 4:
 			p.settings.pages[pid].elements[3].status = false;
 			p.settings.pages[pid].elements[4].status = true;
-			properties.defaultPlaylistItemAction = "添加到播放队列";
+			properties.defaultPlaylistItemAction = "Add to playback queue";
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
 		};
@@ -1674,10 +1674,10 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			gr.SetSmoothingMode(0);
 			switch (this.parentPageId) {
 			case 1:
-				isCustom = (p.headerBar.columns[i].ref.substr(0, 3) == "自定义");
+				isCustom = (p.headerBar.columns[i].ref.substr(0, 6) == "Custom");
 				break;
 			case 2:
-				isCustom = (p.list.groupby[i].ref.substr(0, 3) == "自定义");
+				isCustom = (p.list.groupby[i].ref.substr(0, 6) == "Custom");
 				break;
 			};
 			if (i == this.selectedId) gr.FillSolidRect(this.x + 1, this.ly + row * this.rowHeight + 1, this.w - this.scrollbarWidth - 2, this.rowHeight - 1, RGB(135, 135, 135));
@@ -1772,14 +1772,14 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 		case 1:
 			if (p.headerBar.totalColumns < properties.max_columns) {
 				var source_ref = p.headerBar.columns[id].ref;
-				if (source_ref != "封面" && source_ref != "状态" && source_ref != "喜爱" && source_ref != "等级") {
-					_menu.AppendMenuItem(MF_STRING, 10, "复制");
+				if (source_ref != "Cover" && source_ref != "State" && source_ref != "Mood" && source_ref != "Rating") {
+					_menu.AppendMenuItem(MF_STRING, 10, "Duplicate this Column");
 				};
 			};
 			break;
 		case 2:
 			if (p.list.totalGroupBy < properties.max_patterns) {
-				_menu.AppendMenuItem(MF_STRING, 20, "复制");
+				_menu.AppendMenuItem(MF_STRING, 20, "Duplicate this Pattern");
 			};
 			break;
 		};
@@ -1799,7 +1799,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			// get free number to affect to the new User column to create
 			fin = tmp_array.length;
 			for (var i = 0; i < fin; i++) {
-				if (tmp_array[i].substr(0, 3) == "自定义") {
+				if (tmp_array[i].substr(0, 6) == "Custom") {
 					if (tmp_array[i].substr(tmp_array[i].length - 2, 2) == num(no_user, 2)) {
 						no_user++;
 					};
@@ -1814,7 +1814,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			var c5 = p.headerBar.columns[id].enableCustomColor;
 			var c6 = p.headerBar.columns[id].customColor;
 
-			p.headerBar.columns.push(new oColumn(c0 + " 副本", c1, c2, 0, "自定义 " + num(no_user, 2), c3, c4, c5, c6));
+			p.headerBar.columns.push(new oColumn("copy of "+ c0, c1, c2, 0, "Custom " + num(no_user, 2), c3, c4, c5, c6));
 			p.headerBar.totalColumns++;
 			window.SetProperty("SYSTEM.HeaderBar.TotalColumns", p.headerBar.totalColumns);
 			var arr = [];
@@ -1844,7 +1844,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			var c12 = p.list.groupby[id].r2;
 			var c13 = p.list.groupby[id].l4;
 
-			p.list.groupby.push(new oGroupBy(c0 + " 副本", c1, c2, "自定义", c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13));
+			p.list.groupby.push(new oGroupBy("copy of "+ c0, c1, c2, "Custom", c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13));
 			p.list.totalGroupBy++;
 			window.SetProperty("SYSTEM.Groups.TotalGroupBy", p.list.totalGroupBy);
 			var arr = [];
@@ -1897,21 +1897,21 @@ oPage = function(id, objectName, label, nbrows) {
 			// General
 			var rh = cSettings.rowHeight;
 			// Layout options
-			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "显示分栏标题 (按 CTRL+T 切换显示)", "cHeaderBar.locked", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "Show header (toggle = CTRL+T)", "cHeaderBar.locked", "settings_checkboxes_action", this.id));
 			// Behaviour options
-			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 4.25, "平滑滚动", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 5.25, "触屏滚动控制 (禁用拖放)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 4.25, "Smooth scrolling", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 5.25, "Touch scrolling control (disable drag'n drop)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
 
 			// Create radio buttons
 			var spaceBetween_w = zoom(70, zdpi);
-			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 7.25, "播放", (properties.defaultPlaylistItemAction == "播放"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "添加到播放队列", (properties.defaultPlaylistItemAction == "添加到播放队列"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
 			// Tagging options
-			this.elements.push(new oCheckBox(5, txtbox_x + 30, cSettings.topBarHeight + rh * 9.25, "跳过已存在的文件", "dl_skip", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "预设下载目录，自定义时请确保该路径有效（需提前创建），否则更改将无效", dl_prefix_folder, "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "下载的音频命名格式", dl_rename_by, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 15.25, "顺序播放时自动播放下一个播放列表 (遇到空列表停止)", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "对非网络播放列表禁用底部工具栏", "properties.disableToolbar", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, txtbox_x + 30, cSettings.topBarHeight + rh * 9.25, "Skip existing file", "dl_skip", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "Preset download folder. If you need to revise it, please ensure the path is valid (create it if the folder not existing).", dl_prefix_folder, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "Rename format for downloaded tracks", dl_rename_by, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 15.25, "Play the next playlist when finish current one (effective in default playback order, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "Disable bottom toolbar if not a web playlist", "properties.disableToolbar", "settings_checkboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1927,26 +1927,26 @@ oPage = function(id, objectName, label, nbrows) {
 			//var listBoxHeight = Math.floor(wh - (cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight) - 25);
 			var listBoxWidth = zoom(120, zdpi);
 			var listBoxCurrentId = 0;
-			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "列", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
+			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "Columns", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 
 			// Create TextBoxes
 			var txtbox_value = p.headerBar.columns[listBoxCurrentId].label;
-			this.elements.push(new oTextBox(1, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.25), oTextBox_3, cHeaderBar.height, "标签", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(1, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.25), oTextBox_3, cHeaderBar.height, "Label", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.headerBar.columns[listBoxCurrentId].tf;
-			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_1, cHeaderBar.height, "标题格式化 (输入 'null' ：无)", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_1, cHeaderBar.height, "Title format (enter 'null' for nothing)", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.headerBar.columns[listBoxCurrentId].tf2;
-			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_1, cHeaderBar.height, "附加行标题格式化 (输入 'null' ：无)", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_1, cHeaderBar.height, "Extra line title format (enter 'null' for nothing)", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.headerBar.columns[listBoxCurrentId].sortOrder;
-			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 14.25), oTextBox_1, cHeaderBar.height, "排序 (输入 'null' ：不排序)", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 14.25), oTextBox_1, cHeaderBar.height, "Sort order (enter 'null' for nothing)", txtbox_value, "settings_textboxes_action", this.id));
 
 			// Create radio buttons
 			var spaceBetween_w = zoom(80, zdpi);
-			this.elements.push(new oRadioButton(5, txtbox_x, cSettings.topBarHeight + rh * 17.25, "左", (p.headerBar.columns[listBoxCurrentId].align == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(6, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 17.25, "居中", (p.headerBar.columns[listBoxCurrentId].align == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(7, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 17.25, "右", (p.headerBar.columns[listBoxCurrentId].align == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, txtbox_x, cSettings.topBarHeight + rh * 17.25, "Left", (p.headerBar.columns[listBoxCurrentId].align == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(6, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 17.25, "Center", (p.headerBar.columns[listBoxCurrentId].align == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(7, txtbox_x + spaceBetween_w * 2, cSettings.topBarHeight + rh * 17.25, "Right", (p.headerBar.columns[listBoxCurrentId].align == 2), "settings_radioboxes_action", this.id));
 
 			// checkbox : activate columns Y/N
-			this.elements.push(new oCheckBox(0, txtbox_x, cSettings.topBarHeight + rh * 7.45, "显示", "p.headerBar.columns[p.settings.pages[1].elements[0].selectedId].percent == 0 ? false : true", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(0, txtbox_x, cSettings.topBarHeight + rh * 7.45, "Visible", "p.headerBar.columns[p.settings.pages[1].elements[0].selectedId].percent == 0 ? false : true", "settings_checkboxes_action", this.id));
 			break;
 		case 2:
 			// Groups
@@ -1962,20 +1962,20 @@ oPage = function(id, objectName, label, nbrows) {
 			//var listBoxHeight = Math.floor(wh - (cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight) - 25);
 			var listBoxWidth = zoom(175, zdpi);
 			var listBoxCurrentId = cGroup.pattern_idx;
-			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "分组模版", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
+			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "Group by", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 
 			// Create TextBoxes
 			var txtbox_value = p.list.groupby[listBoxCurrentId].label;
-			this.elements.push(new oTextBox(1, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 6.5), oTextBox_3, cHeaderBar.height, "标签", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(1, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 6.5), oTextBox_3, cHeaderBar.height, "Label", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].tf;
-			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.5), oTextBox_1, cHeaderBar.height, "标题格式化 (输入 'null' ：无)", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.5), oTextBox_1, cHeaderBar.height, "Title format (enter 'null' for nothing)", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].sortOrder;
-			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.5), oTextBox_1, cHeaderBar.height, "排序 (输入 'null' ：不排序)", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.5), oTextBox_1, cHeaderBar.height, "Sort order (enter 'null' for nothing)", txtbox_value, "settings_textboxes_action", this.id));
 
 			txtbox_value = p.list.groupby[listBoxCurrentId].playlistFilter;
-			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 13.0), oTextBox_1, cHeaderBar.height, "播放列表过滤 (定义自动启用本分组依据的播放列表, '*' = 所有播放列表, 'null' = 不过滤, 多个列表以分号隔开)", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(4, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 13.0), oTextBox_1, cHeaderBar.height, "Playlist filter ('*' = all playlists, 'null' = nothing, put ';' between playlists)", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].extraRows;
-			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.0), 30, cHeaderBar.height, "添加附加行", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.0), 30, cHeaderBar.height, "Extra rows to add", txtbox_value, "settings_textboxes_action", this.id));
 			// Create radio buttons / group header COLLAPSED height
 			var spaceBetween_w = zoom(50, zdpi);
 			// force value if set to an unauthirized one [0;4]
@@ -2003,19 +2003,19 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(14, txtbox_x + spaceBetween_w * 3, cSettings.topBarHeight + rh * 19.5, "3", (v == 3), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(15, txtbox_x + spaceBetween_w * 4, cSettings.topBarHeight + rh * 19.5, "4", (v == 4), "settings_radioboxes_action", this.id));
 			// Create checkbox Cover Art in Group Header ON/OFF
-			this.elements.push(new oCheckBox(16, txtbox_x, cSettings.topBarHeight + rh * 21.5, "显示", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].showCover == 0 ? false : true", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(16, txtbox_x, cSettings.topBarHeight + rh * 21.5, "Visible", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].showCover == 0 ? false : true", "settings_checkboxes_action", this.id));
 			// Create checkbox Auto-Collpase ON/OFF
-			this.elements.push(new oCheckBox(17, txtbox_x, cSettings.topBarHeight + rh * 23.25, "启用", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].autoCollapse == 0 ? false : true", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(17, txtbox_x, cSettings.topBarHeight + rh * 23.25, "Enable", "p.list.groupby[p.settings.pages[2].elements[0].selectedId].autoCollapse == 0 ? false : true", "settings_checkboxes_action", this.id));
 
 			var GHF_delta = 13.0;
 			var txtbox_value = p.list.groupby[listBoxCurrentId].l1;
-			this.elements.push(new oTextBox(18, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (14.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 1 行,左侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(18, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (14.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 1, left field", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].r1;
-			this.elements.push(new oTextBox(19, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (16.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 1 行,右侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(19, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (16.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 1, right field", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].l2;
-			this.elements.push(new oTextBox(20, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (18.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 2 行,左侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(20, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (18.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 2, left field", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].r2;
-			this.elements.push(new oTextBox(21, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (20.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 2 行,右侧字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(21, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (20.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 2, right field", txtbox_value, "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(22, txtbox_x, cSettings.topBarHeight + rh * 35.0, "第 2 行右侧显示音轨数 (选中时上面一栏的定义无效, 此选项仅作用于分组标题高度为两行时)", ("l2_addinfo == true ? true : false"), "settings_checkboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].l4;
 			this.elements.push(new oTextBox(23, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (23.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 4 行字段", txtbox_value, "settings_textboxes_action", this.id));

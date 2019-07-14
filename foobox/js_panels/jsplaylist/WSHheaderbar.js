@@ -109,7 +109,7 @@ oHeaderBar = function() {
 		gb.SetTextRenderingHint(4);
 		gb.DrawString(">", this.icoFont, color_txt, 0, 0, cScrollBar.width, btn_h, cc_stringformat);
 		this.slide_open_down.ReleaseGraphics(gb);
-		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "显示当前播放");
+		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "Show Now Playing Track");
 	};
 	this.setButtons();
 
@@ -361,19 +361,19 @@ oHeaderBar = function() {
 			for (var i = 0; i < 7; i++) {
 				switch (i) {
 				case 0:
-					fields.push(new Array("封面", "状态", "索引", "#", "标题", "年份", "艺术家", "专辑艺术家", "专辑", "流派", "喜爱", "等级", "播放次数", "比特率", "编码", "时间"));
+					fields.push(new Array("Cover", "State", "Index", "#", "Title", "Year", "Artist", "Album Artist", "Album", "Genre", "Mood", "Rating", "Plays", "Bitrate", "Codec", "Time"));
 					break;
 				case 1:
-					fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_counter%,$if2(%play_count%,0))", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
+					fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'Unknown artist')", "$if2(%album artist%,'Unknown artist')", "$if2(%album%,$if(%length%,'Single','Radio'))", "$if2(%genre%,'Other')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_counter%,$if2(%play_count%,0))", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
 					break;
 				case 2:
-					fields.push(new Array("null", "null", "null", "$if2(%play_counter%,$if2(%play_count%,0))", "$if2(%album artist%,'未知艺术家')", "null", "null", "null", "$if2(%genre%,'其他')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
+					fields.push(new Array("null", "null", "null", "$if2(%play_counter%,$if2(%play_count%,0))", "$if2(%album artist%,'Unknown artist')", "null", "null", "null", "$if2(%genre%,'Other')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
 					break;
 				case 3:
 					fields.push(new Array("0", "5000", "0", "5000", "40000", "0", "30000", "0", "0", "0", "0", "11000", "0", "0", "0", "9000"));
 					break;
 				case 4:
-					fields.push(new Array("封面", "状态", "索引", "音轨号", "标题", "日期", "艺术家", "专辑艺术家", "专辑", "流派", "喜爱", "等级", "播放次数", "比特率", "编码类型", "持续时间"));
+					fields.push(new Array("Cover", "State", "Index", "Tracknumber", "Title", "Date", "Artist", "Album Artist", "Album", "Genre", "Mood", "Rating", "Plays", "Bitrate", "Codec", "Duration"));
 					break;
 				case 5:
 					fields.push(new Array("0", "1", "1", "2", "0", "2", "0", "0", "0", "0", "1", "1", "2", "1", "1", "2"));
@@ -739,10 +739,10 @@ oHeaderBar = function() {
 		};
 
 		// main Menu entries
-		_menu.AppendMenuItem(MF_STRING, 11, "面板设置..."); 	        
+		_menu.AppendMenuItem(MF_STRING, 11, "Panel settings..."); 	        
 		_menu.AppendMenuSeparator();
 		if (properties.showgroupheaders) {
-			_patterns.AppendTo(_menu, MF_STRING, "更改分组依据");
+			_patterns.AppendTo(_menu, MF_STRING, "Edit groups...");
 			var groupByMenuIdx = 20;
 			var totalGroupBy = p.list.groupby.length;
 			for (var i = 0; i < totalGroupBy; i++) {
@@ -755,24 +755,24 @@ oHeaderBar = function() {
 				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, playlist_pattern_index + groupByMenuIdx);
 			};
 		};
-		_sorting.AppendTo(_menu, MF_STRING, "排序");
-		_sorting.AppendMenuItem(MF_STRING, 205, "专辑艺术家");
-		_sorting.AppendMenuItem(MF_STRING, 219, "艺术家");
-		_sorting.AppendMenuItem(MF_STRING, 206, "专辑");
-		_sorting.AppendMenuItem(MF_STRING, 207, "音轨号");
-		_sorting.AppendMenuItem(MF_STRING, 208, "标题");
-		_sorting.AppendMenuItem(MF_STRING, 209, "路径");
-		_sorting.AppendMenuItem(MF_STRING, 210, "日期");
-		_sorting.AppendMenuItem(MF_STRING, 211, "流派");
-		_sorting.AppendMenuItem(MF_STRING, 212, "等级");
-		_sorting.AppendMenuItem(MF_STRING, 213, "比特率");
-		_sorting.AppendMenuItem(MF_STRING, 214, "修改时间");
-		_sorting.AppendMenuItem(MF_STRING, 215, "播放次数");
-		_sorting.AppendMenuItem(MF_STRING, 216, "编码类型");
-		_sorting.AppendMenuItem(MF_STRING, 217, "随机");
-		_sorting.AppendMenuItem(MF_STRING, 218, "颠倒");
-		_columns.AppendTo(_menu, MF_STRING, "列");
-		_columns.AppendMenuItem(MF_STRING, 99, "显示附加行信息");
+		_sorting.AppendTo(_menu, MF_STRING, "Sort order");
+		_sorting.AppendMenuItem(MF_STRING, 205, "Album artist");
+		_sorting.AppendMenuItem(MF_STRING, 219, "Artist");
+		_sorting.AppendMenuItem(MF_STRING, 206, "Album");
+		_sorting.AppendMenuItem(MF_STRING, 207, "Track number");
+		_sorting.AppendMenuItem(MF_STRING, 208, "Title");
+		_sorting.AppendMenuItem(MF_STRING, 209, "Path");
+		_sorting.AppendMenuItem(MF_STRING, 210, "Date");
+		_sorting.AppendMenuItem(MF_STRING, 211, "Genre");
+		_sorting.AppendMenuItem(MF_STRING, 212, "Rating");
+		_sorting.AppendMenuItem(MF_STRING, 213, "Bitrate");
+		_sorting.AppendMenuItem(MF_STRING, 214, "Modification");
+		_sorting.AppendMenuItem(MF_STRING, 215, "Plays");
+		_sorting.AppendMenuItem(MF_STRING, 216, "Codec");
+		_sorting.AppendMenuItem(MF_STRING, 217, "Random");
+		_sorting.AppendMenuItem(MF_STRING, 218, "Reverse");
+		_columns.AppendTo(_menu, MF_STRING, "Columns");
+		_columns.AppendMenuItem(MF_STRING, 99, "Show Row Extra-Line Infos");
 		_columns.CheckMenuItem(99, cList.enableExtraLine ? 1 : 0);
 		_columns.AppendMenuSeparator();
 		var columnMenuIdx = 100;
@@ -787,27 +787,27 @@ oHeaderBar = function() {
 		};
 		// Columns submenu entries
 		_menu.AppendMenuSeparator();
-		_groups.AppendTo(_menu, MF_STRING, "分组选项");
-		_groups.AppendMenuItem(MF_STRING, 18, "启用分组");
+		_groups.AppendTo(_menu, MF_STRING, "Group options");
+		_groups.AppendMenuItem(MF_STRING, 18, "Enable group");
 		_groups.CheckMenuItem(18, properties.showgroupheaders);
 		if (properties.showgroupheaders) {
-			_groups.AppendMenuItem(MF_STRING, 17, "网络播放列表禁止分组");
+			_groups.AppendMenuItem(MF_STRING, 17, "Disable group for Web playlist");
 			_groups.CheckMenuItem(17, properties.NetDisableGroup);
-			_groups.AppendMenuItem(MF_STRING, 19, "启用播放列表过滤");
+			_groups.AppendMenuItem(MF_STRING, 19, "Enable playlist filter");
 			_groups.CheckMenuItem(19, properties.enablePlaylistFilter);
 			_groups.AppendMenuSeparator();
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Ctrl+Tab)");	
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "Collapse all (Tab)");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "Expand all (Ctrl+Tab)");	
 		};
 		_groups.AppendMenuSeparator();
-		_groups.AppendMenuItem(MF_STRING, 13, "编辑分组...");
-		_menu.AppendMenuItem(MF_STRING, 12, "编辑列...");
+		_groups.AppendMenuItem(MF_STRING, 13, "Edit groups...");
+		_menu.AppendMenuItem(MF_STRING, 12, "Edit columns...");
 		
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 16, "刷新封面 (F5)");
+		_menu.AppendMenuItem(MF_STRING, 16, "Refresh covers (F5)");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 15, "查看下载目录");
-		_menu.AppendMenuItem(MF_STRING, 14, "面板属性");
+		_menu.AppendMenuItem(MF_STRING, 15, "View download folder");
+		_menu.AppendMenuItem(MF_STRING, 14, "Panel properties");
 		
 		idx = _menu.TrackPopupMenu(x, y);
 		switch (true) {
@@ -1038,7 +1038,7 @@ oHeaderBar = function() {
 			plman.SortByFormat(plman.ActivePlaylist,"",false);
             break;
 		case (idx == 218):
-			fb.RunMainMenuCommand("编辑/排序/颠倒");
+			fb.RunMainMenuCommand("Edit/Sort/Reverse");
             break;
 		};
 		_menu.Dispose();

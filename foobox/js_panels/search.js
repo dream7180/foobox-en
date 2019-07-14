@@ -672,7 +672,7 @@ function KWSearch(searchtext, pageid, switchpage){
 							if (l == songid.length) {
 								filedata = filedata + "</asx>";
 								SaveAs(filedata, cachefile);
-								DisposeList("Netsearch", 4, SearchListName, pageid, switchpage);
+								DisposeList("NetSearch", 4, SearchListName, pageid, switchpage);
 								SetBoxText(null);
 							}
 						}

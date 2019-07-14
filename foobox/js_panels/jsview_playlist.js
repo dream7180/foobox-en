@@ -127,7 +127,7 @@ olist = function() {
 		var _menu = window.CreatePopupMenu();
 		var Context = fb.CreateContextMenuManager();
 		var _child01 = window.CreatePopupMenu();
-		_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "Playback queue")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "Remove");
+		_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "Queue Content")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "Remove");
 		_menu.AppendMenuSeparator();
 		this.metadblist_selection = plman.GetPlaylistSelectedItems(pidx);
 		Context.InitContext(this.metadblist_selection);

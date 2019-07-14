@@ -71,12 +71,12 @@ ppt = {
 	lineHeightMin: 0,
 	//enableDiskCache: window.GetProperty("SYSTEM Disk Cache", true),
 	scrollRowDivider: window.GetProperty("SYSTEM Scroll Row Divider", 1),
-	tf_groupkey_genre: fb.TitleFormat("$if2(%genre%,未知流派)"),
+	tf_groupkey_genre: fb.TitleFormat("$if2(%genre%,Unknown genre)"),
 	tf_groupkey_dir: fb.TitleFormat("$directory_path(%path%)"),
-	tf_groupkey_albumartist: fb.TitleFormat("$if2(%album artist%,未知艺术家)"),
-	tf_groupkey_artist: fb.TitleFormat("$if2(%artist%,未知艺术家)"),
+	tf_groupkey_albumartist: fb.TitleFormat("$if2(%album artist%,Unknown artist)"),
+	tf_groupkey_artist: fb.TitleFormat("$if2(%artist%,Unknown artist)"),
 	tf_groupkey_album: fb.TitleFormat("%album artist% ^^ %album% ## %title%"),
-	tf_groupkey_album_lt: fb.TitleFormat("$if2(%album%,单曲)"),
+	tf_groupkey_album_lt: fb.TitleFormat("$if2(%album%,Single)"),
 	tf_path: fb.TitleFormat(album_cover_dir+"\\"),
 	tf_path_artist: fb.TitleFormat(artist_cover_dir+"\\"),
 	tf_path_genre: genre_cover_dir + "\\",//fb.TitleFormat(genre_cover_dir+"\\"),
@@ -524,7 +524,7 @@ oPlaylistManager = function(name) {
 		for (var idx = 0; idx < this.total_playlists; idx++) {
 			plname = plman.GetPlaylistName(idx);
 			isAutoPl = plman.IsAutoPlaylist(idx);
-			isReserved = (plname == "播放队列" || plname == "播放记录");
+			isReserved = (plname == "Queue Content" || plname == "History");
 
 			if (!isAutoPl && !isReserved) {
 				if (idx == plman.ActivePlaylist) {
@@ -640,19 +640,19 @@ oPlaylistManager = function(name) {
 			if (cPlaylistManager.blink_counter > -1) {
 				if (cPlaylistManager.blink_row == 0) {
 					if (cPlaylistManager.blink_counter <= 6 && Math.floor(cPlaylistManager.blink_counter / 2) == Math.ceil(cPlaylistManager.blink_counter / 2)) {
-						gr.GdiDrawText("+ 发送到新播放列表", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+						gr.GdiDrawText("+ Sent to a new playlist", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 					};
 				};
 				else {
-					gr.GdiDrawText("发送到 ...", g_font, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+					gr.GdiDrawText("Send to ...", g_font, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				};
 			};
 			else {
 				if (this.activeRow == 0) {
-					gr.GdiDrawText("+ 发送到新播放列表", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+					gr.GdiDrawText("+ Sent to a new playlist", g_font_bb, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				};
 				else {
-					gr.GdiDrawText("发送到 ...", g_font, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
+					gr.GdiDrawText("Send to ...", g_font, txt_color, cx + bg_margin_left + txt_margin, this.y, cw - bg_margin_left * 2 - txt_margin * 2 - tw - this.scr_w, ch, lc_txt);
 				};
 			};
 
@@ -755,7 +755,7 @@ oPlaylistManager = function(name) {
 					if (this.activeRow == 0) {
 						// send to a new playlist
 						this.drop_done = true;
-						fb.RunMainMenuCommand("文件/新建播放列表");
+						fb.RunMainMenuCommand("File/New playlist");
 						plman.InsertPlaylistItems(plman.PlaylistCount - 1, 0, brw.metadblist_selection, false);
 					};
 					else {
@@ -1396,11 +1396,11 @@ oBrowser = function(name) {
 		//var pidx = -1;
 		var pidx_playing = -1;
 		for (var i = 0; i < total; i++) {
-			if (!pfound && plman.GetPlaylistName(i) == "媒体库视图") {
+			if (!pfound && plman.GetPlaylistName(i) == "Library View") {
 				pidx = i;
 				pfound = true;
 			};
-			if (!pfound_playing && plman.GetPlaylistName(i) == "媒体库视图(正在播放)") {
+			if (!pfound_playing && plman.GetPlaylistName(i) == "Library View (playing)") {
 				pidx_playing = i;
 				pfound_playing = true;
 			};
@@ -1414,7 +1414,7 @@ oBrowser = function(name) {
 			};
 			else {
 				pidx = plman.PlaylistCount;
-				plman.CreatePlaylist(pidx, "媒体库视图");
+				plman.CreatePlaylist(pidx, "Library View");
 				var from = 0;
 			};
 			// *** insert tracks into pidx playlist
@@ -1423,9 +1423,9 @@ oBrowser = function(name) {
 		else {
 			if (fb.IsPlaying) {
 				if (plman.PlayingPlaylist == pidx) { // playing playlist is "Library selection"
-					plman.RenamePlaylist(pidx, "媒体库视图(正在播放)");
+					plman.RenamePlaylist(pidx, "Library View (playing)");
 					if (pfound_playing) {
-						plman.RenamePlaylist(pidx_playing, "媒体库视图");
+						plman.RenamePlaylist(pidx_playing, "Library View");
 						// 1. initialize old "Library selection (playing)" playlist
 						var tot = plman.PlaylistItemCount(pidx_playing);
 						affectedItems.splice(0, affectedItems.length);
@@ -1437,7 +1437,7 @@ oBrowser = function(name) {
 					};
 					else {
 						pidx_playing = plman.PlaylistCount;
-						plman.CreatePlaylist(pidx_playing, "媒体库视图");
+						plman.CreatePlaylist(pidx_playing, "Library View");
 					};
 					// *** insert tracks into pidx_playing playlist
 					plman.InsertPlaylistItems(pidx_playing, 0, brw.groups[index].pl, false);
@@ -1458,7 +1458,7 @@ oBrowser = function(name) {
 					else {
 						// create "Library selection" playlist
 						pidx = plman.PlaylistCount;
-						plman.CreatePlaylist(pidx, "媒体库视图");
+						plman.CreatePlaylist(pidx, "Library View");
 					};
 					// *** insert tracks into pidx playlist
 					plman.InsertPlaylistItems(pidx, 0, brw.groups[index].pl, false);
@@ -1478,7 +1478,7 @@ oBrowser = function(name) {
 				else {
 					// create "Library selection" playlist
 					pidx = plman.PlaylistCount;
-					plman.CreatePlaylist(pidx, "媒体库视图");
+					plman.CreatePlaylist(pidx, "Library View");
 				};
 				// *** insert tracks into pidx playlist
 				plman.InsertPlaylistItems(pidx, 0, brw.groups[index].pl, false);
@@ -1536,23 +1536,23 @@ oBrowser = function(name) {
 	};
 	
 	this.init_dlbtn = function(){
-		this.dl_btn = new button(images.down_all, images.down_all_h, images.down_all_d, "一键下载封面");
+		this.dl_btn = new button(images.down_all, images.down_all_h, images.down_all_d, "Onekey download covers");
 	}
 	this.init_dlbtn();
 	
 	this.init_swbtn = function(){
 		switch(ppt.tagMode){
 			case 1:
-			if (ppt.albumMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "切换至简单专辑模式");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "切换至高级专辑模式");
+			if (ppt.albumMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "Switch to simple album");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "Switch to advanced album");
 			break;
 			case 2:
-			if (ppt.artistMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "切换至艺术家");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "切换至专辑艺术家");
+			if (ppt.artistMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "Switch to artist");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "Switch to album artist");
 			break;
 			case 3:
-			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "切换至文件夹");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "切换至流派");
+			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "Switch to directory");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "Switch to genre");
 			break;
 		}
 	}
@@ -1563,28 +1563,28 @@ oBrowser = function(name) {
 			case 1:
 			if (ppt.albumMode ==0) {
 				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
-				this.switch_btn.Tooltip.Text = "切换至简单专辑模式";
+				this.switch_btn.Tooltip.Text = "Switch to simple album";
 			}else{
 				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
-				this.switch_btn.Tooltip.Text = "切换至高级专辑模式";
+				this.switch_btn.Tooltip.Text = "Switch to advanced album";
 			}
 			break;
 			case 2:
 			if (ppt.artistMode ==0) {
 				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
-				this.switch_btn.Tooltip.Text = "切换至艺术家";
+				this.switch_btn.Tooltip.Text = "Switch to artist";
 			}else{
 				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
-				this.switch_btn.Tooltip.Text = "切换至专辑艺术家";
+				this.switch_btn.Tooltip.Text = "Switch to album artist";
 			}
 			break;
 			case 3:
 			if (ppt.genre_dir ==0) {
 				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
-				this.switch_btn.Tooltip.Text = "切换至文件夹";
+				this.switch_btn.Tooltip.Text = "Switch to directory";
 			}else{
 				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
-				this.switch_btn.Tooltip.Text = "切换至流派";
+				this.switch_btn.Tooltip.Text = "Switch to genre";
 			}
 			break;
 		}
@@ -1754,22 +1754,22 @@ oBrowser = function(name) {
 						if (ppt.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
 							try {
 								if (ppt.tagMode == 1) {
-									gr.gdiDrawText("所有项目", g_font_b, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+									gr.gdiDrawText("All items", g_font_b, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
 									//gr.gdiDrawText("(" + (total - 1) + " 个项目)", g_font_s, txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth + ppt.botTextRowHeight), coverWidth, ppt.botTextRowHeight, lt_txt);
 								};
 								else {
-									gr.gdiDrawText("所有项目", (i == this.selectedIndex ? g_font_b : g_font), txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+									gr.gdiDrawText("All items", (i == this.selectedIndex ? g_font_b : g_font), txt_color2, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
 								};
 							} catch (e) {}
 						};
 						else {
 							if (arr[1] == "?") {
 								if (this.groups[i].count > 1) {
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
+									var album_name = (this.groups[i].tracktype != 3 ? "(Singles)" : "(Radios)");
 								};
 								else {
 									var arr_t = this.groups[i].tra[0].split(" ^^ ");
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲) " : "") + arr_t[0];
+									var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[0];
 								};
 							};
 							else {
@@ -1797,11 +1797,11 @@ oBrowser = function(name) {
 						else {
 							if (arr[1] == "?") {
 								if (this.groups[i].count > 1) {
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲)" : "(网络电台)");
+									var album_name = (this.groups[i].tracktype != 3 ? "(Singles)" : "(Radios)");
 								};
 								else {
 									var arr_t = this.groups[i].tra[0].split(" ^^ ");
-									var album_name = (this.groups[i].tracktype != 3 ? "(单曲) " : "") + arr_t[0];
+									var album_name = (this.groups[i].tracktype != 3 ? "(Single) " : "") + arr_t[0];
 								};
 							};
 							else {
@@ -1899,7 +1899,7 @@ oBrowser = function(name) {
 
 			// draw top header bar 
 			if (ppt.showHeaderBar) {
-				var item_txt = new Array("", "张专辑", "位专辑艺术家", "位艺术家", "个流派", "个文件夹");
+				var item_txt = new Array("", "album", "album artist", "artist", "genre", "directory");
 				var nb_groups = (ppt.showAllItem && total > 1 ? total - 1 : total);
 				var _idx1 = (ppt.tagMode == 2 && ppt.artistMode);
 				var _idx2 = (ppt.tagMode == 3 ? (ppt.genre_dir ? 2 : 1) : 0);
@@ -1907,10 +1907,10 @@ oBrowser = function(name) {
 				try{boxText_len = gr.CalcTextWidth(boxText, g_font_b)};
 				catch (e) {boxText_len = 0;}
 				if (ppt.sourceMode == 0) {
-					var source_name = "媒体库"
+					var source_name = "Library"
 				};
 				else {
-					var source_name = "当前列表：" + (ppt.locklibpl ? "媒体库" : plman.GetPlaylistName(plman.ActivePlaylist))
+					var source_name = "Playlist: " + (ppt.locklibpl ? "Library" : plman.GetPlaylistName(plman.ActivePlaylist))
 				};
 				gr.FillSolidRect(0, 0, ww, brw.y + 1, g_syscolor_window_bg);
 				gr.FillSolidRect(this.x, ppt.headerBarHeight, this.w + (cScrollBar.enabled ? cScrollBar.width : 0), 1, g_color_line);
@@ -2161,15 +2161,15 @@ oBrowser = function(name) {
 		this.metadblist_selection = this.groups[albumIndex].pl.Clone();
 		Context.InitContext(this.metadblist_selection);
 
-		_menu.AppendMenuItem(MF_STRING, 1, "设置...");
+		_menu.AppendMenuItem(MF_STRING, 1, "Settings...");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 899, "创建智能列表");
-		if(ppt.tagMode < 3 && !_allitem) _menu.AppendMenuItem(MF_STRING, 898, "下载封面图片 (强制)");
+		_menu.AppendMenuItem(MF_STRING, 899, "Create autoplaylist");
+		if(ppt.tagMode < 3 && !_allitem) _menu.AppendMenuItem(MF_STRING, 898, "Download cover (overwirte)");
 		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 2, -1);
-		_menu.AppendMenuItem(MF_STRING, 1010, "重置所选图像的缓存");
-		_child01.AppendTo(_menu, MF_STRING, "选择发送到...");
-		_child01.AppendMenuItem(MF_STRING, 2000, "新播放列表");
+		_menu.AppendMenuItem(MF_STRING, 1010, "Reset cache of selected");
+		_child01.AppendTo(_menu, MF_STRING, "Selected send to...");
+		_child01.AppendMenuItem(MF_STRING, 2000, "New playlist");
 
 		var pl_count = plman.PlaylistCount;
 		if (pl_count > 1) {
@@ -2221,7 +2221,7 @@ oBrowser = function(name) {
 				this.repaint();
 				break;
 			case 2000:
-				fb.RunMainMenuCommand("文件/新建播放列表");
+				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount - 1, 0, this.metadblist_selection, false);
 				break;
 			default:
@@ -2243,47 +2243,47 @@ oBrowser = function(name) {
 		var _menu3 = window.CreatePopupMenu();
 		var idx;
 
-		_menu0.AppendMenuItem(MF_STRING, 50, "媒体库");
-		_menu0.AppendMenuItem(MF_STRING, 51, "播放列表");
+		_menu0.AppendMenuItem(MF_STRING, 50, "Library");
+		_menu0.AppendMenuItem(MF_STRING, 51, "Playlist");
 		_menu0.CheckMenuRadioItem(50, 51, 50 + ppt.sourceMode);
 		_menu0.AppendMenuSeparator();
-		_menu0.AppendMenuItem((ppt.sourceMode == 1 && fb.IsMediaLibraryEnabled()) ? MF_STRING : MF_DISABLED, 52, "锁定在媒体库播放列表");
+		_menu0.AppendMenuItem((ppt.sourceMode == 1 && fb.IsMediaLibraryEnabled()) ? MF_STRING : MF_DISABLED, 52, "Locked in Library playlist");
 		_menu0.CheckMenuItem(52, ppt.locklibpl);
-		_menu0.AppendMenuItem((ppt.sourceMode == 1) ? MF_STRING : MF_DISABLED, 53, "播放列表强制排序");
+		_menu0.AppendMenuItem((ppt.sourceMode == 1) ? MF_STRING : MF_DISABLED, 53, "Forced sorting");
 		_menu0.CheckMenuItem(53, ppt.forceSorting);
-		_menu0.AppendTo(_menu, MF_STRING, "来源");
+		_menu0.AppendTo(_menu, MF_STRING, "Source");
 		_menu.AppendMenuSeparator();
 		
-		_menu1.AppendMenuItem(MF_STRING, 111, "专辑 | 专辑艺术家");
-		_menu1.AppendMenuItem(MF_STRING, 112, "专辑");
-		_menu1.AppendMenuItem(MF_STRING, 113, "专辑艺术家");
-		_menu1.AppendMenuItem(MF_STRING, 114, "艺术家");
-		_menu1.AppendMenuItem(MF_STRING, 115, "流派");
-		_menu1.AppendMenuItem(MF_STRING, 116, "文件夹");
+		_menu1.AppendMenuItem(MF_STRING, 111, "Album | album artist");
+		_menu1.AppendMenuItem(MF_STRING, 112, "Album");
+		_menu1.AppendMenuItem(MF_STRING, 113, "Album artist");
+		_menu1.AppendMenuItem(MF_STRING, 114, "Artist");
+		_menu1.AppendMenuItem(MF_STRING, 115, "Genre");
+		_menu1.AppendMenuItem(MF_STRING, 116, "Directory");
 		var _idx1 = (ppt.tagMode == 1 && ppt.albumMode);
 		var _idx2 = (ppt.tagMode == 2 ? (ppt.artistMode ? 2 : 1)  : 0);
 		var _idx3 = (ppt.tagMode == 3 ? (ppt.genre_dir ? 3 : 2)  : 0);
 		_menu1.CheckMenuRadioItem(111, 116, 110 + ppt.tagMode + _idx1 + _idx2 + _idx3);
-		_menu1.AppendTo(_menu, MF_STRING, "视图");
-		_menu2.AppendMenuItem(MF_STRING, 901, "间距排列模式");
-		_menu2.AppendMenuItem(MF_STRING, 903, "网格排列模式");
+		_menu1.AppendTo(_menu, MF_STRING, "View");
+		_menu2.AppendMenuItem(MF_STRING, 901, "Column mode");
+		_menu2.AppendMenuItem(MF_STRING, 903, "Grid mode");
 		_menu2.CheckMenuRadioItem(901, 903, 900 + ppt.panelMode);
 		_menu2.AppendMenuSeparator();
-		_menu2.AppendMenuItem(MF_STRING, 910, "标题栏");
+		_menu2.AppendMenuItem(MF_STRING, 910, "Header bar");
 		_menu2.CheckMenuItem(910, ppt.showHeaderBar);
-		_menu2.AppendMenuItem(MF_STRING, 911, "合计项目");
+		_menu2.AppendMenuItem(MF_STRING, 911, "Aggregate item");
 		_menu2.CheckMenuItem(911, ppt.showAllItem);
 		_menu2.AppendMenuSeparator();
-		_menu2.AppendMenuItem(MF_STRING, 912, "重置磁盘缓存");
-		_menu2.AppendTo(_menu, MF_STRING, "显示");
-		_menu.AppendMenuItem(MF_STRING, 200, "刷新封面");
+		_menu2.AppendMenuItem(MF_STRING, 912, "Reset disk cache");
+		_menu2.AppendTo(_menu, MF_STRING, "Display");
+		_menu.AppendMenuItem(MF_STRING, 200, "Refresh");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 201, "加载时动画效果");
+		_menu.AppendMenuItem(MF_STRING, 201, "Loading animation");
 		_menu.CheckMenuItem(201, ppt.showloading);
 		//_menu.AppendMenuSeparator();
 		//_menu.AppendMenuItem(MF_STRING, 990, "Reload Library");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 991, "面板属性");
+		_menu.AppendMenuItem(MF_STRING, 991, "Panel properties");
 		//_menu.AppendMenuItem(MF_STRING, 992, "配置...");
 
 		idx = _menu.TrackPopupMenu(x, y);
@@ -2586,7 +2586,7 @@ function on_init() {
 	window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
 	if (ppt.locklibpl) {
 		g_active_playlist = lib_pl;
-		if (plman.GetPlaylistName(lib_pl) != "媒体库") {
+		if (plman.GetPlaylistName(lib_pl) != "Library") {
 			ppt.locklibpl = false;
 			g_active_playlist = plman.ActivePlaylist;
 			window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
@@ -3489,22 +3489,22 @@ function on_key_down(vkey) {
 
 			};
 			if (vkey == 70) { // CTRL+F
-				fb.RunMainMenuCommand("编辑/搜索");
+				fb.RunMainMenuCommand("Edit/Search");
 			};
 			if (vkey == 73) { // CTRL+I
 
 			};
 			if (vkey == 78) { // CTRL+N
-				fb.RunMainMenuCommand("文件/新建播放列表");
+				fb.RunMainMenuCommand("File/New playlist");
 			};
 			if (vkey == 79) { // CTRL+O
-				fb.RunMainMenuCommand("文件/打开...");
+				fb.RunMainMenuCommand("File/Open...");
 			};
 			if (vkey == 80) { // CTRL+P
-				fb.RunMainMenuCommand("文件/参数选项");
+				fb.RunMainMenuCommand("File/Preferences");
 			};
 			if (vkey == 83) { // CTRL+S
-				fb.RunMainMenuCommand("文件/保存播放列表...");
+				fb.RunMainMenuCommand("File/Save playlist...");
 			};
 			if (vkey == 84) { // CTRL+T
 				ppt.showHeaderBar = !ppt.showHeaderBar;
@@ -3518,7 +3518,7 @@ function on_key_down(vkey) {
 			switch (vkey) {
 			case 65:
 				// ALT+A
-				fb.RunMainMenuCommand("视图/总在最上面");
+				fb.RunMainMenuCommand("View/Always on Top");
 				break;
 			case VK_ALT:
 				// ALT key alone
@@ -3632,7 +3632,7 @@ function on_playlists_changed() {
 	};
 
 	if (ppt.locklibpl) {
-		if (plman.GetPlaylistName(lib_pl) != "媒体库") {
+		if (plman.GetPlaylistName(lib_pl) != "Library") {
 			ppt.locklibpl = false;
 			g_active_playlist = plman.ActivePlaylist;
 			window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
@@ -4084,7 +4084,7 @@ function reset_this_cache(idx, crc){
 			fso.DeleteFile(fb.ProfilePath + "cache\\imgcache\\" + crc);
 		};
 		catch (e) {
-			fb.trace("WSH Panel 错误: 图像缓存 [" + crc + "] 无法删除, 文件正在使用中,稍后重试或重载面板.");
+			fb.trace("WSH Panel error: unable to delete cache [" + crc + "], file is being used, try later or reload the panel.");
 		};
 	};
 	brw.groups[idx].tid = -1;

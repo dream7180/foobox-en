@@ -172,7 +172,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				cx = p.headerBar.columns[j].x + g_z5;
 				cw = (Math.abs(p.headerBar.w * p.headerBar.columns[j].percent / 100000)) - g_z10;
 				switch (p.headerBar.columns[j].ref) {
-				case "状态":
+				case "State":
 					if (p.headerBar.columns[j].tf == "null") {
 						var columnColor = this.text_colour;
 					};
@@ -271,7 +271,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						};
 					};
 					break;
-				case "喜爱":
+				case "Mood":
 					if (typeof(this.mood) == "undefined") {
 						this.mood = fb.TitleFormat(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
 						var moodArray = this.parseTF(this.mood, this.text_colour);
@@ -299,7 +299,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					var m_color = (this.mood != 0 ? 0 +  _playing_mood*imgh*3 : _dark_mood*imgh + imgh);
 					gr.DrawImage(images.mood_ico, columns.mood_x, this.y + Math.floor(cTrack.height / 2) - imgh/2 + 1, imgw, imgh, 0, m_color, imgw, imgh, 0, 255);
 					break;
-				case "等级":
+				case "Rating":
 					cw = p.headerBar.columns[j].w - g_z6;
 					if (typeof(this.rating) == "undefined") {
 						this.rating = fb.TitleFormat(p.headerBar.columns[j].tf).EvalWithMetadb(this.metadb);
@@ -412,10 +412,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			};
 			else {
 				switch (p.headerBar.columns[j].ref) {
-				case "喜爱":
+				case "Mood":
 					columns.mood = false;
 					break;
-				case "等级":
+				case "Rating":
 					columns.rating = false;
 					break;
 				};
@@ -688,7 +688,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				break;
 			case 2:
 				if(this.obj && l2_addinfo){
-					this.r2 = this.obj.count + " 首";//, " + this.obj.total_group_duration_txt;
+					this.r2 = this.obj.count + (this.obj.count > 1 ? " Tracks" : " Track");//, " + this.obj.total_group_duration_txt;
 				}
 				var lg2_right_field_w = gr.CalcTextWidth(this.r2, g_font_group2) + cList.borderWidth * 2;
 				gr.gdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z8 - lg1_right_field_w, cTrack.height * 1.15, lcs_txt);
@@ -703,7 +703,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.gdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.gdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
-					var lg3_left_field = this.obj.count + " 首, " + this.obj.total_group_duration_txt;
+					var lg3_left_field = this.obj.count + (this.obj.count > 1 ? " Tracks, " : " Track, ") + this.obj.total_group_duration_txt;
 				};
 				else {
 					var lg3_left_field = "";
@@ -720,7 +720,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.gdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.gdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
-					var lg3_left_field = this.obj.count + " 首, " + this.obj.total_group_duration_txt;
+					var lg3_left_field = this.obj.count + (this.obj.count > 1 ? " Tracks, " : " Track, ") + this.obj.total_group_duration_txt;
 				};
 				else {
 					var lg3_left_field = "";
@@ -1072,7 +1072,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				};
 				else { // track
 					var cmd = properties.defaultPlaylistItemAction;
-					if (cmd == "播放") {
+					if (cmd == "Play") {
 						plman.ExecutePlaylistDefaultAction(p.list.playlist, this.track_index);
 					};
 					else {
@@ -1098,13 +1098,13 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							if (this.l_rating != this.rating) {
 								if (this.metadb) {
 									if (rating2tag && this.tracktype < 2) this.metadb.UpdateFileInfoSimple("RATING", this.l_rating);
-									fb.RunContextCommandWithMetadb("等级/" + ((this.l_rating == 0) ? "<不设置>" : this.l_rating), this.metadb) || fb.RunContextCommandWithMetadb("Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
+									fb.RunContextCommandWithMetadb("Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
 									this.rating = this.l_rating;
 								};
 							};
 							else {
 								if (rating2tag && this.tracktype < 2) this.metadb.UpdateFileInfoSimple("RATING", "");
-								fb.RunContextCommandWithMetadb("等级/<不设置>", this.metadb) || fb.RunContextCommandWithMetadb("Rating/<not set>", this.metadb);
+								fb.RunContextCommandWithMetadb("Rating/<not set>", this.metadb);
 
 								this.rating = 0;
 							};
@@ -1492,7 +1492,7 @@ oList = function(object_name, playlist) {
 			for (var i = 0; i < 16; i++) {
 				switch (i) {
 				case 0:
-					fields.push(new Array("专辑 (简单)", "专辑艺术家 | 专辑 | 光盘", "专辑艺术家", "艺术家", "流派", "目录结构"));
+					fields.push(new Array("Album (simple)", "Album Artist | Album | Disc", "Album Artist", "Artist", "Genre", "Directory"));
 					break;
 				case 1:
 					fields.push(new Array("%album%", "%album artist%%album%%discnumber%", "%album artist%", "%artist%", "%genre%", "$directory_path(%path%)"));
@@ -1501,7 +1501,7 @@ oList = function(object_name, playlist) {
 					fields.push(new Array(sort_pattern_album, sort_pattern_albumartist, sort_pattern_albumartist, sort_pattern_artist, sort_pattern_genre, sort_pattern_path));
 					break;
 				case 3:
-					fields.push(new Array("专辑 (简单)", "专辑", "专辑艺术家", "艺术家", "流派", "目录结构"));
+					fields.push(new Array("Album (simple)", "Album", "Album Artist", "Artist", "Genre", "Directory"));
 					break;
 				case 4:
 					// playlist filter
@@ -1529,19 +1529,19 @@ oList = function(object_name, playlist) {
 					break;
 				case 10:
 					// l1
-					fields.push(new Array("$if2(%album%,'未知专辑')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [光盘 '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'单曲','网络电台'))", "$if2(%album artist%,'未知艺术家')", "$if2(%artist%,'未知艺术家')", "$if2(%genre%,'未知流派')", "$directory(%path%,1)"));
+					fields.push(new Array("$if2(%album%,'Unknown album')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [Disc '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'Single','Radio'))", "$if2(%album artist%,'Unknown artist')", "$if2(%artist%,'Unknown artist')", "$if2(%genre%,'Unknown genre')", "$directory(%path%,1)"));
 					break;
 				case 11:
 					// r1
-					fields.push(new Array("$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if2(%genre%,'未知流派')", "$if2(%genre%,'未知流派')", "", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')"));
+					fields.push(new Array("$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')", "$if2(%genre%,'Unknown genre')", "$if2(%genre%,'Unknown genre')", "", "$if(%date%,$year($replace(%date%,/,-,.,-)),' ')"));
 					break;
 				case 12:
 					// l2
-					fields.push(new Array("$if(%album%, $if2(%album artist%,'未知艺术家'),$if2(%album artist%,'未知艺术家')...)", "$if2(%album artist%,'未知艺术家')", "", "", "", "$directory(%path%,2)"));
+					fields.push(new Array("$if(%album%, $if2(%album artist%,'Unknown artist'),$if2(%album artist%,'Unknown artist')...)", "$if2(%album artist%,'Unknown artist')", "", "", "", "$directory(%path%,2)"));
 					break;
 				case 13:
 					// r2
-					fields.push(new Array("$if2(%genre%,'未知流派')", "$if2(%genre%,'未知流派')", "", "", "", "$if2(%genre%,'未知流派')"));
+					fields.push(new Array("$if2(%genre%,'Unknown genre')", "$if2(%genre%,'Unknown genre')", "", "", "", "$if2(%genre%,'Unknown genre')"));
 					break;
 				case 14:
 					// l4
@@ -2614,29 +2614,29 @@ oList = function(object_name, playlist) {
 		var o_genre = fb.TitleFormat("$ifequal($stricmp(%genre%,?),1,,%genre%)");
 
 		//_menu.AppendMenuItem(MF_STRING, 1, "面板设置...");
-		_menu.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "移除");
+		_menu.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
 		if(g_track_type == 3) {
-			_menu.AppendMenuItem(MF_STRING, 1013, "下载...");
+			_menu.AppendMenuItem(MF_STRING, 1013, "Download...");
 		}
 		_menu.AppendMenuSeparator();
 		if (plman.GetPlaybackQueueCount() > 0) {
-			if (this.name != "播放队列") {
-				_menu.AppendMenuItem(MF_STRING, 2, "显示播放队列");
+			if (this.name != "Queue Content") {
+				_menu.AppendMenuItem(MF_STRING, 2, "Show playback queue");
 			};
 		};
 		Context.BuildMenu(_menu, 3, -1);
 		
 		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (g_track_type < 2))
-			_menu.AppendMenuItem(MF_STRING, 1012, "用Mp3tag编辑");
-		_child01.AppendTo(_menu, MF_STRING, "选择...");
-		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "从播放列表移除");
-		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "移除列表其他项");
-		_child02.AppendTo(_child01, MF_STRING, "添加到...");
-		_child03.AppendTo(_child01, MF_STRING, "发送到...");
-		_child03.AppendMenuItem(MF_STRING, 4000, "新建播放列表");
+			_menu.AppendMenuItem(MF_STRING, 1012, "Edit with Mp3tag");
+		_child01.AppendTo(_menu, MF_STRING, "Selection...");
+		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
+		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "Crop");
+		_child02.AppendTo(_child01, MF_STRING, "Add to...");
+		_child03.AppendTo(_child01, MF_STRING, "Send to...");
+		_child03.AppendMenuItem(MF_STRING, 4000, "New playlist");
 		_child01.AppendMenuSeparator();
-		_child01.AppendMenuItem(this.metadblist_selection.count == 1 && !o_title.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_artist.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_album.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_genre.EvalWithMetadb(this.metadblist_selection.item(i)) ? MF_GRAYED | MF_DISABLED : MF_STRING, 7000, "标签繁转简");
-		_child01.AppendMenuItem(this.metadblist_selection.count == 1 && !o_title.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_artist.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_album.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_genre.EvalWithMetadb(this.metadblist_selection.item(i)) ? MF_GRAYED | MF_DISABLED : MF_STRING, 7001, "标签简转繁");
+		_child01.AppendMenuItem(this.metadblist_selection.count == 1 && !o_title.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_artist.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_album.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_genre.EvalWithMetadb(this.metadblist_selection.item(i)) ? MF_GRAYED | MF_DISABLED : MF_STRING, 7000, "Convert tag (ZH_TW -> ZH_CN)");
+		_child01.AppendMenuItem(this.metadblist_selection.count == 1 && !o_title.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_artist.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_album.EvalWithMetadb(this.metadblist_selection.item(i)) && !o_genre.EvalWithMetadb(this.metadblist_selection.item(i)) ? MF_GRAYED | MF_DISABLED : MF_STRING, 7001, "Convert tag (ZH_CN -> ZH_TW)");
 
 		var pl_count = plman.PlaylistCount;
 
@@ -2764,7 +2764,7 @@ oList = function(object_name, playlist) {
 				}
 				break;
 			case (ret == 4000):
-				fb.RunMainMenuCommand("文件/新建播放列表");
+				fb.RunMainMenuCommand("File/New playlist");
 				plman.InsertPlaylistItems(plman.PlaylistCount - 1, 0, this.metadblist_selection, false);
 				break;
 			case (ret > 2000 && ret < 4000):

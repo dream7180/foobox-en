@@ -1303,7 +1303,7 @@ function Display(x, y, w, h, prop) {
 				imgCache.text = "";
 			}
 
-		}(0, 0, Math.ceil(55*zdpi) + 5, Math.ceil(25*zdpi));
+		}(0, 0, Math.ceil(75*zdpi) + 5, Math.ceil(25*zdpi));
 
 		var btnStatus = -1; // -1: hide.
 		var bugx, bugy; // Prevent a windows menu behaviour bug.
@@ -1671,7 +1671,7 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!imgDisplay.menuButton) return;
 		var caption;
 		if (currentPathItem) caption = currentPathItem.artId == -1 ? "Genre" : GetCaption(AlbumArtId.GetName(currentPathItem.artId).capitalize());
-		else caption = "No cover";
+		else caption = "No Cover";
 		imgDisplay.menuButton.caption = GetCaption(caption);
 	}
 

@@ -1908,7 +1908,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
 			// Tagging options
 			this.elements.push(new oCheckBox(5, txtbox_x + 30, cSettings.topBarHeight + rh * 9.25, "Skip existing file", "dl_skip", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "Preset download folder. If you need to revise it, please ensure the path is valid (create it if the folder not existing).", dl_prefix_folder, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "Preset download folder. To customize it, ensure the path is valid (create it if the folder not existing).", dl_prefix_folder, "settings_textboxes_action", this.id));
 			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "Rename format for downloaded tracks", dl_rename_by, "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 15.25, "Play the next playlist when finish current one (effective in default playback order, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "Disable bottom toolbar if not a web playlist", "properties.disableToolbar", "settings_checkboxes_action", this.id));
@@ -2016,46 +2016,46 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(20, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (18.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 2, left field", txtbox_value, "settings_textboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].r2;
 			this.elements.push(new oTextBox(21, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (20.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 2, right field", txtbox_value, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(22, txtbox_x, cSettings.topBarHeight + rh * 35.0, "第 2 行右侧显示音轨数 (选中时上面一栏的定义无效, 此选项仅作用于分组标题高度为两行时)", ("l2_addinfo == true ? true : false"), "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(22, txtbox_x, cSettings.topBarHeight + rh * 35.0, "Show track count in line 2, right field (will override the upper setting, effective only when the header row height is 2)", ("l2_addinfo == true ? true : false"), "settings_checkboxes_action", this.id));
 			txtbox_value = p.list.groupby[listBoxCurrentId].l4;
-			this.elements.push(new oTextBox(23, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (23.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "标题第 4 行字段", txtbox_value, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(23, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * (23.0 + GHF_delta)), oTextBox_1, cHeaderBar.height, "Header line 4", txtbox_value, "settings_textboxes_action", this.id));
 			// Create radio buttons for Defaul Group Status (Collapsed OR Expanded)
 			var spaceBetween_w = zoom(90, zdpi);
-			this.elements.push(new oRadioButton(24, txtbox_x, cSettings.topBarHeight + rh * 25.0, "折叠", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "1"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(25, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 25.0, "展开", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "0"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(24, txtbox_x, cSettings.topBarHeight + rh * 25.0, "Collapse", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "1"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(25, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 25.0, "Expand", (p.list.groupby[p.settings.pages[2].elements[0].selectedId].collapseGroupsByDefault == "0"), "settings_radioboxes_action", this.id));
 			break;
 		case 3:
 			//foobox options
 			var rh = cSettings.rowHeight;
-			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "启动时随机获取以下风格", (ui_mode_set == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 3.25, "白色", (ui_mode_set == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(2, zoom(120, zdpi), cSettings.topBarHeight + rh * 3.25, "浅色", (ui_mode_set == 2), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(3, zoom(220, zdpi), cSettings.topBarHeight + rh * 3.25, "深色", (ui_mode_set == 3), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(4, zoom(320, zdpi), cSettings.topBarHeight + rh * 3.25, "加深", (ui_mode_set == 4), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(5, 20, cSettings.topBarHeight + rh * 5.25, "随机变幻", (random_mode == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(6, zoom(120, zdpi), cSettings.topBarHeight + rh * 5.25, "不变色，黑白", (random_mode == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(7, zoom(280, zdpi), cSettings.topBarHeight + rh * 5.25, "不变色，保存当前配色", (random_mode == 2), "settings_radioboxes_action", this.id));
-			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 6.25, "跟随封面变色", "col_by_cover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 8.25, "跟随全局字体", "esl_font_auto ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(10, zoom(150, zdpi), cSettings.topBarHeight + rh * 8.25, "并加粗", "esl_font_bold ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(11, 20, cSettings.topBarHeight + rh * 10.25, "同时写入文件标签及playcount记录", (rating2tag == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(12, zoom(280, zdpi), cSettings.topBarHeight + rh * 10.25, "仅由playcount记录", (rating2tag == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oCheckBox(13, 20, cSettings.topBarHeight + rh * 12.25, "无窗口边框", "ui_noborder ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(14, zoom(150, zdpi), cSettings.topBarHeight + rh * 12.25, "显示全屏按钮", "btn_fullscr ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 13.25, "专辑图片 = 封面 + 碟片, 并以碟片优先 (对部分网易云下载的歌曲适用)", "album_front_disc ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(16, 20, cSettings.topBarHeight + rh * 14.25, "右栏面板总是跟随光标 (不推荐)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(17, 20, cSettings.topBarHeight + rh * 15.25, "右栏面板跟随主面板联动切换", "auto_sw ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(18, 20, cSettings.topBarHeight + rh * 16.25, "顶栏和底栏开启阴影效果", "show_shadow ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(19, 20, cSettings.topBarHeight + rh * 18.25, "系统", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(20, zoom(120, zdpi), cSettings.topBarHeight + rh * 18.25, "较窄", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "Random of the following themes", (ui_mode_set == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 3.25, "White", (ui_mode_set == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(2, zoom(120, zdpi), cSettings.topBarHeight + rh * 3.25, "Light", (ui_mode_set == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(3, zoom(220, zdpi), cSettings.topBarHeight + rh * 3.25, "Dark", (ui_mode_set == 3), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, zoom(320, zdpi), cSettings.topBarHeight + rh * 3.25, "Darken", (ui_mode_set == 4), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, 20, cSettings.topBarHeight + rh * 5.25, "Random", (random_mode == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(6, zoom(120, zdpi), cSettings.topBarHeight + rh * 5.25, "Black and white", (random_mode == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(7, zoom(280, zdpi), cSettings.topBarHeight + rh * 5.25, "Keep current", (random_mode == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 6.25, "Vary follow cover", "col_by_cover ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 8.25, "Global font", "esl_font_auto ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(10, zoom(150, zdpi), cSettings.topBarHeight + rh * 8.25, "Bold", "esl_font_bold ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(11, 20, cSettings.topBarHeight + rh * 10.25, "Recorded by both playcount and file tags", (rating2tag == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(12, zoom(300, zdpi), cSettings.topBarHeight + rh * 10.25, "Recorded by playcount only", (rating2tag == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oCheckBox(13, 20, cSettings.topBarHeight + rh * 12.25, "No window border", "ui_noborder ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(14, zoom(180, zdpi), cSettings.topBarHeight + rh * 12.25, "Show full-screen button", "btn_fullscr ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 13.25, "Album cover = disc + front, and disc is prior to front", "album_front_disc ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(16, 20, cSettings.topBarHeight + rh * 14.25, "Right panels follow cursor (not recommended)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(17, 20, cSettings.topBarHeight + rh * 15.25, "Switch right panels automatically following main panels", "auto_sw ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(18, 20, cSettings.topBarHeight + rh * 16.25, "Shadow effect for top and bottom bars", "show_shadow ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(19, 20, cSettings.topBarHeight + rh * 18.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(20, zoom(120, zdpi), cSettings.topBarHeight + rh * 18.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			break;
 		case 4:
 			//jssb options
 			var rh = cSettings.rowHeight;
-			this.elements.push(new oTextBox(0, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_2, cHeaderBar.height, "专辑", album_cover_dir, "settings_textboxes_action", this.id));			
-			this.elements.push(new oTextBox(1, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 6.25), oTextBox_2, cHeaderBar.height, "艺术家", artist_cover_dir, "settings_textboxes_action", this.id));			
-			this.elements.push(new oTextBox(2, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 8.25), oTextBox_2, cHeaderBar.height, "流派（不要定义为 %path%）", genre_cover_dir, "settings_textboxes_action", this.id));			
-			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_3, cHeaderBar.height, "音频文件夹封面文件名（不要输入扩展名）", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(0, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_2, cHeaderBar.height, "Album", album_cover_dir, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(1, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 6.25), oTextBox_2, cHeaderBar.height, "Artist", artist_cover_dir, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(2, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 8.25), oTextBox_2, cHeaderBar.height, "Genre（don't use %path%）", genre_cover_dir, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_3, cHeaderBar.height, "Filename of folder cover（don't input filename extension）", dir_cover_name, "settings_textboxes_action", this.id));			
 			break;
 		};
 	};
@@ -2089,17 +2089,17 @@ oPage = function(id, objectName, label, nbrows) {
 
 		switch (this.id) {
 		case 0:
-			gr.gdiDrawText("布局", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("行为", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("双击项目默认操作", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("网络音频下载选项", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Layout", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Behaviour", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Web download options", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			p.settings.viewdl_btn.draw(gr, txtbox_x + 40 + Math.min(500*zdpi - 60, 450*zdpi), cSettings.topBarHeight + rh * 11.05 - (this.offset * cSettings.rowHeight), 255);
-			gr.gdiDrawText("其他", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 1:
 			var listBoxWidth = zoom(120, zdpi);
-			gr.gdiDrawText("状态", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.7 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("对齐方式", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 16.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Status", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.7 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Text Alignment", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 16.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			// new column button
 			var nx = 20 + listBoxWidth + g_z30;
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
@@ -2115,7 +2115,7 @@ oPage = function(id, objectName, label, nbrows) {
 			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.new_no.Height) - (this.offset * cSettings.rowHeight);
 			var idx = p.settings.pages[1].elements[0].selectedId;
 			var ref = p.headerBar.columns[idx].ref;
-			if (ref.substr(0, 3) == "自定义") {
+			if (ref.substr(0, 3) == "Custom") {
 				p.settings.delbutton.draw(gr, dx, dy, 255);
 			};
 			else {
@@ -2139,39 +2139,39 @@ oPage = function(id, objectName, label, nbrows) {
 			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.new_no.Height) - (this.offset * cSettings.rowHeight);
 			var idx = p.settings.pages[2].elements[0].selectedId;
 			var ref = p.list.groupby[idx].ref;
-			if (ref.substr(0, 3) == "自定义") {
+			if (ref.substr(0, 3) == "Custom") {
 				p.settings.delbuttonPattern.draw(gr, dx, dy, 255);
 			};
 			else {
 				gr.DrawImage(p.settings.del_no, dx, dy, p.settings.del_no.Width, p.settings.del_no.Height, 0, 0, p.settings.del_no.Width, p.settings.del_no.Height, 0, 255);
 			};
 			//gr.FillSolidRect(txtbox_x, cSettings.topBarHeight + rh * 12.75 - (this.offset * cSettings.rowHeight), p.settings.w - 20 * 2 - cScrollBar.width, 2, p.settings.color1);
-			gr.gdiDrawText("折叠高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("展开高度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("封面", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 20.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("自动折叠", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 22.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("默认分组状态", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 24.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Collapsed row height", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Expanded row height", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Cover", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 20.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Auto-collapse", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 22.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Default group status", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 24.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 
 			var GHF_delta = 13.0;
-			gr.gdiDrawText("分组标题字段", g_font_blank, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * (13.0 + GHF_delta) - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Group header fields", g_font_blank, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * (13.0 + GHF_delta) - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 3:
-			gr.gdiDrawText("界面风格", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("变色方案", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("歌词面板字体", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 7.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("评级数据方案", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 9.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("其他选项", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("滚动条宽度", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("UI theme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Color scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("ESLyric Font", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 7.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 9.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			p.settings.opt_fb2k_btn.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 19.5 - (this.offset * cSettings.rowHeight), 255);
 			break;
 		case 4:
-			gr.gdiDrawText("封面储存路径", g_font_b, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("自定义时请确保该路径有效（需提前创建），否则更改将无效", p.settings.font, p.settings.color2, txtbox_x + 30, cSettings.topBarHeight + rh * 2.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("如果需要定义为与音频所在目录相同，请填写为 %path%", p.settings.font, p.settings.color2, txtbox_x + 30, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("注意：", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 12.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("1. 此处设定仅用于下载和缓存，不能替代foobar2000封面读取路径的设置 “参数选项--显示--专辑封面”", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 13.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("2. 支持的图片格式为 jpg 和 png", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("3. B盘为foobar2000文件夹的映射驱动器", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 15.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Cover storage path", g_font_b, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("To customize the path, ensure the path is valid (create it if the folder not existing).", p.settings.font, p.settings.color2, txtbox_x + 30, cSettings.topBarHeight + rh * 2.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("To define as same directory with the media tracks, input %path%.", p.settings.font, p.settings.color2, txtbox_x + 30, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Notes:", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 12.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("1. The settings here are used for download and caching, for the setting of cover reading, go to 'Preference->Display->Album art'", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 13.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("2. Support picture formats: jpg, png", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("3. B drive is the virtual drive mounted for foobar2000 directory.", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 15.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		};
 
@@ -2201,14 +2201,14 @@ oPage = function(id, objectName, label, nbrows) {
 				// get free number to affect to the new User column to create
 				fin = tmp_array.length;
 				for (var i = 0; i < fin; i++) {
-					if (tmp_array[i].substr(0, 3) == "自定义") {
+					if (tmp_array[i].substr(0, 3) == "Custom") {
 						if (tmp_array[i].substr(tmp_array[i].length - 2, 2) == num(no_user, 2)) {
 							no_user++;
 						};
 					};
 				};
 
-				p.headerBar.columns.push(new oColumn("自定义 " + num(no_user, 2), "null", "null", 0, "自定义 " + num(no_user, 2), 0, "null"));
+				p.headerBar.columns.push(new oColumn("Custom " + num(no_user, 2), "null", "null", 0, "Custom " + num(no_user, 2), 0, "null"));
 				p.headerBar.totalColumns++;
 				window.SetProperty("SYSTEM.HeaderBar.TotalColumns", p.headerBar.totalColumns);
 				var arr = [];
@@ -2238,7 +2238,7 @@ oPage = function(id, objectName, label, nbrows) {
 				// action
 				var idx = p.settings.pages[1].elements[0].selectedId;
 				var ref = p.headerBar.columns[idx].ref;
-				if (ref.substr(0, 3) == "自定义") {
+				if (ref.substr(0, 3) == "Custom") {
 					// if the column is visible, percent are to be adjusted on other visible columns before deletinf it
 					if (p.headerBar.columns[idx].percent > 0) {
 						// check if it's not the last column visible, otherwise, we coundn't hide it!
@@ -2322,7 +2322,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				// action
-				p.list.groupby.push(new oGroupBy("自定义模版", "null", "null", "自定义", "null", "0", "2", "3", "1", "0", "-", "-", "-", "-", "-", "0"));
+				p.list.groupby.push(new oGroupBy("Custom pattern", "null", "null", "Custom", "null", "0", "2", "3", "1", "0", "-", "-", "-", "-", "-", "0"));
 				p.list.totalGroupBy++;
 				window.SetProperty("SYSTEM.Groups.TotalGroupBy", p.list.totalGroupBy);
 				var arr = [];
@@ -2352,7 +2352,7 @@ oPage = function(id, objectName, label, nbrows) {
 				// action
 				var idx = p.settings.pages[2].elements[0].selectedId;
 				var ref = p.list.groupby[idx].ref;
-				if (ref.substr(0, 3) == "自定义") {
+				if (ref.substr(0, 3) == "Custom") {
 					var tmp_array = p.list.groupby.slice(0, p.list.groupby.length);
 					p.list.groupby.splice(0, p.list.groupby.length);
 					fin = tmp_array.length;
@@ -2401,7 +2401,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				// action
-				fb.RunMainMenuCommand("文件/参数选项");
+				fb.RunMainMenuCommand("File/Preferences");
 			};
 			break;
 		};
@@ -2554,13 +2554,13 @@ oSettings = function() {
 			rect_w = 0;
 		var lineWidth = zoom(1.5, zdpi);
 
-		rect_w = gpic.CalcTextWidth("删除", g_font_b) + g_z30;
+		rect_w = gpic.CalcTextWidth("Remove", g_font_b) + g_z30;
 		this.new_off = gdi.CreateImage(rect_w, x32);
 		gb = this.new_off.GetGraphics();
 		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("新建", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("New", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.new_off.ReleaseGraphics(gb);
 
 		this.new_ov = gdi.CreateImage(rect_w, x32);
@@ -2568,7 +2568,7 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("新建", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("New", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.new_ov.ReleaseGraphics(gb);
 
 		this.new_no = gdi.CreateImage(rect_w, x32);
@@ -2576,7 +2576,7 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color0);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("新建", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("New", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.new_no.ReleaseGraphics(gb);
 
 		
@@ -2585,7 +2585,7 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("删除", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("Remove", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.del_off.ReleaseGraphics(gb);
 
 		this.del_ov = gdi.CreateImage(rect_w, x32);
@@ -2593,7 +2593,7 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("删除", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("Remove", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.del_ov.ReleaseGraphics(gb);
 
 		this.del_no = gdi.CreateImage(rect_w, x32);
@@ -2601,7 +2601,7 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color0);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("删除", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("Remove", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.del_no.ReleaseGraphics(gb);
 		
 		// Add a Custom Column
@@ -2614,13 +2614,13 @@ oSettings = function() {
 		this.delbuttonPattern = new button(this.del_off, this.del_ov, this.del_ov);
 		
 		// foobar2000 options button
-		rect_w = gpic.CalcTextWidth("foobar2000设置", g_font_b) + g_z30;
+		rect_w = gpic.CalcTextWidth("foobar2000 Preference", g_font_b) + g_z30;
 		this.fb2k_off = gdi.CreateImage(rect_w, x32);
 		gb = this.fb2k_off.GetGraphics();
 		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("foobar2000设置", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("foobar2000 Preference", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.fb2k_off.ReleaseGraphics(gb);
 
 		this.fb2k_ov = gdi.CreateImage(rect_w, x32);
@@ -2628,19 +2628,19 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("foobar2000设置", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("foobar2000 Preference", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.fb2k_ov.ReleaseGraphics(gb);
 
 		this.opt_fb2k_btn = new button(this.fb2k_off, this.fb2k_ov, this.fb2k_ov);
 		
 		// view download folder button
-		rect_w = gpic.CalcTextWidth("查看下载目录", g_font_b) + g_z30;
+		rect_w = gpic.CalcTextWidth("View downloaded", g_font_b) + g_z30;
 		this.viewdl = gdi.CreateImage(rect_w, x32);
 		gb = this.viewdl.GetGraphics();
 		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("查看下载目录", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("View downloaded", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.viewdl.ReleaseGraphics(gb);
 
 		this.viewdl_ov = gdi.CreateImage(rect_w, x32);
@@ -2648,7 +2648,7 @@ oSettings = function() {
 		gb.setSmoothingMode(2);
 		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
 		gb.SetTextRenderingHint(4);
-		gb.DrawString("查看下载目录", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		gb.DrawString("View downloaded", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
 		this.viewdl_ov.ReleaseGraphics(gb);
 
 		this.viewdl_btn = new button(this.viewdl, this.viewdl_ov, this.viewdl_ov);
@@ -2724,11 +2724,11 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "播放列表视图", 17));
-			this.pages.push(new oPage(1, "p.settings.pages[1]", "列", 18));
-			this.pages.push(new oPage(2, "p.settings.pages[2]", "分组", 38));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 17));
+			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 18));
+			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 38));
 			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 20));
-			this.pages.push(new oPage(4, "p.settings.pages[4]", "封面浏览面板", 16));
+			this.pages.push(new oPage(4, "p.settings.pages[4]", "Cover Browsing", 16));
 		};
 		var fin = this.pages.length;
 		for (var i = 0; i < fin; i++) {
@@ -2773,7 +2773,7 @@ oSettings = function() {
 		// draw Panel Title
 		var title_x = this.x + this.closebutton.w + 20;
 		gr.SetTextRenderingHint(4);
-		gr.DrawString("foobox设置", this.font_title, this.color2, title_x, this.y + 10, this.w - 50, cSettings.topBarHeight + 10, lt_stringformat);
+		gr.DrawString("foobox settings", this.font_title, this.color2, title_x, this.y + 10, this.w - 50, cSettings.topBarHeight + 10, lt_stringformat);
 		// draw panel version
 		var version_x = this.x;
 		gr.DrawString("Version " + g_script_version, g_font_queue_idx, this.color1, version_x, this.y, this.w - 8, ty + th - 4, rb_stringformat);

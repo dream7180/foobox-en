@@ -376,7 +376,7 @@ oToolbar = function(){
 			this.groupby_bt.draw(gr, this.x + x2, this.y+x2, 255);
 			this.groupAlb_bt.draw(gr, end_x - 2*imgw-4*zdpi, this.y+x2, 255);
 			this.groupArt_bt.draw(gr, end_x - imgw-x3, this.y+x2, 255);
-			gr.gdiDrawText("组", g_font, g_color_dl_txt, this.x + x2, this.y+x2, imgw, imgh, ccs_txt);
+			gr.gdiDrawText("G", g_font, g_color_dl_txt, this.x + x2, this.y+x2, imgw, imgh, ccs_txt);
 			if(p.list.dlitems.length){
 				this.dl_showhide.draw(gr, this.x + imgw+x3, this.y+x2, 255);
 				gr.FillEllipse(this.x + imgw+4*zdpi, this.y+x3, imgw-x2,imgw-x2,g_color_dl_txt)

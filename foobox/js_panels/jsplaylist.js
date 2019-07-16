@@ -532,7 +532,7 @@ oToolbar = function(){
 			if(properties.NetDisableGroup) nethide_groupheader(true);
 			this.disabled = false;
 		} else{
-			this.is_netsearch = (p.list.name.indexOf("NetSearch") == 0) ? 1 : 0;
+			this.is_netsearch = (p.list.name.indexOf("WebSearch") == 0) ? 1 : 0;
 			if(this.is_netsearch){
 				this.netradio = 0;
 				this.netsearch_name = p.list.name.split(" | ")[1];

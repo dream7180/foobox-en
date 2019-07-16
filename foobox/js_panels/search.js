@@ -614,7 +614,7 @@ function clean_name(n) {
 function NetSearch(searchtext, pageid, switchpage) {
 	SearchListName = clean_name(searchtext);
 	g_searchbox.inputbox.edit = false;
-	SetBoxText("Net searching...");
+	SetBoxText("Web searching...");
 	cachefile = fb.ProfilePath + "\\cache\\KWSearch.asx";
 	try {fso.DeleteFile(cachefile);}catch(e) {};
 	KWSearch(searchtext, pageid, switchpage);
@@ -672,7 +672,7 @@ function KWSearch(searchtext, pageid, switchpage){
 							if (l == songid.length) {
 								filedata = filedata + "</asx>";
 								SaveAs(filedata, cachefile);
-								DisposeList("NetSearch", 4, SearchListName, pageid, switchpage);
+								DisposeList("WebSearch", 4, SearchListName, pageid, switchpage);
 								SetBoxText(null);
 							}
 						}

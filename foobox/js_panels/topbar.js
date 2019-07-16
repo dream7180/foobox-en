@@ -365,8 +365,8 @@ function on_mouse_lbtn_up(x, y) {
 	if (ui_noborder) {
 		if (buttons[0].MouseUp()) {
 			UIHacks.DisableSizing = false;
-			fb.Exit();
-			//fb_hWnd.SendMsg(0x0010,0,0);
+			//fb.Exit();
+			fb_hWnd.SendMsg(0x0010,0,0);
 		}
 		if (buttons[1].MouseUp()) {
 			UIHacks.DisableSizing = false;

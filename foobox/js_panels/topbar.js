@@ -39,7 +39,7 @@ function PopMessage(method, text, type) {
 
 function AboutFoobox() {
 	var shellObj = new ActiveXObject("Shell.Application");
-	var HelpFile = fb.FoobarPath + "foobox help.chm";
+	var HelpFile = fb.FoobarPath + "foobox-help.chm";
 	if (utils.FileTest(HelpFile, "e")) shellObj.ShellExecute('"' + HelpFile + '"', "", "", "open", 1);
 	else PopMessage(1, "File not found: \'" + HelpFile + "\'", 16);
 }

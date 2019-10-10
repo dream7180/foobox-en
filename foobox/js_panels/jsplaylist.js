@@ -24,7 +24,7 @@ var show_shadow = fbx_set[28];
 var sys_scrollbar = fbx_set[29];
 var col_by_cover = fbx_set[30];
 // GLOBALS
-var g_script_version = "6.1.4.6";
+var g_script_version = "6.1.4.8";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -1940,6 +1940,14 @@ function on_mouse_mbtn_up(x, y, mask) {
 		window.ClearTimeout(g_middle_click_timer);
 		g_middle_click_timer = false;
 	}, 250);
+	if (cSettings.visible) return;
+	var fin = p.list.items.length;
+	for (var i = 0; i < fin; i++) {
+		if (p.list.items[i].ishover) {
+			plman.SetPlaylistFocusItem(p.list.playlist, p.list.items[i].track_index);
+			plman.AddItemToPlaybackQueue(plman.GetPlaylistFocusItemHandle(p.list.playlist));
+		}
+	};
 };
 
 function on_mouse_leave() {

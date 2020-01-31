@@ -132,7 +132,8 @@ olist = function() {
 		this.metadblist_selection = plman.GetPlaylistSelectedItems(pidx);
 		Context.InitContext(this.metadblist_selection);
 		Context.BuildMenu(_menu, 1, -1);
-		_menu.AppendMenuItem(MF_STRING, 803, "Edit with Mp3tag");
+		var fso = new ActiveXObject("Scripting.FileSystemObject");
+		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe")) _menu.AppendMenuItem(MF_STRING, 803, "Edit with Mp3tag");
 		_child01.AppendTo(_menu, MF_STRING, "Send to...");
 		_child01.AppendMenuItem(MF_STRING, 801, "New playlist");
 		_menu.AppendMenuSeparator();

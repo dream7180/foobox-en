@@ -8,12 +8,10 @@ ppt = {
 	historytext: window.GetProperty("Search Box: Search History", ""),
 	showreset: window.GetProperty("Search Box: Always Show Reset Button", false),
 	webnb: window.GetProperty("Search Source: Web: Number", 1),//1-KW, 2-TT
-	webkqtradioarr: window.GetProperty("_PROPERTY: Search Source: QT Radio: List Arr", "").split("|"),
-	quality: window.GetProperty("Search Source: Quality", 1),
+	webkqtradioarr: "",
 	pagesize: window.GetProperty("Search Results Per Page", 50)
 };
 
-var MGRankList = [["新歌速递","11248351"],["音乐榜","23603703"],["影视榜","23603721"],["华语榜(内地)","23603926"],["华语榜(港台)","23603954"],["欧美榜","23603974"],["日韩榜","23603982"],["彩铃榜","23604023"],["原创榜","23604032"],["KTV榜","23604040"],["网络榜","23604058"]];
 //=================================================// 定义变量
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 if (!fso.FolderExists(fb.ProfilePath + "cache")) fso.CreateFolder(fb.ProfilePath + "cache");
@@ -22,6 +20,9 @@ xmlHttp2 = new ActiveXObject("Msxml2.XMLHTTP.6.0");
 var debug = false;
 var oldsearch = oldpid = 0;
 var SearchListName, cachefile;
+var qtfm_arr = fb.ProfilePath + "\\cache\\qtfm.arr";
+if (fso.FileExists(qtfm_arr))
+	ppt.webkqtradioarr = utils.ReadTextFile(qtfm_arr).split("|");
 //=================================================// 搜索框
 var g_searchbox = null;
 searchbox = function() {
@@ -381,7 +382,7 @@ function g_sendResponse() {
 		var isFound = false;
 		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i).substr(0, 8) == "Search [") {
+			if (plman.GetPlaylistName(i).substr(0, 4) == "Search [") {
 				if (!ppt.multiple) {
 					if (!isFound) {
 						var plIndex = i;
@@ -477,36 +478,14 @@ function Show_Menu_Searchbox(x, y) {
 		_menu.AppendMenuItem(MF_STRING, 9, "Keep previous search playlist");
 		_menu.CheckMenuItem(9, ppt.multiple ? 1 : 0);
 		_menu.AppendMenuSeparator();
-		/*var SearchQualityMenu = window.CreatePopupMenu();
-		SearchQualityMenu.AppendMenuItem(MF_STRING, 31, "有损格式");
-		SearchQualityMenu.AppendMenuItem(MF_STRING, 32, "无损格式");
-		SearchQualityMenu.AppendMenuItem(MF_STRING, 33, "全部");
-		SearchQualityMenu.CheckMenuRadioItem(31, 33, ppt.quality + 30);
-		SearchQualityMenu.AppendTo(_menu, MF_STRING, "搜索格式");*/
 
-		var WebSearchMenu = window.CreatePopupMenu();
-		WebSearchMenu.AppendMenuItem(MF_STRING, 11, "Kuwo Music (320K)");
-		WebSearchMenu.AppendMenuItem(MF_STRING, 12, "Qianqian Music (320K)");
-		WebSearchMenu.AppendMenuItem(MF_STRING, 13, "Migu Music (Lossless)");
-		WebSearchMenu.CheckMenuRadioItem(11, 13, ppt.webnb + 10);
-		WebSearchMenu.AppendTo(_menu, MF_STRING, "Search source");
+		_menu.AppendMenuItem(MF_STRING, 11, "Kuwo Music (320K)");
+		//_menu.AppendMenuItem(MF_STRING, 12, "咪咕音乐 (320K)");
+		//_menu.AppendMenuItem(MF_STRING, 13, "咪咕音乐 (无损)");
+		_menu.CheckMenuRadioItem(11, 11, ppt.webnb + 10);
 		_menu.AppendMenuSeparator();
 		
-		var WebMGRanklistMenu = window.CreatePopupMenu();
-		if(MGRankList.length > 1){
-			for (var i = 0; i < MGRankList.length; i++) {
-				WebMGRanklistMenu.AppendMenuItem(MF_STRING, 100+i, MGRankList[i][0]);
-			}
-		}
-        WebMGRanklistMenu.AppendTo(_menu, MF_STRING, "Migu music billboard");
-		var SearchQualityMenu = window.CreatePopupMenu();
-		SearchQualityMenu.AppendMenuItem(MF_STRING, 31, "320K MP3");
-		SearchQualityMenu.AppendMenuItem(MF_STRING, 32, "Lossless format");
-		//SearchQualityMenu.AppendMenuItem(MF_STRING, 33, "全部");
-		SearchQualityMenu.CheckMenuRadioItem(31, 32, ppt.quality + 30);
-		SearchQualityMenu.AppendTo(_menu, MF_STRING, "Billboard music format");
-		
-		_menu.AppendMenuSeparator();
+		//_menu.AppendMenuSeparator();
 		var WebQTRadioMenu = window.CreatePopupMenu();
 		if(ppt.webkqtradioarr.length > 1){
 			for (var k = 0; k < ppt.webkqtradioarr.length; k++) {
@@ -571,9 +550,6 @@ function Show_Menu_Searchbox(x, y) {
 		g_searchbox.inputbox.empty_text = "";
 		g_searchbox.repaint();
 		break;
-	case (idx >= 31 && idx <= 32):
-		window.SetProperty("Search Source: Quality", ppt.quality = idx - 30);
-		break;
 	case (idx == 36):
 		quickSearch(now_playing_track, "artist");
 		break;
@@ -593,9 +569,6 @@ function Show_Menu_Searchbox(x, y) {
 		break;
 	case (idx == ppt.historymaxitems + 60):
 		g_searchbox.historyreset();
-		break;
-	case ((idx >= 100 && idx <= 100+MGRankList.length)):
-		MGRankListid(MGRankList[idx-100][1],MGRankList[idx-100][0]);
 		break;
 	case (idx == 500):
 		GetQTFMRadiolist();
@@ -669,22 +642,22 @@ function NetSearch(searchtext, pageid, switchpage) {
 	SetBoxText("Web searching...");
 	switch (ppt.webnb) {
 		case 1:
+		default:
 			cachefile = fb.ProfilePath + "\\cache\\KWSearch.asx";
 			try {fso.DeleteFile(cachefile);}catch(e) {};
 			KWSearch(searchtext, pageid, switchpage);
 			break;
-		case 2:
-			cachefile = fb.ProfilePath + "\\cache\\TTSearch.asx";
+/*		case 2:
+			cachefile = fb.ProfilePath + "\\cache\\MGSearch.asx";
 			try {fso.DeleteFile(cachefile);}catch(e) {};
-			TTSearch(searchtext, pageid, switchpage);
+			MGSearch(searchtext, pageid, switchpage, 1);
 			break;
 		case 3:
 			cachefile = fb.ProfilePath + "\\cache\\MGSearch.asx";
 			try {fso.DeleteFile(cachefile);}catch(e) {};
-			MGSearch(searchtext, pageid, switchpage);
+			MGSearch(searchtext, pageid, switchpage, 2);
 			break;
-		default:
-			break;
+			*/
 	}
 	Deltempfile(cachefile);
 }
@@ -740,7 +713,7 @@ function KWSearch(searchtext, pageid, switchpage){
 							if (l == songid.length) {
 								filedata = filedata + "</asx>";
 								SaveAs(filedata, cachefile);
-								DisposeList("Web", 5, SearchListName, pageid, switchpage);
+								DisposeList("Web", 4, SearchListName, pageid, switchpage);
 								SetBoxText(null);
 							}
 						}
@@ -754,23 +727,23 @@ function KWSearch(searchtext, pageid, switchpage){
 		return;
 	}
 }
-
-function MGSearch(searchtext, pageid, switchpage){
+/*
+function MGSearch(searchtext, pageid, switchpage, quality){
 	var searchURL = "http://140.143.30.148:88/index.php?key=VG&class=miguSearch&ID=" + encodeURIComponent(StringFilter(searchtext)) +  "&k=" + pageid;
-	//switch(ppt.quality){
-	//	case 1:
-	//		var toneFlag = "HQ";
-	//		var resourceType = "2";
-	//		break;
-	//	case 2:
+	switch(quality){
+		case 1:
+			var toneFlag = "HQ";
+			var resourceType = "2";
+			break;
+		case 2:
 			var toneFlag = "SQ";
 			var resourceType = "E";
-	//		break;
-	//	default:
-	//		var toneFlag = "HQ";
-	//		var resourceType = "2";
-	//		break;
-	//}
+			break;
+		default:
+			var toneFlag = "HQ";
+			var resourceType = "2";
+			break;
+	}
 	try {
 		xmlHttp.open("GET", searchURL, true);
 		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
@@ -781,7 +754,7 @@ function MGSearch(searchtext, pageid, switchpage){
 					var songid = [];
 					var filedata = '<asx version="3.0">\r\n\r\n';
 					var ret = json(xmlHttp.responseText).songResultData.resultList;
-					if(!ret || ret.length == 0){UpdateDone("Last page");return;}
+					if(!ret || ret.length == 0){UpdateDone("已经是最后一页");return;}
 					for (var i = 0; i < ret.length; i++) {
 						if(ret[i][0].vipType == ""){
 							filedata = filedata + '<entry>\r\n'
@@ -793,178 +766,18 @@ function MGSearch(searchtext, pageid, switchpage){
 					}
 					filedata = filedata + "</asx>";
 					SaveAs(filedata, cachefile);
-					DisposeList("Web", 4, SearchListName, pageid, switchpage);
+					DisposeList("网搜", 4, SearchListName, pageid, switchpage);
 					SetBoxText(null);
 				}
 			}
 		}
 	} catch(e) {
-		fb.trace("Search failed");
+		fb.trace("搜索失败");
 		SetBoxText(null);
 		return;
 	}
 }
-
-function TTSearch(searchtext, pageid, switchpage){
-	var searchURL = 'http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.search.common&format=json&query='  + encodeURIComponent(StringFilter(searchtext)) + "&page_no=" + pageid + "&page_size=" + ppt.pagesize;
-	var qt = "320";
-	/*switch(ppt.quality){
-		//case 1:
-		//	var qt = "192";
-		//	break;
-		case 1:
-			var qt = "320";
-			break;
-		case 2:
-			var qt = "flac";
-			break;
-		default:
-			var qt = "320";
-			break;
-	}*/
-	
-	try {
-		var l= 0;
-		xmlHttp.open("GET", searchURL, true);
-		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-		xmlHttp.send(null);
-		xmlHttp.onreadystatechange = function () {
-			if (xmlHttp.readyState == 4) {
-				if (xmlHttp.status == 200) {
-					var songid = [];
-					var ret = json(reconvert(xmlHttp.responseText))["song_list"];
-					//debug && fb.trace("搜索到的数量 > " + ret.length);
-					if (ret && ret.length > 0) {
-						for (var i = 0; i < ret.length; i++) {
-							songid.push({
-								artist:ret[i].author,
-								song:ret[i].title,
-								id:ret[i].song_id
-							});
-							//debug && fb.trace(ret[i].author,ret[i].title,ret[i].song_id);
-						}
-					}else{
-						UpdateDone("Last page");
-						return;
-					}
-					l = 0;
-					//debug && fb.trace(songid.length);
-					if(songid.length > 0){
-						var filedata = '<asx version="3.0">\r\n\r\n';
-						var rex = new RegExp("play_url\":\"(.*?)\",","g");
-						url = "http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.getSongLink&format=json&from=bmpc&version=1.0.0&version_d=7&songid=" + songid[l].id + "&lebo=0&down=1&bit=" + qt;
-						//debug && fb.trace(l,url);
-						xmlHttp2.open("GET", url, true);
-						xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-						xmlHttp2.send(null);
-						xmlHttp2.onreadystatechange = function() {
-							if (xmlHttp2.readyState == 4) {
-								if (xmlHttp2.status == 200) {
-									try {
-										ret = json(xmlHttp2.responseText)["result"]["bitrate"][0].file_link;
-										if(ret != null){
-											filedata = filedata + '<entry>\r\n'
-											 + '<title>' + json(xmlHttp2.responseText)["result"]["songinfo"].title + '</title>\r\n'
-											 + '<author>' + json(xmlHttp2.responseText)["result"]["songinfo"].author + '</author>\r\n'
-											 + '<ref href="' + ret + '"/>\r\n'
-											 + '</entry>\r\n\r\n';
-											 //debug && fb.trace(l,songid[l].song,songid[l].artist,ret[1].replace(/\\/g, ""));
-										}
-									} catch(e) {
-										fb.trace("Abnormal: ",songid[l].song,"http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.getSongLink&format=json&from=bmpc&version=1.0.0&version_d=7&songid=" + songid[l].id + "&lebo=0&down=1&bit=" + qt);
-									};
-								}
-								l++;
-								if (l < songid.length){
-									//debug && fb.trace(l,url);
-									var URL_Timer = window.SetTimeout(function () {
-											url = "http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.getSongLink&format=json&from=bmpc&version=1.0.0&version_d=7&songid=" +  + songid[l].id + "&lebo=0&down=1&bit=" + qt;
-											xmlHttp2.open("GET", url, true);
-											xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-											xmlHttp2.send(null);
-											URL_Timer && window.ClearTimeout(URL_Timer);
-										}, 5);
-
-								}
-								if (l == songid.length) {
-									filedata = filedata + "</asx>";
-									SaveAs(filedata, cachefile);
-									DisposeList("Web", 5, SearchListName, pageid, switchpage);
-									SetBoxText(null);
-								}
-							}
-						}
-					}else{
-						UpdateDone("Last page");
-						return;
-					}
-				}
-			}
-		}
-	} catch(e) {
-		fb.trace("Search failed");
-		SetBoxText(null);
-		return;
-	}
-}
-
-function MGRankListid(id, listname){
-	//cachefile = fb.ProfilePath + "\\cache\\RankList.asx";
-	cachefile = fb.ProfilePath + "\\cache\\" + listname + ".asx";
-	SetBoxText("Updating billboard...");
-	var searchURL = "http://m.music.migu.cn/migu/remoting/cms_list_tag?nid=" + id + "&pageSize=800&pageNo=0";
-	//debug && fb.trace(searchURL);
-	
-	switch(ppt.quality){
-		case 1:
-			var toneFlag = "HQ";
-			var resourceType = "2";
-			break;
-		case 2:
-			var toneFlag = "SQ";
-			var resourceType = "E";
-			break;
-		default:
-			var toneFlag = "HQ";
-			var resourceType = "2";
-			break;
-	}
-	try {
-		xmlHttp.open("GET", searchURL, true);
-		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-		xmlHttp.send(null);
-		xmlHttp.onreadystatechange = function () {
-			if (xmlHttp.readyState == 4) {
-				if (xmlHttp.status == 200) {
-					var songid = [];
-					var filedata = '<asx version="3.0">\r\n\r\n';
-					var ret = json(xmlHttp.responseText).result.results;
-					if(!ret || ret.length == 0){UpdateDone("Last page");return;}
-					for (var i = 0; i < ret.length; i++) {
-						try {
-							filedata = filedata + '<entry>\r\n'
-							 + '<title>' + ret[i].songData.songName + '</title>\r\n'
-							 + '<author>' + ret[i].songData.singerName[0] + '</author>\r\n'
-							 + '<ref href="' + "http://app.pd.nf.migu.cn/MIGUM2.0/v1.0/content/sub/listenSong.do?toneFlag=" + toneFlag + "&netType=00&userId=15548614588710179085069&ua=Android_migu&version=5.1&copyrightId=0&contentId=" + ret[i].songData.qq.productId + "&resourceType=" + resourceType + "&channel=0" + '"/>\r\n'
-							 + '</entry>\r\n\r\n';
-							//debug && fb.trace(ret[i].contentId,ret[i].songData.songName,ret[i].songData.singerName[0]);
-						} catch(e) {};
-					}
-					filedata = filedata + "</asx>";
-					SaveAs(filedata, cachefile);
-					UpdateList("Board | " + listname);
-					SetBoxText(null);
-				}
-			}
-		}
-	} catch(e) {
-		fb.trace("Search failed");
-		SetBoxText(null);
-		return;
-	}
-	Deltempfile(cachefile);
-}
-
+*/
 //=================================================// 蜻蜓FM
 
 function GetQTFMRadiolist(){
@@ -980,18 +793,12 @@ function GetQTFMRadiolist(){
 			if (xmlHttp.readyState == 4) {
 				if (xmlHttp.status == 200) {
 					var listid = "";
-					var listidname = "";
 					var c = 0;
 					var ret = json(xmlHttp.responseText)["Data"];
-					if (ret.length > 0) {
-						if(c == 0) c = ret.length;
-						listid = "";
-						for (var k = 0; k < ret.length; k++) {
-							listid += ret[k].title + ":" + ret[k].id + ";"
-						}
-						if(listid.charAt(listid.length-1) == ";") listid = listid.slice(0,listid.length-1);
+					if (ret && ret.length > 0) {
+						if(c == 0) c = ret.length + 1;
 						l = 0;
-						url = "http://rapi.qingting.fm/categories/" + ret[l].id + "/channels?page=1&pagesize=50";
+						url = "http://rapi.qingting.fm/categories/" + 409 + "/channels?page=1&pagesize=50";
 						xmlHttp2.open("GET", url, true);
 						xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
 						xmlHttp2.send(null);
@@ -1000,39 +807,29 @@ function GetQTFMRadiolist(){
 								if (xmlHttp2.status == 200) {
 									//debug && fb.trace(l,url);
 									var ret1 = json(xmlHttp2.responseText)["Data"];
-									listid = ret[l].title + ": g;";
+									listid = (l==0?"国家台":ret[l-1].title) + ": g;";
 									if(ret1 != null){
 										for (var k = 0; k < ret1.length; k++) {
 											listid += ret1[k].title + ":" + ret1[k].content_id + ";"
 										}
 										if(listid.charAt(listid.length-1) == ";") qtlistid += listid.slice(0,listid.length-1) + "|";
 										if(l+1==c) {
-											qtlistid = qtlistid.slice(0,qtlistid.length-1)
-											window.SetProperty("_PROPERTY: Search Source: QT Radio: List Arr", qtlistid);
-											ppt.webkqtradioarr = window.GetProperty("_PROPERTY: Search Source: QT Radio: List Arr", "").split("|");
+											try {fso.DeleteFile(qtfm_arr);}catch(e) {};
+											qtlistid = qtlistid.slice(0,qtlistid.length-1);
+											SaveAs(qtlistid, qtfm_arr);
+											ppt.webkqtradioarr = qtlistid.split("|");
 										};
 									}
 								}
-								if (ret[l].id == 7){
+								l++;
+								if (l > 0 && l < c){
 									var URL_Timer = window.SetTimeout(function () {
-											url = "http://rapi.qingting.fm/categories/" + 7 + "/channels?page=2&pagesize=50";
-											xmlHttp2.open("GET", url, true);
-											xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-											xmlHttp2.send(null);
-											URL_Timer && window.ClearTimeout(URL_Timer);
-										}, 5);
-									l++;
-								}else{
-									l++;
-									if (l < c){
-										var URL_Timer = window.SetTimeout(function () {
-												url = "http://rapi.qingting.fm/categories/" + ret[l].id + "/channels?page=1&pagesize=50";
-												xmlHttp2.open("GET", url, true);
-												xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-												xmlHttp2.send(null);
-												URL_Timer && window.ClearTimeout(URL_Timer);
-											}, 5);
-									}
+										url = "http://rapi.qingting.fm/categories/" + ret[l-1].id + "/channels?page=1&pagesize=100";
+										xmlHttp2.open("GET", url, true);
+										xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
+										xmlHttp2.send(null);
+										URL_Timer && window.ClearTimeout(URL_Timer);
+									}, 5);
 								}
 							}
 						}

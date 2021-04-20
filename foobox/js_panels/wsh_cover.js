@@ -74,10 +74,9 @@ function SearchItem(name, url, keyword) {
 	this.url = url;
 	this.keyword = keyword;
 }
-SearchItems.push(new SearchItem("Xiami.com", "http://www.xiami.com/search/album?key=%s", "[%album artist% ][%album%]"));
+SearchItems.push(new SearchItem("Google.com", "https://www.google.com/search?q=%s&tbm=isch", "[%album artist% ][%album%]"));
+SearchItems.push(new SearchItem("Baidu.com", "https://image.baidu.com/search/index?tn=baiduimage&word=%s", "[%album artist% ][%album%]"));
 SearchItems.push(new SearchItem("Last.fm", "http://www.last.fm/search?q=%s&type=album", "[%album artist% ][%album%]"));
-SearchItems.push(new SearchItem("Amazon.com", "http://www.amazon.com/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Daps&field-keywords=%s&x=0&y=0", "[%album artist% ][%album%]"));
-SearchItems.push(new SearchItem("AllCdCovers.com", "http://www.allcdcovers.com/search/music/all/%s/1", "[%album artist% ][%album%]"));
 
 //var show_cover_case = window.GetProperty("Panel.ShowCoverCase", false);
 var img_padding_x = 0;
@@ -1698,13 +1697,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!currentMetadb) return;
 		switch (arr[0]) {
 		case 0:
-			fb.RunContextCommandWithMetadb("Manage attached pictures", arr[1]) || fb.RunContextCommandWithMetadb("Manage attached pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Properties", arr[1]);
 			break;
 		case 1:
-			fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]) || fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
 			break;
 		case 2:
-			fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]) || fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
 			break;
 		}
 	}

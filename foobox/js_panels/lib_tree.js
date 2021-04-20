@@ -507,6 +507,7 @@ function scrollbar() {
 var sbar = new scrollbar();
 
 function panel_operations() {
+	this.separt = window.GetProperty("SYSTEM.Split Multiartists", false);
 	var def_ppt = window.GetProperty(" View by Folder Structure: Name // Pattern", "View by folder structure // Pattern not configurable");
 	var DT_LEFT = 0x00000000,
 		DT_CENTER = 0x00000001,
@@ -519,17 +520,7 @@ function panel_operations() {
 		grps = [],
 		i = 0,
 		sort = "";
-	var view_ppt = [
-		window.GetProperty(" View 01: Name // Pattern", "View by artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 02: Name // Pattern", "View by album artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 03: Name // Pattern", "View by artist (simple) // %artist%|%title%"), 
-		window.GetProperty(" View 04: Name // Pattern", "View by album artist - album // [%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 05: Name // Pattern", "View by album [album artist] // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 06: Name // Pattern", "View by album // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 07: Name // Pattern", "View by Genre // %<genre>%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 08: Name // Pattern", "View by year // $year($replace(%date%,/,-,.,-))|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 09: Name // Pattern", "View by date // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
-		window.GetProperty(" View 10: Name // Pattern", "View by directory // %directory%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")];
+	var view_ppt = getview(1, this.separt);
 	var nm = "",
 		ppt_l = view_ppt.length + 1;
 	for (i = ppt_l; i < ppt_l + 93; i++) {
@@ -2222,6 +2213,61 @@ function populate() {
 }
 var pop = new populate();
 
+function getview(initial, separt) {
+	if(initial){
+		if (separt) return [
+			window.GetProperty(" View 01: Name // Pattern", "View by artist // %<artist>%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 02: Name // Pattern", "View by album artist // %<album artist>%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 03: Name // Pattern", "View by artist (simple) // %<artist>%|%title%"), 
+			window.GetProperty(" View 04: Name // Pattern", "View by album artist - album // [%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 05: Name // Pattern", "View by album [album artist] // %album%[ '['%<album artist>%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 06: Name // Pattern", "View by album // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 07: Name // Pattern", "View by Genre // %<genre>%|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 08: Name // Pattern", "View by year // $year($replace(%date%,/,-,.,-))|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 09: Name // Pattern", "View by date // %date%|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 10: Name // Pattern", "View by directory // %directory%|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")
+		];
+		else return [
+			window.GetProperty(" View 01: Name // Pattern", "View by artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 02: Name // Pattern", "View by album artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 03: Name // Pattern", "View by artist (simple) // %artist%|%title%"), 
+			window.GetProperty(" View 04: Name // Pattern", "View by album artist - album // [%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 05: Name // Pattern", "View by album [album artist] // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 06: Name // Pattern", "View by album // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 07: Name // Pattern", "View by Genre // %<genre>%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 08: Name // Pattern", "View by year // $year($replace(%date%,/,-,.,-))|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 09: Name // Pattern", "View by date  // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%"), 
+			window.GetProperty(" View 10: Name // Pattern", "View by directory // %directory%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%")
+		]
+	} else {
+		if(separt){
+			window.SetProperty(" View 01: Name // Pattern", "View by artist // %<artist>%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 02: Name // Pattern", "View by album artist // %<album artist>%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 03: Name // Pattern", "View by artist (simple) // %<artist>%|%title%");
+			window.SetProperty(" View 04: Name // Pattern", "View by album artist - album // [%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 05: Name // Pattern", "View by album [album artist] // %album%[ '['%<album artist>%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 06: Name // Pattern", "View by album // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 07: Name // Pattern", "View by Genre // %<genre>%|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 08: Name // Pattern", "View by year // $year($replace(%date%,/,-,.,-))|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 09: Name // Pattern", "View by date  // %date%|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 10: Name // Pattern", "View by directory // %directory%|[%<album artist>% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		}
+		else {
+			window.SetProperty(" View 01: Name // Pattern", "View by artist // %artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 02: Name // Pattern", "View by album artist // %album artist%|%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 03: Name // Pattern", "View by artist (simple) // %artist%|%title%");
+			window.SetProperty(" View 04: Name // Pattern", "View by album artist - album // [%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 05: Name // Pattern", "View by album [album artist] // %album%[ '['%album artist%']']|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 06: Name // Pattern", "View by album // %album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 07: Name // Pattern", "View by Genre // %<genre>%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 08: Name // Pattern", "View by year // $year($replace(%date%,/,-,.,-))|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 09: Name // Pattern", "View by date  // %date%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+			window.SetProperty(" View 10: Name // Pattern", "View by directory // %directory%|[%album artist% - ]%album%|[[%discnumber%.]%tracknumber%. ][%track artist% - ]%title%");
+		}
+		window.Reload();
+	}
+}
+
 function on_init() {
 	lib_pln = check_libpl();
 }
@@ -3163,6 +3209,8 @@ function menu_object() {
 			SettingMenu.CheckMenuItem(5801, pop.auto ? 1 : 0);
 			SettingMenu.AppendMenuItem(MF_STRING, 5802, "Show nodes");
 			SettingMenu.CheckMenuItem(5802, p.base ? 1 : 0);
+			SettingMenu.AppendMenuItem(MF_STRING, 5812, "多艺术家时进行分割");
+			SettingMenu.CheckMenuItem(5812, p.separt ? 1 : 0);
 			SettingMenu.AppendMenuItem(MF_STRING, 5803, "Show tracks");
 			SettingMenu.CheckMenuItem(5803, p.show_tracks ? 1 : 0);
 			SettingMenu.AppendMenuItem(MF_STRING, 5804, "Play on send from menu");
@@ -3307,6 +3355,11 @@ function menu_object() {
 			case 5811:
 				lock_libpl = !lock_libpl;
 				window.SetProperty("Lock to Library playlist", lock_libpl);
+				break;
+			case 5812:
+				p.separt = !p.separt
+				window.SetProperty("SYSTEM.Split Multiartists", p.separt);
+				getview(0, p.separt);
 				break;
 			case 5820:
 				pop.collapseAll();

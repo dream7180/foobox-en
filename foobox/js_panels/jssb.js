@@ -40,10 +40,6 @@ images = {
 	noart: null,
 	sw_btn_n0: null,
 	sw_btn_n1: null,
-	sw_btn_h0: null,
-	sw_btn_h1: null,
-	sw_btn_d0: null,
-	sw_btn_d1: null,
 	stream: null,
 	down_all: null
 };
@@ -99,12 +95,13 @@ ppt = {
 	headerBarHeight: 28,
 	enableTouchControl: window.GetProperty("_PROPERTY: Enable Scroll Touch Control", true),
 	botStampHeight: 48*zdpi,
-	default_botGridHeight: 30,
+	default_botGridHeight: 26,
 	botGridHeight: 0,
 	botTextRowHeight: 17*zdpi,
 	textLineHeight: 10*zdpi
 	//rawBitmap: false
 };
+var _showAllItem = ppt.showAllItem;
 
 cTouch = {
 	down: false,
@@ -339,8 +336,11 @@ image_cache = function() {
 							} else {
 								this.albumArtId = ppt.albumArtId;
 							}
-							brw.groups[albumIndex].load_requested = 1;
-							utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+							try {
+								brw.groups[albumIndex].load_requested = 1;
+								utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+								}
+							catch(e) {}
 						};
 						timers.coverLoad && window.ClearTimeout(timers.coverLoad);
 						timers.coverLoad = false;
@@ -949,6 +949,8 @@ oBrowser = function(name) {
 			this.marginSide = 0;
 			this.marginCover = 1;
 		};
+		if(this.groups.length < 2) ppt.showAllItem = 0;
+		else ppt.showAllItem = _showAllItem;
 		// Adjust Column 
 		this.totalColumns = Math.floor((this.w - this.marginLR * 2) / this.thumb_w);
 		if (this.totalColumns < 1) this.totalColumns = 1;
@@ -1291,13 +1293,13 @@ oBrowser = function(name) {
 				};
 			};
 		};
-
+		if (g < 2) ppt.showAllItem = 0;
+		else ppt.showAllItem = _showAllItem;
 		if (g > 0) {
 			// update last group properties
 			this.groups[g - 1].finalize(t, tr, pl);
-
 			// add 1st group ("ALL" item)
-			if (ppt.showAllItem && g > 1) {
+			if (ppt.showAllItem) {// && g > 1) {
 				this.groups.unshift(new oGroup(0, 0, null, null));
 				this.groups[0].finalize(t_all, tr_all, pl_all);
 			};
@@ -1379,7 +1381,7 @@ oBrowser = function(name) {
 		//window.NotifyOthers("JSSmoothBrowser->JSSmoothPlaylist:avoid_on_playlist_items_removed_callbacks_on_sendItemToPlaylist", true);
 
 		// parse stored tags
-		if (ppt.showAllItem && index == 0 && this.groups.length > 1) {
+		if (ppt.showAllItem && index == 0){// && this.groups.length > 1) {
 			var arr = null;
 		};
 		else {
@@ -1543,16 +1545,16 @@ oBrowser = function(name) {
 	this.init_swbtn = function(){
 		switch(ppt.tagMode){
 			case 1:
-			if (ppt.albumMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "Switch to simple album");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "Switch to advanced album");
+			if (ppt.albumMode ==0) this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "Switch to simple album");
+			else this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "Switch to advanced album");
 			break;
 			case 2:
-			if (ppt.artistMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "Switch to artist");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "Switch to album artist");
+			if (ppt.artistMode ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "Switch to artist");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "Switch to album artist");
 			break;
 			case 3:
-			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0, "Switch to directory");
-			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1, "Switch to genre");
+			if (ppt.genre_dir ==0) this.switch_btn = new button(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0, "Switch to directory");
+			else this.switch_btn = new button(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1, "Switch to genre");
 			break;
 		}
 	}
@@ -1562,28 +1564,28 @@ oBrowser = function(name) {
 		switch(ppt.tagMode){
 			case 1:
 			if (ppt.albumMode ==0) {
-				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
+				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
 				this.switch_btn.Tooltip.Text = "Switch to simple album";
 			}else{
-				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
+				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
 				this.switch_btn.Tooltip.Text = "Switch to advanced album";
 			}
 			break;
 			case 2:
 			if (ppt.artistMode ==0) {
-				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
+				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
 				this.switch_btn.Tooltip.Text = "Switch to artist";
 			}else{
-				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
+				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
 				this.switch_btn.Tooltip.Text = "Switch to album artist";
 			}
 			break;
 			case 3:
 			if (ppt.genre_dir ==0) {
-				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_h0, images.sw_btn_d0);
+				this.switch_btn.img = Array(images.sw_btn_n0, images.sw_btn_n0, images.sw_btn_n0);
 				this.switch_btn.Tooltip.Text = "Switch to directory";
 			}else{
-				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_h1, images.sw_btn_d1);
+				this.switch_btn.img = Array(images.sw_btn_n1, images.sw_btn_n1, images.sw_btn_n1);
 				this.switch_btn.Tooltip.Text = "Switch to genre";
 			}
 			break;
@@ -1622,13 +1624,13 @@ oBrowser = function(name) {
 				if (ay >= (0 - this.rowHeight) && ay < this.y + this.h) { // if stamp visible, we have to draw it
 
 					// parse stored tags
-					if (!(ppt.showAllItem && i == 0 && total > 1)) {
+					if (!(ppt.showAllItem && i == 0)) {// && total > 1)) {
 						if (this.groups[i].groupkey.length > 0) {
 							var arr = this.groups[i].groupkey.split(" ^^ ");
 						};
 					};
 					// get cover
-					if (ppt.showAllItem && i == 0 && total > 1) {
+					if (ppt.showAllItem && i == 0) {// && total > 1) {
 						//if (ppt.rawBitmap) {
 						//	this.groups[i].cover_img = images.all.CreateRawBitmap();
 						//};
@@ -1686,7 +1688,7 @@ oBrowser = function(name) {
 							var im_h = coverWidth;
 						};
 						// save coords ALL cover image:
-						if (ppt.showAllItem && i == 0 && total > 1) {
+						if (ppt.showAllItem && i == 0) {// && total > 1) {
 							all_x = ax + Math.round((aw - im_w) / 2);
 							all_y = coverTop + coverWidth - im_h;
 							all_w = im_w;
@@ -1751,7 +1753,7 @@ oBrowser = function(name) {
 
 					if (ppt.panelMode == 1) { // panelMode = 1 (Art + bottom labels)
 						// draw text
-						if (ppt.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
+						if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
 							try {
 								if (ppt.tagMode == 1) {
 									gr.gdiDrawText("All items", g_font_b, txt_color1, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
@@ -1791,7 +1793,7 @@ oBrowser = function(name) {
 					};
 					else if (this.groups[i].cover_img) { // panelMode = 3 (Grid)
 						// draw text
-						if (ppt.showAllItem && i == 0 && total > 1) { // aggregate item ( [ALL] )
+						if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
 							// nothing
 						};
 						else {
@@ -1857,7 +1859,7 @@ oBrowser = function(name) {
 
 			// fill ALL cover image with the 1st four cover art found
 			// get cover
-			if (all_x > -1 && ppt.showAllItem && g_start_ == 0 && total > 1) {
+			if (all_x > -1 && ppt.showAllItem && g_start_ == 0) {// && total > 1) {
 				var ii_w = Math.floor(all_w / 2);
 				var ii_h = Math.floor(all_h / 2);
 				var ii_x1 = all_x;
@@ -1900,7 +1902,7 @@ oBrowser = function(name) {
 			// draw top header bar 
 			if (ppt.showHeaderBar) {
 				var item_txt = new Array("", "album", "album artist", "artist", "genre", "directory");
-				var nb_groups = (ppt.showAllItem && total > 1 ? total - 1 : total);
+				var nb_groups = (ppt.showAllItem/* && total > 1*/ ? total - 1 : total);
 				var _idx1 = (ppt.tagMode == 2 && ppt.artistMode);
 				var _idx2 = (ppt.tagMode == 3 ? (ppt.genre_dir ? 2 : 1) : 0);
 				var boxText = nb_groups + " " +  item_txt[ppt.tagMode+_idx1+_idx2] + "  ";
@@ -2166,7 +2168,7 @@ oBrowser = function(name) {
 		_menu.AppendMenuItem(MF_STRING, 1, "Settings...");
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 899, "Create autoplaylist");
-		if(ppt.tagMode < 3 && !_allitem) _menu.AppendMenuItem(MF_STRING, 898, "Download cover (overwirte)");
+		if(ppt.tagMode < 3 && !_allitem) _menu.AppendMenuItem(MF_STRING, 898, "Download cover (overwrite)");
 		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 2, -1);
 		_menu.AppendMenuItem(MF_STRING, 1010, "Reset cache of selected");
@@ -2274,7 +2276,7 @@ oBrowser = function(name) {
 		_menu2.AppendMenuItem(MF_STRING, 910, "Header bar");
 		_menu2.CheckMenuItem(910, ppt.showHeaderBar);
 		_menu2.AppendMenuItem(MF_STRING, 911, "Aggregate item");
-		_menu2.CheckMenuItem(911, ppt.showAllItem);
+		_menu2.CheckMenuItem(911, _showAllItem);
 		_menu2.AppendMenuSeparator();
 		_menu2.AppendMenuItem(MF_STRING, 912, "Reset disk cache");
 		_menu2.AppendTo(_menu, MF_STRING, "Display");
@@ -2374,8 +2376,10 @@ oBrowser = function(name) {
 			get_metrics();
 			break;
 		case (idx == 911):
-			ppt.showAllItem = !ppt.showAllItem;
-			window.SetProperty("_PROPERTY: Show ALL item", ppt.showAllItem);
+			_showAllItem = !_showAllItem;
+			if(brw.groups.length < 2) ppt.showAllItem = 0;
+			else ppt.showAllItem = _showAllItem;
+			window.SetProperty("_PROPERTY: Show ALL item", _showAllItem);
 			brw.populate(false);
 			break;
 		case (idx == 912):
@@ -2540,7 +2544,7 @@ var g_color_highlight = 0;
 var g_syscolor_window_bg = 0;
 var g_scroll_color = 0;
 var g_color_grid_bg = 0;
-var g_btn_color1, g_btn_color2, g_btn_color3, g_btn_color4;
+var g_btn_color1, g_btn_color2;
 // boolean to avoid callbacks
 var g_avoid_on_playlists_changed = false;
 var g_avoid_on_playlist_switch = false;
@@ -3071,7 +3075,7 @@ function on_mouse_leave() {
 function get_metrics() {
 	ppt.thumbnailWidthMin = Math.floor(ppt.default_thumbnailWidthMin * zdpi);
 	if(ppt.tagMode == 1 && ppt.albumMode == 0){
-	 ppt.botGridHeight = Math.floor((ppt.default_botGridHeight + 12) * zdpi);
+	 ppt.botGridHeight = Math.floor((ppt.default_botGridHeight + 14) * zdpi);
 	}
 	else ppt.botGridHeight = Math.floor(ppt.default_botGridHeight * zdpi);
 	
@@ -3145,113 +3149,47 @@ function get_images() {
 	gb.DrawImage(stream_1, 0, 0, stream_1.width, stream_1.height, 0, 0, stream_1.width, stream_1.height);
 	images.stream.ReleaseGraphics(gb);
 	
-	var x3 = Math.floor(3 * zdpi),
-		x18 = Math.floor(18 * zdpi);
-	var col_1 = g_btn_color1 & 0xbbffffff, col_2 = g_btn_color2 & 0xbbffffff;
+	var x5 = 5 * zdpi;
 	images.sw_btn_n0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n0.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, g_btn_color2);
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
 	images.sw_btn_n0.ReleaseGraphics(gb);
-	images.sw_btn_h0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_h0.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, g_btn_color4);
-	images.sw_btn_h0.ReleaseGraphics(gb);
-	images.sw_btn_d0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_d0.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, col_1);
-	gb.FillSolidRect(x3 * 2 + 1, x3, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 2 + 2, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 3 + 4, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x3 * 2 + 1, x3 * 4 + 6, x3 + 2, 3, col_2);
-	images.sw_btn_d0.ReleaseGraphics(gb);
 	
-	var x8 =  Math.floor(13 * zdpi)-1;
 	images.sw_btn_n1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n1.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color1);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, g_btn_color2);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, g_btn_color2);
+	gb.SetSmoothingMode(2);
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
+	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
 	images.sw_btn_n1.ReleaseGraphics(gb);
-	images.sw_btn_h1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_h1.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, g_btn_color3);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, g_btn_color4);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, g_btn_color4);
-	images.sw_btn_h1.ReleaseGraphics(gb);
-	images.sw_btn_d1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
-	gb = images.sw_btn_d1.GetGraphics();
-	gb.FillSolidRect(x3, x3, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 2 + 2, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 3 + 4, x18, 3, col_1);
-	gb.FillSolidRect(x3, x3 * 4 + 6, x18, 3, col_1);
-	gb.FillSolidRect(x8, x3, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x8, x3 * 2 + 2, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x8, x3 * 3 + 4, x3 + 2, 3, col_2);
-	gb.FillSolidRect(x8, x3 * 4 + 6, x3 + 2, 3, col_2);
-	images.sw_btn_d1.ReleaseGraphics(gb);
 
+	var points = Array(10*zdpi,4*zdpi, 14*zdpi,4*zdpi, 14*zdpi,9*zdpi, 17*zdpi,9*zdpi, 12*zdpi,13.5*zdpi, 7*zdpi,9*zdpi, 10*zdpi,9*zdpi);
 	col_2 =g_btn_color2 & 0xccffffff;
 	images.down_all = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.down_all.GetGraphics();
-	gb.DrawLine(12*zdpi, 5*zdpi, 12*zdpi, 11*zdpi+5, 2, g_btn_color2);
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(8*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
-	gb.DrawLine(15*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
+	gb.DrawPolygon(g_btn_color2, 2, points);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(4*zdpi, 11*zdpi+7, 20*zdpi, 11*zdpi+7, 2, g_btn_color2);
+	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, g_btn_color2);
 	images.down_all.ReleaseGraphics(gb);
 	
 	images.down_all_h = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.down_all_h.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(zdpi, zdpi, cSwitchBtn.w - 2*zdpi, cSwitchBtn.h - 2*zdpi, 3*zdpi, 3*zdpi, g_color_normal_txt & 0x20ffffff);
+	gb.DrawPolygon(g_btn_color2, 2, points);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(12*zdpi, 5*zdpi, 12*zdpi, 11*zdpi+5, 2, g_btn_color2);
-	gb.SetSmoothingMode(2);
-	gb.DrawLine(8*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
-	gb.DrawLine(15*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, g_btn_color2);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(4*zdpi, 11*zdpi+7, 20*zdpi, 11*zdpi+7, 2, g_btn_color2);
+	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, g_btn_color2);
 	images.down_all_h.ReleaseGraphics(gb);
 	
 	images.down_all_d = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.down_all_d.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(zdpi, zdpi, cSwitchBtn.w - 2*zdpi, cSwitchBtn.h - 2*zdpi, 3*zdpi, 3*zdpi, g_color_normal_txt & 0x35ffffff);
+	gb.DrawPolygon(col_2, 2, points);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(12*zdpi, 5*zdpi, 12*zdpi, 11*zdpi+5, 2, col_2);
-	gb.SetSmoothingMode(2);
-	gb.DrawLine(8*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, col_2);
-	gb.DrawLine(15*zdpi, 11*zdpi, 11.5*zdpi, 11*zdpi+6, 2, col_2);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(4*zdpi, 11*zdpi+7, 20*zdpi, 11*zdpi+7, 2, col_2);
+	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, col_2);
 	images.down_all_d.ReleaseGraphics(gb);
 };
 
@@ -3280,10 +3218,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x15ffffff;
-		g_btn_color1 = RGBA(0, 0, 0, 40);
+		g_btn_color1 = RGBA(0, 0, 0, 60);
 		g_btn_color2 = RGBA(0, 0, 0, 90);
-		g_btn_color3 = RGBA(0, 0, 0, 70);
-		g_btn_color4 = RGBA(0, 0, 0, 140);
 		break;
 	case (2):
 		g_syscolor_window_bg = fbx_set[3];
@@ -3294,10 +3230,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x15ffffff;
-		g_btn_color1 = RGBA(0, 0, 0, 40);
+		g_btn_color1 = RGBA(0, 0, 0, 60);
 		g_btn_color2 = RGBA(0, 0, 0, 90);
-		g_btn_color3 = RGBA(0, 0, 0, 70);
-		g_btn_color4 = RGBA(0, 0, 0, 140);
 		break;
 	case (3):
 		g_syscolor_window_bg = fbx_set[0];
@@ -3308,10 +3242,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x12ffffff;
-		g_btn_color1 = RGBA(255, 255, 255, 85);
+		g_btn_color1 = RGBA(255, 255, 255, 40);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
-		g_btn_color3 = RGBA(255, 255, 255, 120);
-		g_btn_color4 = RGBA(255, 255, 255, 240);
 		break;
 	case (4):
 		g_syscolor_window_bg = fbx_set[2];
@@ -3322,10 +3254,8 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 55);
 		g_color_selected_bg = (random_mode == 1 || g_syscolor_window_bg == RGB(10, 10, 10)) ? RGBA(255, 255, 255, 30) : fbx_set[7];
 		g_color_topbar = g_color_normal_txt & 0x12ffffff;
-		g_btn_color1 = RGBA(255, 255, 255, 85);
+		g_btn_color1 = RGBA(255, 255, 255, 40);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
-		g_btn_color3 = RGBA(255, 255, 255, 120);
-		g_btn_color4 = RGBA(255, 255, 255, 240);
 		break;
 	}
 	g_color_highlight = fbx_set[6];
@@ -3579,7 +3509,9 @@ function on_playback_stop(reason) {
 function on_playback_new_track(metadb) {
 	g_metadb = metadb;
 	if(ppt.sourceMode == 0 || !window.IsVisible) {
-		playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+		try{
+			playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+		} catch (e) {};
 		return;	
 	}
 	try {
@@ -3608,7 +3540,9 @@ function on_playback_new_track(metadb) {
 		};
 	};
 	catch (e) {};
-	playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+	try{
+		playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
+	} catch (e) {};
 };
 
 function on_playback_starting(cmd, is_paused) {};

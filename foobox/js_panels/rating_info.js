@@ -307,9 +307,9 @@ function on_mouse_rbtn_up(x, y) {
 		rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
 		rMenu.AppendMenuSeparator();
 		rMenu.AppendMenuItem(MF_STRING, 1, "Activate now playing");
-		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (tracktype < 2) && (follow_cursor || !fb.IsPlaying))
-			rMenu.AppendMenuItem(MF_STRING, 4, "Edit with Mp3tag");
+		//var fso = new ActiveXObject("Scripting.FileSystemObject");
+		//if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (tracktype < 2) && (follow_cursor || !fb.IsPlaying) && g_metadb)
+		//	rMenu.AppendMenuItem(MF_STRING, 4, "Edit with Mp3tag");
 		rMenu.AppendMenuItem(MF_STRING, 2, "Properties");
 		rMenu.AppendMenuSeparator();
 		rMenu.AppendMenuItem(MF_STRING, 5, "Panel properties");
@@ -330,11 +330,11 @@ function on_mouse_rbtn_up(x, y) {
 			on_size();
 			window.RepaintRect(0, top_padding, ww, top_padding + mood_h);
 			break;
-		case 4:
-			var WshShell = new ActiveXObject("WScript.Shell");
-			var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_metadb);
-			WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
-			break;
+		//case 4:
+		//	var WshShell = new ActiveXObject("WScript.Shell");
+		//	var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_metadb);
+		//	WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
+		//	break;
 		case 5:
 			window.ShowProperties();
 			break;
@@ -389,6 +389,7 @@ function on_item_focus_change() {
 }
 
 function on_metadb_changed() {
+	if(!g_metadb) return;
 	rating = g_tfo.rating.EvalWithMetadb(g_metadb);
 	if (rating == "?") {
 		rating = 0;
@@ -409,8 +410,10 @@ function on_metadb_changed() {
 function on_playback_new_track(metadb) {
 	on_item_focus_change();
 	if(random_color != 0) window.RepaintRect(0, wh - spec_h, ww, spec_h);
-	var track_len = fb.TitleFormat("%length%").EvalWithMetadb(g_metadb);
-	window.NotifyOthers("g_track_len", track_len);
+	if(g_metadb){
+		var track_len = fb.TitleFormat("%length%").EvalWithMetadb(g_metadb);
+		window.NotifyOthers("g_track_len", track_len);
+	}
 }
 
 function on_playback_stop(metadb) {

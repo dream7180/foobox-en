@@ -1174,8 +1174,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						p.list.SHIFT_start_id = null;
 					};
 					if (!utils.IsKeyPressed(VK_SHIFT)) {
-						var g_path = tf_path.EvalWithMetadb(fb.GetFocusItem());
-						g_track_type = TrackType(g_path);
+						g_track_type = TrackType(fb.GetFocusItem().rawpath.substring(0, 4));
 						p.list.contextMenu(x, y, this.track_index, this.row_index);
 					};
 				};
@@ -1196,8 +1195,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							plman.SetPlaylistSelectionSingle(p.list.playlist, this.track_index, true);
 						};
 						//if (!utils.IsKeyPressed(VK_SHIFT)) {
-							var g_path = tf_path.EvalWithMetadb(fb.GetFocusItem());
-							g_track_type = TrackType(g_path);
+							g_track_type = TrackType(fb.GetFocusItem().rawpath.substring(0, 4));
 							p.list.contextMenu(x, y, this.track_index, this.row_index);
 						//};
 					};

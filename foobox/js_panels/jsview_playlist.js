@@ -367,7 +367,7 @@ function get_colors() {
 		g_color_line = RGBA(0, 0, 0, 35);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[5];
-		g_btn_color1 = RGBA(255, 255, 255, 40);
+		g_btn_color1 = RGBA(255, 255, 255, 45);
 		g_btn_color2 = RGBA(255, 255, 255, 175);
 		g_color_topbar = fontcolor & 0x12ffffff;
 		break;
@@ -460,22 +460,22 @@ function get_imgs() {
 	gb = img_plsw.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	gb.FillRoundRect(2*zdpi,x5 + btn_h, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(2*zdpi+2,x5+2 + btn_h, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi+2,x5+2 + btn_h, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	gb.FillRoundRect(2*zdpi,x5 + btn_h * 2, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(2*zdpi+2,x5+2 + btn_h * 2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(2*zdpi+2,x5+2 + btn_h * 2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	img_plsw.ReleaseGraphics(gb)
 	
 	img_plsw_2 = gdi.CreateImage(btn_w, btn_h * 3);
 	gb = img_plsw_2.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	gb.FillRoundRect(2*zdpi,x5 + btn_h, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(10*zdpi+2,x5+2 + btn_h, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(10*zdpi+2,x5+2 + btn_h, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	gb.FillRoundRect(2*zdpi,x5 + btn_h * 2, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(10*zdpi+2,x5+2 + btn_h * 2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 225));
+	gb.FillRoundRect(10*zdpi+2,x5+2 + btn_h * 2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	img_plsw_2.ReleaseGraphics(gb)
 }
 

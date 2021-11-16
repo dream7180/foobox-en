@@ -1,5 +1,5 @@
 ﻿// *****************************************************************************************************************************************
-// headerBar object by Br3tt aka Falstaff (c)2015, mod for foobox http://blog.sina.com.cn/dream7180
+// headerBar object by Br3tt aka Falstaff (c)2015, mod for foobox https://github.com/dream7180
 // *****************************************************************************************************************************************
 
 oBorder = function() {
@@ -791,7 +791,7 @@ oHeaderBar = function() {
 		_groups.AppendMenuItem(MF_STRING, 18, "Enable group");
 		_groups.CheckMenuItem(18, properties.showgroupheaders);
 		if (properties.showgroupheaders) {
-			_groups.AppendMenuItem(MF_STRING, 17, "Disable group for Web playlist");
+			_groups.AppendMenuItem(MF_STRING, 17, "Disable group for radio playlist");
 			_groups.CheckMenuItem(17, properties.NetDisableGroup);
 			_groups.AppendMenuItem(MF_STRING, 19, "Enable playlist filter");
 			_groups.CheckMenuItem(19, properties.enablePlaylistFilter);

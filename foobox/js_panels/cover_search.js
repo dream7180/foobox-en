@@ -1,11 +1,25 @@
-//by EHfive, https://github.com/EHfive/Some-js-script-for-FB2K, mod by Asion, dreamawake for foobox http://blog.sina.com.cn/dream7180
+//by EHfive, https://github.com/EHfive/Some-js-script-for-FB2K, mod by Asion, dreamawake for foobox https://github.com/dream7180
 var debug=false;
 var StatusHeadersAvailable = 1 << 0;
 var StatusDataReadComplete = 1 << 1;
 var downloaded = -1;//-1:no download, 0: download start, 1: download completed, >1: completed...
 client = utils.CreateHttpRequestEx(window.ID);
 
-function search_album(idx, title,artist,album, path, filename){
+function search_album(idx, title,artist,album, path, filename, alb_source){
+	switch(alb_source){
+		case (0):
+			search_album_all(idx, title,artist,album, path, filename);
+			break;
+		case (1):
+			search_album_163(idx, title,artist,album, path, filename);
+			break;
+		case (2):
+			search_album_itunes(idx, title,artist,album, path, filename);
+			break;
+	}
+}
+
+function search_album_all(idx, title,artist,album, path, filename){
 	downloaded = 0;
 	var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 	url = "https://itunes.apple.com/search?term=" + encodeURIComponent(artist) + encodeURIComponent(album) + "&entity=album";
@@ -34,7 +48,7 @@ function search_album(idx, title,artist,album, path, filename){
 							//fb.trace(i,"专辑名称不同，不下载");
 						//}
 					}
-					fb.trace("PICPIC: "+pic);
+					//fb.trace("PICPIC: "+pic);
 					if(pic == ""){
 						search_album_163(idx, title,artist,album, path, filename);
 						return;
@@ -49,8 +63,52 @@ function search_album(idx, title,artist,album, path, filename){
 	}
 }
 
-function search_album_163(idx, title,artist,album, path, filename){
+function search_album_itunes(idx, title,artist,album, path, filename){
 	downloaded = 0;
+	var xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	url = "https://itunes.apple.com/search?term=" + encodeURIComponent(artist) + encodeURIComponent(album) + "&entity=album";
+	var pic= "";
+	//fb.trace(url);
+	try {
+		xmlhttp.open("GET", url, true);
+		xmlhttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
+		xmlhttp.send(null);
+		xmlhttp.onreadystatechange = function () {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				//fb.trace(xmlhttp.responseText);
+				var _json_obj = json(xmlhttp.responseText);
+				//fb.trace(_json_obj.resultCount);
+				if (_json_obj.resultCount > 0){
+					var _coverdates = _json_obj["results"];
+					for (var i = 0; i < _coverdates.length; ++i) {
+						//fb.trace(compare(utils.LCMapString(_coverdates[i].collectionName, 0x0804, 0x02000000), utils.LCMapString(Album_Name, 0x0804, 0x02000000)),utils.LCMapString(_coverdates[i].collectionName, 0x0804, 0x02000000), utils.LCMapString(Album_Name, 0x0804, 0x02000000));
+						if (compare(utils.LCMapString(_coverdates[i].collectionName, 0x0804, 0x02000000), utils.LCMapString(album, 0x0804, 0x02000000)) > 70){
+							pic = _coverdates[i].artworkUrl100;
+							//fb.trace(i,"专辑名称相同，下载");
+							//fb.trace("O:",pic);
+							pic = pic.replace("100x100bb","1200x1200bb")
+							//fb.trace("F:",pic);
+						}//else{
+							//fb.trace(i,"专辑名称不同，不下载");
+						//}
+					}
+					//fb.trace("PICPIC: "+pic);
+					if(pic == ""){
+						catcherr(idx);
+						return;
+					}
+					client.SavePath = path;
+					client.RunAsync(idx, pic, filename);
+				} else catcherr(idx);
+			}
+		}
+	} catch (e) {
+		catcherr(idx);
+	}
+}
+
+function search_album_163(idx, title,artist,album, path, filename){
+	downloaded = 0;	
 	var xmlHttp = new ActiveXObject("Microsoft.XMLHTTP"), xmlHttp2 = new ActiveXObject("WinHttp.WinHttpRequest.5.1");
 	var searchURL, infoURL;
 	var limit = 3;
@@ -82,9 +140,7 @@ function search_album_163(idx, title,artist,album, path, filename){
 					var result = ncm_back.result;
 					if(!result || result == null) return;
 					if (ncm_back.code != 200 || !result.songCount) {
-						if(DLItems.length == 0) return;
-						DLItems[idx].downloaded = 1;
-						insertQueue();
+						catcherr(idx);
 						return;
 					}
 					//筛选艺术家、专辑、标题
@@ -140,17 +196,13 @@ function search_album_163(idx, title,artist,album, path, filename){
 							client.RunAsync(idx, ncm_pic.songs[0].album.picUrl, filename);
 						}
 					} catch (e) {
-						if(DLItems.length == 0) return;
-						DLItems[idx].downloaded = 1;
-						insertQueue();
+						catcherr(idx);
 					}
 				}
 			}
 		}
 	} catch (e) {
-		if(DLItems.length == 0) return;
-		DLItems[idx].downloaded = 1;
-		insertQueue();
+		catcherr(idx);
 	}
 }
 
@@ -179,21 +231,26 @@ function search_artist(idx, Name, path, filename){
 					client.SavePath = path;
 					client.RunAsync(idx, pic_num[0], filename);
 				}else {
-					if(DLItems.length == 0) return;
-					DLItems[idx].downloaded = 1;
-					insertQueue();
+					catcherr(idx);
 				}
 			}
 		}
 	}catch(e){
-		if(DLItems.length == 0) return;
-		DLItems[idx].downloaded = 1;
-		insertQueue();
+		catcherr(idx);
+		//if(DLItems.length == 0) return;
+		//DLItems[idx].downloaded = 1;
+		//insertQueue();
 	}
 }
 
-function console(s) {
-	fb.trace("Netease Art: " + s);
+//function console(s) {
+//	fb.trace("Netease Art: " + s);
+//}
+
+function catcherr(i){
+	if(DLItems.length == 0) return;
+	DLItems[i].downloaded = 1;
+	insertQueue(albumsource);
 }
 
 function del(str, delthis) {

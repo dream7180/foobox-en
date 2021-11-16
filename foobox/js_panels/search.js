@@ -1,4 +1,4 @@
-﻿//by Asion, mod for foobox http://blog.sina.com.cn/dream7180
+﻿//by Asion, mod for foobox https://github.com/dream7180
 ppt = {
 	source: window.GetProperty("Search Source", 1),
 	autosearch: window.GetProperty("Search Box: Auto-validation", false),
@@ -7,9 +7,7 @@ ppt = {
 	historymaxitems: 10,
 	historytext: window.GetProperty("Search Box: Search History", ""),
 	showreset: window.GetProperty("Search Box: Always Show Reset Button", false),
-	webnb: window.GetProperty("Search Source: Web: Number", 1),//1-KW, 2-TT
 	webkqtradioarr: "",
-	pagesize: window.GetProperty("Search Results Per Page", 50)
 };
 
 //=================================================// 定义变量
@@ -43,21 +41,19 @@ searchbox = function() {
 	this.repaint = function() {
 		window.RepaintRect(this.x, this.y, this.w, this.h);
 	}
-	
+/*	
 	this.getTooltip = function(){
 		switch (ppt.source){
 			case 1:
-				return "Playlist";
+				return "列表";
 				break;
 			case 2:
-				return "Media library";
-				break;
-			case 3:
-				return "Website";
+				return "媒体库";
 				break;
 		}
+		
 	}
-
+*/
 	this.getImages = function() {
 		var gb;
 		var x2 = 2 * zdpi, x4 = 4 * zdpi, x5 = 5 * zdpi, x11 = 11 * zdpi, x12 = 12 * zdpi, 
@@ -121,17 +117,7 @@ searchbox = function() {
 		gb.DrawLine(0, x4, 0, x11, 1, on_colour);
 		gb.DrawLine(x11, x4, x11, x11, 1, on_colour);
 		this.images.source_lib.ReleaseGraphics(gb);
-		
-		this.images.source_net = gdi.CreateImage(x14, x14);
-		gb = this.images.source_net.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.FillEllipse(0, 10*zdpi, 3*zdpi, 3*zdpi,on_colour);
-		gb.DrawEllipse(-8*zdpi, 6*zdpi, 15*zdpi, 15*zdpi, 1, on_colour);
-		gb.DrawEllipse(-13*zdpi, x2, 24*zdpi, 24*zdpi, 1, on_colour);
-		gb.SetSmoothingMode(0);
-		this.images.source_net.ReleaseGraphics(gb);
-		
-		this.src_switch = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, this.getTooltip());
+		this.src_switch = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, ""/*this.getTooltip()*/);
 	}
 	this.getImages();
 
@@ -166,7 +152,7 @@ searchbox = function() {
 		var g_z14 = Math.ceil(14 * zdpi);
 		this.src_switch.draw(gr, this.x + 5, this.y + 3 * zdpi, 255);
 		this.inputbox.draw(gr, this.x + g_z14 + 10, this.y + 2, 0, 0);
-		var src_img = ((ppt.source == 1) ? this.images.source_pl : (ppt.source == 2) ? this.images.source_lib : this.images.source_net);
+		var src_img = ((ppt.source == 1) ? this.images.source_pl : this.images.source_lib);
 		gr.DrawImage(src_img, this.x + 5, this.y + 3 * zdpi + 1, g_z14, g_z14, 0, 0, g_z14, g_z14, 0, 255);
 		if ((this.inputbox.text.length > 0 || ppt.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, this.x + this.inputbox.w + 22 * zdpi, this.y + 3 * zdpi, 255);
 	}
@@ -234,16 +220,9 @@ searchbox = function() {
 			break;
 		case "lbtn_up":
 			if (this.src_switch.checkstate("up", x, y) == ButtonStates.hover) {
-				ppt.source = ppt.source + 1;
-				if (ppt.source > 3) ppt.source = 1;
-				window.SetProperty("Search Source", ppt.source);
-				if(ppt.source == 3){
-					this.inputbox.autovalidation = false;
-				} else{
-					this.inputbox.autovalidation = ppt.autosearch;
-				}
+				Show_Menu_Searchbox(x, y);
+				this.inputbox.autovalidation = ppt.autosearch;
 				this.inputbox.empty_text = "";
-				this.src_switch.changeTooltip(this.getTooltip());
 				
 				this.repaint();
 			}
@@ -262,7 +241,10 @@ searchbox = function() {
 			break;
 		case "rbtn_down":
 			if (this.src_switch.checkstate("up", x, y) == ButtonStates.hover) {
-				Show_Menu_Searchbox(x, y);
+				ppt.source = 3 - ppt.source;
+				if (ppt.source > 2 || ppt.source < 1) ppt.source = 1;
+				//this.src_switch.changeTooltip(this.getTooltip());
+				window.SetProperty("Search Source", ppt.source);
 			}
 			this.inputbox.check("right", x, y);
 			break;
@@ -372,17 +354,12 @@ function g_sendResponse() {
 		};
 
 		handle_list.Dispose();
-	} else if (ppt.source == 3) {
-		if (oldsearch != s1) {
-			oldsearch = s1;
-		}
-		NetSearch(s2, 1);
 	} else if (ppt.source == 2) {
 		// 搜索列表索引
 		var isFound = false;
 		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i).substr(0, 4) == "Search [") {
+			if (plman.GetPlaylistName(i).substr(0, 8) == "Search [") {
 				if (!ppt.multiple) {
 					if (!isFound) {
 						var plIndex = i;
@@ -439,12 +416,22 @@ function Show_Menu_Searchbox(x, y) {
 	var _menu = window.CreatePopupMenu();
 	if (typeof x == "undefined") x = ww;
 	if (typeof y == "undefined") y = 30;
-	var SearchModeMenu = window.CreatePopupMenu();
-	SearchModeMenu.AppendMenuItem(MF_STRING, 21, "Playlist");
-	SearchModeMenu.AppendMenuItem(MF_STRING, 22, "Media library");
-	SearchModeMenu.AppendMenuItem(MF_STRING, 23, "Website");
-	SearchModeMenu.CheckMenuRadioItem(21, 23, ppt.source + 20);
-	SearchModeMenu.AppendTo(_menu, MF_STRING, "Search mode");
+	
+	_menu.AppendMenuItem(MF_STRING, 21, "Search in playlist");
+	_menu.AppendMenuItem(MF_STRING, 22, "Search in library");
+	_menu.CheckMenuRadioItem(21, 22, ppt.source + 20);
+	_menu.AppendMenuSeparator();
+	var WebQTRadioMenu = window.CreatePopupMenu();
+	if(ppt.webkqtradioarr.length > 1){
+		for (var k = 0; k < ppt.webkqtradioarr.length; k++) {
+			WebQTRadioMenu.AppendMenuItem(MF_STRING, 501+k, ppt.webkqtradioarr[k].split(":")[0]);
+		}
+		WebQTRadioMenu.AppendMenuSeparator();
+	}
+	WebQTRadioMenu.AppendMenuItem(MF_STRING, 500, "Update QT-FM menu");
+	WebQTRadioMenu.AppendTo(_menu, MF_STRING, "QT-FM");
+	_menu.AppendMenuSeparator();
+	
 	var SearchHistoryMenu = window.CreatePopupMenu();
 
 	for (var i = g_searchbox.historylist.length - 1; i >= 0; i--) {
@@ -459,7 +446,7 @@ function Show_Menu_Searchbox(x, y) {
 
 	SearchHistoryMenu.AppendTo(_menu, MF_STRING, "Search history");
 
-	_menu.AppendMenuSeparator();
+	//_menu.AppendMenuSeparator();
 
 	if (ppt.source == 1) {
 		_menu.AppendMenuItem(MF_STRING, 1, "Auto-validation");
@@ -474,28 +461,7 @@ function Show_Menu_Searchbox(x, y) {
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		_menu.AppendMenuItem(MF_STRING, 8, "Search: Comment");
 		_menu.CheckMenuRadioItem(2, 8, ppt.scope + 2);
-	} else if (ppt.source == 3) {
-		_menu.AppendMenuItem(MF_STRING, 9, "Keep previous search playlist");
-		_menu.CheckMenuItem(9, ppt.multiple ? 1 : 0);
-		_menu.AppendMenuSeparator();
 
-		_menu.AppendMenuItem(MF_STRING, 11, "Kuwo Music (320K)");
-		//_menu.AppendMenuItem(MF_STRING, 12, "咪咕音乐 (320K)");
-		//_menu.AppendMenuItem(MF_STRING, 13, "咪咕音乐 (无损)");
-		_menu.CheckMenuRadioItem(11, 11, ppt.webnb + 10);
-		_menu.AppendMenuSeparator();
-		
-		//_menu.AppendMenuSeparator();
-		var WebQTRadioMenu = window.CreatePopupMenu();
-		if(ppt.webkqtradioarr.length > 1){
-			for (var k = 0; k < ppt.webkqtradioarr.length; k++) {
-				WebQTRadioMenu.AppendMenuItem(MF_STRING, 501+k, ppt.webkqtradioarr[k].split(":")[0]);
-			}
-			WebQTRadioMenu.AppendMenuSeparator();
-		}
-		WebQTRadioMenu.AppendMenuItem(MF_STRING, 500, "Update QT-FM menu");
-        WebQTRadioMenu.AppendTo(_menu, MF_STRING, "QT-FM");
-		
 	} else if (ppt.source == 2) {
 		var now_playing_track = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
 		var quickSearchMenu = window.CreatePopupMenu();
@@ -504,8 +470,8 @@ function Show_Menu_Searchbox(x, y) {
 		quickSearchMenu.AppendMenuItem(MF_STRING, 38, "Same genre");
 		quickSearchMenu.AppendMenuItem(MF_STRING, 39, "Same date");
 		quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search...");
-		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 1, "Auto-validation");
+		//_menu.AppendMenuSeparator();
+		//_menu.AppendMenuItem(MF_STRING, 1, "启用自动搜索");
 		_menu.CheckMenuItem(1, ppt.autosearch ? 1 : 0);
 		_menu.AppendMenuItem(MF_STRING, 9, "Keep previous search playlist");
 		_menu.CheckMenuItem(9, ppt.multiple ? 1 : 0);
@@ -536,17 +502,11 @@ function Show_Menu_Searchbox(x, y) {
 		ppt.multiple = !ppt.multiple;
 		window.SetProperty("Search Box: Keep Playlist", ppt.multiple);
 		break;
-	case (idx >= 11 && idx <= 13):
-		window.SetProperty("Search Source: Web: Number", ppt.webnb = idx - 10);
-		if (ppt.source == 3) oldsearch = "";
-		break;
-	case (idx >= 21 && idx <= 23):
+
+	case (idx >= 21 && idx <= 22):
 		window.SetProperty("Search Source", ppt.source = idx - 20);
-		if(ppt.source == 3){
-			g_searchbox.inputbox.autovalidation = false;
-		} else{
-			g_searchbox.inputbox.autovalidation = ppt.autosearch;
-		}
+		//g_searchbox.src_switch.changeTooltip(g_searchbox.getTooltip());
+		g_searchbox.inputbox.autovalidation = ppt.autosearch;
 		g_searchbox.inputbox.empty_text = "";
 		g_searchbox.repaint();
 		break;
@@ -578,7 +538,7 @@ function Show_Menu_Searchbox(x, y) {
 		break;
 	}
 	SearchHistoryMenu.Dispose();
-	SearchModeMenu.Dispose();
+	//SearchModeMenu.Dispose();
 	_menu.Dispose();
 }
 
@@ -629,155 +589,6 @@ function trimstr(str) {
 	return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 }
 
-//=================================================// 网络搜索
-
-function clean_name(n) {
-	if (!n) return;
-	return n.replace(/[\/\:\*\?\"\<\>\|]/g, '').replace(/^\s+|\s+$/g, "");
-}
-
-function NetSearch(searchtext, pageid, switchpage) {
-	SearchListName = clean_name(searchtext);
-	g_searchbox.inputbox.edit = false;
-	SetBoxText("Web searching...");
-	switch (ppt.webnb) {
-		case 1:
-		default:
-			cachefile = fb.ProfilePath + "\\cache\\KWSearch.asx";
-			try {fso.DeleteFile(cachefile);}catch(e) {};
-			KWSearch(searchtext, pageid, switchpage);
-			break;
-/*		case 2:
-			cachefile = fb.ProfilePath + "\\cache\\MGSearch.asx";
-			try {fso.DeleteFile(cachefile);}catch(e) {};
-			MGSearch(searchtext, pageid, switchpage, 1);
-			break;
-		case 3:
-			cachefile = fb.ProfilePath + "\\cache\\MGSearch.asx";
-			try {fso.DeleteFile(cachefile);}catch(e) {};
-			MGSearch(searchtext, pageid, switchpage, 2);
-			break;
-			*/
-	}
-	Deltempfile(cachefile);
-}
-
-function KWSearch(searchtext, pageid, switchpage){
-    var searchURL = "http://player.kuwo.cn/webmusic/getsjplayinfo?flag=6&pn=" + pageid + "&pr=" + ppt.pagesize + "&type=music&key=" + encodeURIComponent(StringFilter(searchtext));
-	try {
-		xmlHttp.open("GET", searchURL, true);
-		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-		xmlHttp.send(null);
-		xmlHttp.onreadystatechange = function () {
-			if (xmlHttp.readyState == 4) {
-				if (xmlHttp.status == 200) {
-					var songid = [];
-					var filedata = '<asx version="3.0">\r\n\r\n';
-					var ret = json(xmlHttp.responseText.replace(/'/g, '"'))["list"];
-					if(!ret || ret.length == 0){UpdateDone("Last page");return;}
-					for (var i = 0; i < ret.length; i++) {
-						songid[i] = {
-							artist:ret[i].artist,
-							song:ret[i].songName,
-							url:"http://antiserver.kuwo.cn/anti.s?type=convert_url&response=url&rid=" + ret[i].rid + "&br=320kmp3&format=mp3"
-						};
-					}
-					l = 0;
-					//debug && fb.trace(songid.length);
-					if(songid.length == 0){UpdateDone("Last page");return;}
-					url = songid[l].url;
-					//debug && fb.trace(l,url);
-					xmlHttp2.open("GET", url, true);
-					xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-					xmlHttp2.send(null);
-					xmlHttp2.onreadystatechange = function() {
-						if (xmlHttp2.readyState == 4) {
-							if (xmlHttp2.status == 200) {
-								filedata = filedata + '<entry>\r\n'
-								 + '<title>' + songid[l].song + '</title>\r\n'
-								 + '<author>' + songid[l].artist + '</author>\r\n'
-								 + '<ref href="' + xmlHttp2.responseText + '"/>\r\n'
-								 + '</entry>\r\n\r\n';
-								 //debug && fb.trace(l,songid[l].song,songid[l].artist,xmlHttp2.responseText)
-							}
-							l++;
-							if (l < songid.length){
-								var URL_Timer = window.SetTimeout(function () {
-										url = songid[l].url;
-										xmlHttp2.open("GET", url, true);
-										xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-										xmlHttp2.send(null);
-										URL_Timer && window.ClearTimeout(URL_Timer);
-									}, 5);
-							}	
-							if (l == songid.length) {
-								filedata = filedata + "</asx>";
-								SaveAs(filedata, cachefile);
-								DisposeList("Web", 4, SearchListName, pageid, switchpage);
-								SetBoxText(null);
-							}
-						}
-					};
-				}
-			}
-		}
-	} catch(e) {
-		fb.trace("Search failed");
-		SetBoxText(null);
-		return;
-	}
-}
-/*
-function MGSearch(searchtext, pageid, switchpage, quality){
-	var searchURL = "http://140.143.30.148:88/index.php?key=VG&class=miguSearch&ID=" + encodeURIComponent(StringFilter(searchtext)) +  "&k=" + pageid;
-	switch(quality){
-		case 1:
-			var toneFlag = "HQ";
-			var resourceType = "2";
-			break;
-		case 2:
-			var toneFlag = "SQ";
-			var resourceType = "E";
-			break;
-		default:
-			var toneFlag = "HQ";
-			var resourceType = "2";
-			break;
-	}
-	try {
-		xmlHttp.open("GET", searchURL, true);
-		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-		xmlHttp.send(null);
-		xmlHttp.onreadystatechange = function () {
-			if (xmlHttp.readyState == 4) {
-				if (xmlHttp.status == 200) {
-					var songid = [];
-					var filedata = '<asx version="3.0">\r\n\r\n';
-					var ret = json(xmlHttp.responseText).songResultData.resultList;
-					if(!ret || ret.length == 0){UpdateDone("已经是最后一页");return;}
-					for (var i = 0; i < ret.length; i++) {
-						if(ret[i][0].vipType == ""){
-							filedata = filedata + '<entry>\r\n'
-							 + '<title>' + ret[i][0].name + '</title>\r\n'
-							 + '<author>' + ret[i][0].singers[0].name + '</author>\r\n'
-							 + '<ref href="' + "http://app.pd.nf.migu.cn/MIGUM2.0/v1.0/content/sub/listenSong.do?toneFlag=" + toneFlag + "&netType=00&userId=15548614588710179085069&ua=Android_migu&version=5.1&copyrightId=0&contentId=" + ret[i][0].contentId + "&resourceType=" + resourceType + "&channel=0" + '"/>\r\n'
-							 + '</entry>\r\n\r\n';
-						}
-					}
-					filedata = filedata + "</asx>";
-					SaveAs(filedata, cachefile);
-					DisposeList("网搜", 4, SearchListName, pageid, switchpage);
-					SetBoxText(null);
-				}
-			}
-		}
-	} catch(e) {
-		fb.trace("搜索失败");
-		SetBoxText(null);
-		return;
-	}
-}
-*/
 //=================================================// 蜻蜓FM
 
 function GetQTFMRadiolist(){

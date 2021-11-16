@@ -1,7 +1,7 @@
 ﻿// Name "JS Smooth Playlist Manager"
 // Version "20151115-1000-151"
 // Author "Br3tt aka Falstaff >> http://br3tt.deviantart.com"
-//mod for foobox http://blog.sina.com.cn/dream7180
+//mod for foobox https://github.com/dream7180
 
 var fbx_set = [];
 window.NotifyOthers("get_fbx_set", fbx_set);
@@ -1669,7 +1669,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 				else return images.icon_auto_pl_hl;
 			}else{
 				if (name.substr(0, 5) == "Radio") return images.radios_icon_hl;
-				if (name.substr(0, 5) == "Board") return images.board_icon_hl;
+				//if (name.substr(0, 5) == "Board") return images.board_icon_hl;
 				else return images.icon_normal_pl_playing_hl;
 			}
 		} else {
@@ -1682,7 +1682,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 				else return images.icon_auto_pl;
 			}else{
 				if (name.substr(0, 5) == "Radio") return images.radios_icon;
-				if (name.substr(0, 5) == "Board") return images.board_icon;
+				//if (name.substr(0, 5) == "Board") return images.board_icon;
 				else return images.icon_normal_pl;
 			}
 		}
@@ -1698,7 +1698,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 		} else{
 			if (name.substr(0, 5) == "Radio") return images.radios_icon;
 			if (name.substr(0, 5) == "Board") return images.board_icon;
-			if (playing_playlist) return images.icon_normal_pl_playing;
+			//if (playing_playlist) return images.icon_normal_pl_playing;
 			else return images.icon_normal_pl;
 		}
 	}
@@ -1887,7 +1887,7 @@ function get_images() {
 	gb.DrawPolygon(g_color_playing_txt,1,point_arr);
 	gb.SetSmoothingMode(0);
 	images.mood_icon_hl.ReleaseGraphics(gb);
-	
+	/*
 	images.board_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.board_icon_hl.GetGraphics();
 	gb.SetSmoothingMode(2);
@@ -1896,7 +1896,7 @@ function get_images() {
 	gb.DrawLine(_x13, _x17, _x18, _x10, 1, g_color_playing_txt);
 	gb.FillPolygon(g_color_playing_txt, 0, point_arr2);
 	gb.SetSmoothingMode(0);
-	images.board_icon_hl.ReleaseGraphics(gb);
+	images.board_icon_hl.ReleaseGraphics(gb);*/
 };
 
 function get_font() {

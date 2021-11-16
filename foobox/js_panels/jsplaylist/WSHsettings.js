@@ -1,5 +1,5 @@
 ﻿// *****************************************************************************************************************************************
-// SETTINGS functions by Br3tt aka Falstaff (c)2015, mod for foobox http://blog.sina.com.cn/dream7180
+// SETTINGS functions by Br3tt aka Falstaff (c)2015, mod for foobox https://github.com/dream7180
 // *****************************************************************************************************************************************
 
 // Objects linked functions
@@ -1911,7 +1911,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "Preset download folder. To customize it, ensure the path is valid (create it if the folder not existing).", dl_prefix_folder, "settings_textboxes_action", this.id));
 			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "Rename format for downloaded tracks", dl_rename_by, "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 15.25, "Play the next playlist when finish current one (effective in default playback order, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "Disable bottom toolbar if not a web playlist", "properties.disableToolbar", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "Disable bottom toolbar, activated only on download", "properties.disableToolbar", "settings_checkboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -2115,7 +2115,7 @@ oPage = function(id, objectName, label, nbrows) {
 			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.new_no.Height) - (this.offset * cSettings.rowHeight);
 			var idx = p.settings.pages[1].elements[0].selectedId;
 			var ref = p.headerBar.columns[idx].ref;
-			if (ref.substr(0, 3) == "Custom") {
+			if (ref.substr(0, 6) == "Custom") {
 				p.settings.delbutton.draw(gr, dx, dy, 255);
 			};
 			else {
@@ -2139,7 +2139,7 @@ oPage = function(id, objectName, label, nbrows) {
 			var dy = Math.floor(cSettings.topBarHeight + rh * 2.1 + g_z5 + p.settings.new_no.Height) - (this.offset * cSettings.rowHeight);
 			var idx = p.settings.pages[2].elements[0].selectedId;
 			var ref = p.list.groupby[idx].ref;
-			if (ref.substr(0, 3) == "Custom") {
+			if (ref.substr(0, 6) == "Custom") {
 				p.settings.delbuttonPattern.draw(gr, dx, dy, 255);
 			};
 			else {
@@ -2201,7 +2201,7 @@ oPage = function(id, objectName, label, nbrows) {
 				// get free number to affect to the new User column to create
 				fin = tmp_array.length;
 				for (var i = 0; i < fin; i++) {
-					if (tmp_array[i].substr(0, 3) == "Custom") {
+					if (tmp_array[i].substr(0, 6) == "Custom") {
 						if (tmp_array[i].substr(tmp_array[i].length - 2, 2) == num(no_user, 2)) {
 							no_user++;
 						};
@@ -2238,7 +2238,7 @@ oPage = function(id, objectName, label, nbrows) {
 				// action
 				var idx = p.settings.pages[1].elements[0].selectedId;
 				var ref = p.headerBar.columns[idx].ref;
-				if (ref.substr(0, 3) == "Custom") {
+				if (ref.substr(0, 6) == "Custom") {
 					// if the column is visible, percent are to be adjusted on other visible columns before deletinf it
 					if (p.headerBar.columns[idx].percent > 0) {
 						// check if it's not the last column visible, otherwise, we coundn't hide it!
@@ -2352,7 +2352,7 @@ oPage = function(id, objectName, label, nbrows) {
 				// action
 				var idx = p.settings.pages[2].elements[0].selectedId;
 				var ref = p.list.groupby[idx].ref;
-				if (ref.substr(0, 3) == "Custom") {
+				if (ref.substr(0, 6) == "Custom") {
 					var tmp_array = p.list.groupby.slice(0, p.list.groupby.length);
 					p.list.groupby.splice(0, p.list.groupby.length);
 					fin = tmp_array.length;

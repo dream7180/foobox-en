@@ -1,7 +1,7 @@
 ﻿// Name "JSPlaylist"
 // Version "1.3.2"
 // Author "Br3tt aka Falstaff >> http://br3tt.deviantart.com"
-// mod for foobox http://blog.sina.com.cn/dream7180
+// mod for foobox https://github.com/dream7180
 var fbx_set = [];
 window.NotifyOthers("get_fbx_set", fbx_set);
 var zdpi = fbx_set[9];
@@ -340,11 +340,6 @@ oToolbar = function(){
 	this.height = 32*zdpi;
 	this.x = 0;
 	this.y = 0;
-	this.is_netsearch = 0;
-	this.netsearch_type = "";
-	this.netsearch_name = "";
-	this.netsearch_num = 0;
-	this.netradio = 0;
 	this.showgh_org = properties.showgroupheaders;
 	this.timer_show = false;
 	this.dlmode = false;
@@ -365,24 +360,34 @@ oToolbar = function(){
 	this.draw = function(gr){
 		if(cSettings.visible) return;
 		if(this.disabled) return;
-		if(this.state == 0 && !this.dlmode) gr.DrawImage(images.show_toolbar, (ww - images.show_toolbar.Width)/2, wh- images.show_toolbar.Height, images.show_toolbar.Width, images.show_toolbar.Height, 0, 0, images.show_toolbar.Width, images.show_toolbar.Height, 0, 70);
+		if(this.state == 0 && !this.dlmode && !properties.disableToolbar) gr.DrawImage(images.show_toolbar, (ww - images.show_toolbar.Width)/2, wh- images.show_toolbar.Height, images.show_toolbar.Width, images.show_toolbar.Height, 0, 0, images.show_toolbar.Width, images.show_toolbar.Height, 0, 70);
 		else{
 			var x2=2*zdpi, x3=3*zdpi, x4=4*zdpi, x23=23*zdpi, end_x = this.x + this.width, mid_x = this.x+this.width/2, col_activeitem = g_color_dl_txt &0x40ffffff;
 			var imgw = images.tool_album.Width, imgh = images.tool_album.Height;
 			gr.SetSmoothingMode(0);
 			gr.FillSolidRect(this.x, this.y, this.width, this.height, g_color_dl_bg);
 			gr.SetSmoothingMode(2);
-			if(properties.showgroupheaders)gr.FillRoundRect(this.x+x3, this.y+x3, x23, x23, 3, 3, col_activeitem);
-			this.groupby_bt.draw(gr, this.x + x2, this.y+x3, 255);
 			this.groupAlb_bt.draw(gr, end_x - 2*imgw-x4, this.y+x3, 255);
 			this.groupArt_bt.draw(gr, end_x - imgw-x3, this.y+x3, 255);
-			gr.gdiDrawText("G", g_font, g_color_dl_txt, this.x + x2, this.y+x3, imgw, imgh, ccs_txt);
+			if(!properties.disableToolbar) {
+				if(properties.showgroupheaders)gr.FillRoundRect(this.x+x3, this.y+x3, x23, x23, 3, 3, col_activeitem);
+				gr.gdiDrawText("G", g_font, g_color_dl_txt, this.x + x2, this.y+x3, imgw, imgh, ccs_txt);
+				this.groupby_bt.draw(gr, this.x + x2, this.y+x3, 255);
+			} else if(p.list.dlitems.length){
+				this.dlcancel_bt.draw(gr, this.x + x2, this.y+x3, 255);
+				gr.DrawImage(images.dl_cancel, this.x + x2, this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+			}else{
+				this.close_bt.draw(gr, this.x + x2, this.y+x3, 255);
+				gr.DrawImage(images.close, this.x + x2, this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+			}
 			if(p.list.dlitems.length){
 				this.dl_showhide.draw(gr, this.x + imgw+x3, this.y+x3, 255);
 				gr.FillEllipse(this.x + imgw+x4, this.y+x4, imgw-x2,imgw-x2,g_color_dl_txt)
 				gr.gdiDrawText(this.dl_count, g_font_2, g_color_dl_bg, this.x + imgw+x4, this.y+x4, imgw,imgh, ccs_txt);
-				this.dlcancel_bt.draw(gr, this.x + 2*(imgw+x2), this.y+x3, 255);
-				gr.DrawImage(images.dl_cancel, this.x + 2*(imgw+x2), this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+				if(!properties.disableToolbar){
+					this.dlcancel_bt.draw(gr, this.x + 2*(imgw+x2), this.y+x3, 255);
+					gr.DrawImage(images.dl_cancel, this.x + 2*(imgw+x2), this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
+				}
 			}else {
 				gr.DrawImage(images.dl_folder, this.x + imgw+x3, this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
 				this.dlfolder_bt.draw(gr, this.x + imgw+x3, this.y+x3, 255);
@@ -392,21 +397,6 @@ oToolbar = function(){
 			gr.SetSmoothingMode(0);
 			gr.DrawImage(images.tool_album, end_x - 2*imgw-x4, this.y+x3, imgw, imgh, 0, 0, imgw, imgh, 0, 255);
 			gr.DrawImage(images.tool_artist, end_x - imgw-x3, this.y+x3, imgw, images.tool_artist.Height, 0, 0, imgw, images.tool_artist.Height, 0, 255);
-			var _w = images.netbtn_n.Width;
-			if(this.is_netsearch) {
-				if(this.netsearch_num > 1) {
-					this.searchbt_prev.draw(gr, mid_x - _w, this.y+x3, 255);
-					this.searchbt_next.draw(gr, mid_x, this.y+x3, 255);
-					gr.gdiDrawText("Previous", g_font, g_color_dl_txt, mid_x - _w, this.y+x3, _w, imgh, ccs_txt);
-					gr.gdiDrawText("Next", g_font, g_color_dl_txt, mid_x, this.y+x3, _w, imgh, ccs_txt);
-				}else{
-					this.searchbt_next.draw(gr, mid_x - _w/2, this.y+x3, 255);
-					gr.gdiDrawText("Next", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x3, _w, imgh, ccs_txt);
-				}
-			}else if(this.netradio) {
-				this.radiobt.draw(gr, mid_x - _w/2, this.y+x3, 255);
-				gr.gdiDrawText("Refresh", g_font, g_color_dl_txt, mid_x - _w/2, this.y+x3, _w,imgh, ccs_txt);
-			}
 		}
 	}
 	
@@ -423,21 +413,13 @@ oToolbar = function(){
 		if(this.disabled) return;
 		switch (event) {
 		case "move":
-			if(this.state == 0 && !this.dlmode){
+			if(this.state == 0 && !this.dlmode && !properties.disableToolbar){
 				if(x > (this.x + this.width*0.2) && x < (this.x + this.width * 0.8) && y > (this.y + this.height*0.25)) {
 					this.state = 1;
 					if(!toolbar.timer_show){
 						toolbar.timer_show = window.SetTimeout(function() {
 							if(toolbar.state == 1){
 								toolbar.repaint();
-								var timer_checkbt = window.SetTimeout(function() {
-									if(toolbar.state == 1){
-										if(toolbar.is_netsearch) toolbar.search_bt_check("move", mouse_x, mouse_y);
-										if(toolbar.netradio) toolbar.radio_bt_check("move", mouse_x, mouse_y);
-									}
-									timer_checkbt && window.ClearTimeout(timer_checkbt);
-									timer_checkbt = false;
-								}, 8);
 							}
 							toolbar.timer_show && window.ClearTimeout(toolbar.timer_show);
 							toolbar.timer_show = false;
@@ -451,22 +433,20 @@ oToolbar = function(){
 				if(x > this.x && x < (this.x + this.width) && y > this.y) {
 					this.state = 1;
 					if(!toolbar.timer_show) {
-						if(this.is_netsearch) this.search_bt_check(event, x, y);
-						if(this.netradio) this.radio_bt_check(event, x, y);
-						this.groupby_bt_check(event, x, y);
 						this.groupAlb_bt_check(event, x, y);
 						this.groupArt_bt_check(event, x, y);
+						if(!properties.disableToolbar) this.groupby_bt_check(event, x, y);
+						else if(p.list.dlitems.length == 0) this.close_bt_check(event, x, y);
 						if(p.list.dlitems.length) {
 							this.dlcancel_bt_check(event, x, y);
 						}else this.dlfolder_bt_check(event, x, y);
 					}
 				} else {
 					this.state = 0;
-					if(this.is_netsearch) this.search_bt_check("leave");
-					if(this.netradio) this.radio_bt_check("leave");
-					this.groupby_bt_check("leave");
 					this.groupAlb_bt_check("leave");
 					this.groupArt_bt_check("leave");
+					if(!properties.disableToolbar) this.groupby_bt_check("leave");
+					else if(p.list.dlitems.length == 0) this.close_bt_check("leave");
 					if(p.list.dlitems.length) {
 						this.dlcancel_bt_check("leave");
 					}else this.dlfolder_bt_check("leave");
@@ -476,26 +456,20 @@ oToolbar = function(){
 			break;
 		case "down":
 			if(!this.state) return;
-			if(this.is_netsearch) {
-				this.search_bt_check(event, x, y);
-			}
-			if(this.netradio) {
-				this.radio_bt_check(event, x, y);
-			}
-			this.groupby_bt_check(event, x, y);
 			this.groupAlb_bt_check(event, x, y);
 			this.groupArt_bt_check(event, x, y);
+			if(!properties.disableToolbar) this.groupby_bt_check(event, x, y);
+			else if(p.list.dlitems.length == 0) this.close_bt_check(event, x, y);
 			if(p.list.dlitems.length) {
 				this.dlcancel_bt_check(event, x, y);
 			}else this.dlfolder_bt_check(event, x, y);
 			break;
 		case "up":
 			if(!this.state) return;
-			if(this.is_netsearch) this.search_bt_check(event, x, y);
-			if(this.netradio) this.radio_bt_check(event, x, y);
-			this.groupby_bt_check(event, x, y);
 			this.groupAlb_bt_check(event, x, y);
 			this.groupArt_bt_check(event, x, y);
+			if(!properties.disableToolbar) this.groupby_bt_check(event, x, y);
+			else if(p.list.dlitems.length == 0) this.close_bt_check(event, x, y);
 			if(p.list.dlitems.length) {
 				this.dlcancel_bt_check(event, x, y);
 				this.dl_showhide.checkstate(event, x, y);
@@ -509,51 +483,25 @@ oToolbar = function(){
 		case "leave":
 			if(this.state != 0){
 				this.state = 0;
-				if(this.is_netsearch) this.search_bt_check(event, x, y);
-				if(this.netradio) this.radio_bt_check(event, x, y);
-				this.groupby_bt_check(event);
 				this.groupAlb_bt_check(event);
 				this.groupArt_bt_check(event);
+				if(!properties.disableToolbar) this.groupby_bt_check(event);
+				else if(p.list.dlitems.length == 0) this.close_bt_check(event);
 				if(p.list.dlitems.length) {
-					this.dlcancel_bt_check(event, x, y);
-				}else this.dlfolder_bt_check(event, x, y);
+					this.dlcancel_bt_check(event);
+				}else this.dlfolder_bt_check(event);
 				if(!this.dlmode) this.repaint();
 			}
 			break;
 		}
 	}
 	
-	this.init_netsearch_bt = function() {
+	this.init_radiolist = function() {
 		var pl_type = p.list.name.substring(0, 5);
-		switch (pl_type){
-			case "Board":
-				this.netradio = 1;
-				this.is_netsearch = 0;
-				this.netsearch_type = pl_type;
-				this.netsearch_name = p.list.name.split(" | ")[1];
-				if(properties.NetDisableGroup) nethide_groupheader(true);
-				this.disabled = false;
-				break;
-			case "Web |":
-				this.is_netsearch = 1;
-				this.netradio = 0;
-				this.netsearch_name = p.list.name.split(" | ")[1];
-				this.netsearch_num = Number(p.list.name.split(" | ")[2]);
-				if(properties.NetDisableGroup) nethide_groupheader(true);
-				this.disabled = false;
-				break;
-			case "Radio":
-				this.is_netsearch = 0;
-				this.netradio = 0;
-				if(properties.NetDisableGroup) nethide_groupheader(true);
-				if(p.list.dlitems.length == 0) this.disabled = properties.disableToolbar;
-				break;
-			default:
-				this.is_netsearch = 0;
-				this.netradio = 0;
-				if(properties.NetDisableGroup) nethide_groupheader(false);
-				if(p.list.dlitems.length == 0) this.disabled = properties.disableToolbar;
-				break;
+		if (pl_type == "Radio") {
+			if(properties.NetDisableGroup) nethide_groupheader(true);
+		}else{
+			if(properties.NetDisableGroup) nethide_groupheader(false);
 		}
 	}
 	
@@ -561,66 +509,32 @@ oToolbar = function(){
 		this.groupby_bt = new button(images.toolbtn_n, images.toolbtn_h, images.toolbtn_d);
 		this.groupAlb_bt = new button(images.toolbtn_n, images.toolbtn_h, images.toolbtn_d);
 		this.groupArt_bt = new button(images.toolbtn_n, images.toolbtn_h, images.toolbtn_d);
-		this.searchbt_next = new button(images.netbtn_n, images.netbtn_h, images.netbtn_d);
-		this.searchbt_prev = new button(images.netbtn_n, images.netbtn_h, images.netbtn_d);
-		this.radiobt = new button(images.netbtn_n, images.netbtn_h, images.netbtn_d);
 		this.dl_showhide = new button(images.toolbtn_n, images.toolbtn_n, images.toolbtn_n);
 		this.dlfolder_bt = new button(images.toolbtn_n, images.toolbtn_h, images.toolbtn_d);
 		this.dlcancel_bt = new button(images.toolbtn_n, images.toolbtn_h, images.toolbtn_d);
+		this.close_bt = new button(images.toolbtn_n, images.toolbtn_h, images.toolbtn_d);
 		
 	}
 	this.init_tbbtn();
-	
-	this.radio_bt_check = function(event, x, y){
+
+	this.close_bt_check = function(event, x, y){
 		switch (event) {
 		case "move":
-			this.radiobt.checkstate(event, x, y);
+			this.close_bt.checkstate(event, x, y);
 			break;
 		case "down":
-			this.radiobt.checkstate(event, x, y);
+			this.close_bt.checkstate(event, x, y);
 			break;
 		case "up":
-			this.radiobt.checkstate(event, x, y);
-			if(this.radiobt.state == ButtonStates.hover){
-				var info = [];
-				info[0] = this.netsearch_type;
-				info[1] = this.netsearch_name;
-				window.NotifyOthers("netradio_update", info);
+			this.close_bt.checkstate(event, x, y);
+			if(this.close_bt.state == ButtonStates.hover){
+				this.disabled = true;
+				this.state = 0;
+				this.repaint();
 			}
 			break;
 		case "leave":
-			this.radiobt.state = ButtonStates.normal;
-			break;
-		}
-	}
-	
-	this.search_bt_check = function(event, x, y) {
-		switch (event) {
-		case "move":
-			this.searchbt_next.checkstate(event, x, y);
-			if(this.netsearch_num > 1)this.searchbt_prev.checkstate(event, x, y);
-			break;
-		case "down":
-			this.searchbt_next.checkstate(event, x, y);
-			if(this.netsearch_num > 1)this.searchbt_prev.checkstate(event, x, y);
-			break;
-		case "up":
-			var info = [];
-			this.searchbt_next.checkstate(event, x, y);
-			if(this.netsearch_num > 1) this.searchbt_prev.checkstate(event, x, y);
-			info[0] = this.netsearch_name;
-			if(this.searchbt_prev.state == ButtonStates.hover && this.netsearch_num > 1){
-				info[1] = this.netsearch_num - 1;
-				window.NotifyOthers("netsearch_switchpage", info);
-			}
-			else if(this.searchbt_next.state == ButtonStates.hover){
-				info[1] = this.netsearch_num + 1;
-				window.NotifyOthers("netsearch_switchpage", info);
-			}
-			break;
-		case "leave":
-			if(this.netsearch_num > 1) this.searchbt_prev.state = ButtonStates.normal;
-			this.searchbt_next.state = ButtonStates.normal;
+			this.close_bt.state = ButtonStates.normal;
 			break;
 		}
 	}
@@ -1286,7 +1200,7 @@ function on_paint(gr) {
 						var text_bot = "No playlist";
 					};
 					// if Search Playlist, draw image "No Result"
-					if (text_top.substr(0, 4) == "Search [") {
+					if (text_top.substr(0, 8) == "Search [") {
 						gr.SetTextRenderingHint(4);
 						var search_text = text_top.substr(4, text_top.length - 5);
 						gr.DrawString("No Result for \"" + search_text + "\"", g_font_blank, g_color_normal_txt & 0x40ffffff, 0, 0 - zoom(20, zdpi), ww, wh, cc_stringformat);
@@ -1987,7 +1901,7 @@ function update_playlist(iscollapsed) {
 		window.SetCursor(IDC_ARROW);
 		cHeaderBar.sortRequested = false;
 	};
-	toolbar.init_netsearch_bt();
+	toolbar.init_radiolist();
 	if(toolbar.state) toolbar.repaint();
 };
 
@@ -3060,29 +2974,12 @@ function get_images_ui() {
 	gb.SetSmoothingMode(0);
 	images.show_toolbar.ReleaseGraphics(gb);
 
-	var imgw = 50*zdpi;
+	//var imgw = 50*zdpi;
 	imgh = 25*zdpi;
-	images.netbtn_n = gdi.CreateImage(imgw, imgh);
-	gb = images.netbtn_n.GetGraphics();
-	images.netbtn_n.ReleaseGraphics(gb);
-	
-	images.netbtn_h = gdi.CreateImage(imgw, imgh);
-	gb = images.netbtn_h.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(zdpi,zdpi,imgw-2*zdpi,x23,3,3,g_color_dl_txt&0x40ffffff);
-	gb.SetSmoothingMode(0);
-	images.netbtn_h.ReleaseGraphics(gb);
-	
-	images.netbtn_d = gdi.CreateImage(imgw, imgh);
-	gb = images.netbtn_d.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(zdpi,zdpi,imgw-2*zdpi,x23,3,3,g_color_dl_txt&0x25ffffff);
-	gb.SetSmoothingMode(0);
-	images.netbtn_d.ReleaseGraphics(gb);
 	
 	images.toolbtn_n = gdi.CreateImage(imgh, imgh);
-	gb = images.netbtn_n.GetGraphics();
-	images.netbtn_n.ReleaseGraphics(gb);
+	gb = images.toolbtn_n.GetGraphics();
+	images.toolbtn_n.ReleaseGraphics(gb);
 	
 	images.toolbtn_h = gdi.CreateImage(imgh, imgh);
 	gb = images.toolbtn_h.GetGraphics();
@@ -3113,6 +3010,15 @@ function get_images_ui() {
 	gb.DrawEllipse(x5,14*zdpi,x15,imgh,1,g_color_dl_txt);
 	gb.SetSmoothingMode(0);
 	images.tool_artist.ReleaseGraphics(gb);
+	
+	images.close = gdi.CreateImage(imgh, imgh);
+	gb = images.close.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.DrawEllipse(x5,x5,x15,x15,1,g_color_dl_txt);
+	gb.DrawLine(16*zdpi, 9*zdpi, 9*zdpi, 16*zdpi, 1, g_color_dl_txt);
+	gb.DrawLine(9*zdpi, 9*zdpi, 16*zdpi, 16*zdpi, 1, g_color_dl_txt);
+	gb.SetSmoothingMode(0);
+	images.close.ReleaseGraphics(gb);
 	
 	images.dl_folder = gdi.CreateImage(imgh, imgh);
 	gb = images.dl_folder.GetGraphics();

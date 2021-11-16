@@ -1,4 +1,4 @@
-﻿//foobox http://blog.sina.com.cn/dream7180
+﻿//foobox https://github.com/dream7180
 var fbx_set = [];
 window.NotifyOthers("get_fbx_set", fbx_set);
 //===============
@@ -487,7 +487,7 @@ function on_notify_data(name, info) {
 			auto_switch_libico();
 		}
 		break;
-	case "netsearch_switchpage":
+/*	case "netsearch_switchpage":
 		NetSearch(info[0], info[1], true);
 		break;
 	case "netradio_update":
@@ -500,6 +500,7 @@ function on_notify_data(name, info) {
 		}
 		if (radio_num != null) MGRankListid(MGRankList[radio_num][1], radio_name);
 		break;
+		*/
 	case "show_button_fullscreen":
 		btn_fullscr = info;
 		BtnSetSize_onsize();

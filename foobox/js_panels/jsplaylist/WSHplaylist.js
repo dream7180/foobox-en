@@ -1,5 +1,5 @@
 ﻿// *****************************************************************************************************************************************
-// Playlist object by Br3tt aka Falstaff (c)2015, mod for foobox http://blog.sina.com.cn/dream7180
+// Playlist object by Br3tt aka Falstaff (c)2015, mod for foobox https://github.com/dream7180
 // *****************************************************************************************************************************************
 
 oGroup = function(index, start, count, total_time_length, focusedTrackId, iscollapsed, handle) {
@@ -2746,6 +2746,7 @@ oList = function(object_name, playlist) {
 									dl_avoid_flush = false;
 								}
 							}
+							toolbar.disabled = false;
 							toolbar.dlmode = true;
 							toolbar.repaint_dl();
 						} else {

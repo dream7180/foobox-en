@@ -2887,10 +2887,10 @@ function on_mouse_lbtn_up(x, y) {
 			if (ppt.tagMode < 3 && brw.dl_btn.checkstate("up", x, y) == ButtonStates.hover) {
 				if(ppt.tagMode == 1){
 					var _menu = window.CreatePopupMenu();
-					_menu.AppendMenuItem(MF_STRING, 20, "全部 (优先iTunes)");
+					_menu.AppendMenuItem(MF_STRING, 20, "All (iTunes preferable)");
 					_menu.AppendMenuSeparator();
-					_menu.AppendMenuItem(MF_STRING, 21, "网易云");
-					_menu.AppendMenuItem(MF_STRING, 22, "iTunes");
+					_menu.AppendMenuItem(MF_STRING, 21, "iTunes");
+					_menu.AppendMenuItem(MF_STRING, 22, "Netease");
 				
 					idx = _menu.TrackPopupMenu(cFilterBox.x + cFilterBox.w + Math.round(22 * zdpi) + 5, cSwitchBtn.y + 12 * zdpi + 12);
 					_menu.Dispose();

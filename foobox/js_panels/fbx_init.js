@@ -1,4 +1,4 @@
-﻿//foobox http://blog.sina.com.cn/dream7180
+﻿//foobox https://github.com/dream7180
 var g_instancetype = window.InstanceType;
 var ui_mode = window.GetProperty("foobox.UiMode", 0);
 var ui_mode_num = ui_mode ? ui_mode : Math.floor(Math.random() * 4 + 1);

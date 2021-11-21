@@ -11,10 +11,10 @@ function search_album(idx, title,artist,album, path, filename, alb_source){
 			search_album_all(idx, title,artist,album, path, filename);
 			break;
 		case (1):
-			search_album_163(idx, title,artist,album, path, filename);
+			search_album_itunes(idx, title,artist,album, path, filename);
 			break;
 		case (2):
-			search_album_itunes(idx, title,artist,album, path, filename);
+			search_album_163(idx, title,artist,album, path, filename);
 			break;
 	}
 }
@@ -54,7 +54,11 @@ function search_album_all(idx, title,artist,album, path, filename){
 						return;
 					}
 					client.SavePath = path;
-					client.RunAsync(idx, pic, filename);
+					try{
+						client.RunAsync(idx, pic, filename);
+					} catch (e) {
+						return;
+					}
 				} else search_album_163(idx, title,artist,album, path, filename);
 			}
 		}
@@ -98,7 +102,11 @@ function search_album_itunes(idx, title,artist,album, path, filename){
 						return;
 					}
 					client.SavePath = path;
-					client.RunAsync(idx, pic, filename);
+					try{
+						client.RunAsync(idx, pic, filename);
+					} catch (e) {
+						return;
+					}
 				} else catcherr(idx);
 			}
 		}
@@ -193,7 +201,11 @@ function search_album_163(idx, title,artist,album, path, filename){
 						if (xmlHttp2.Status == 200) {
 							var ncm_pic = json(xmlHttp2.responseText);
 							client.SavePath = path;
-							client.RunAsync(idx, ncm_pic.songs[0].album.picUrl, filename);
+							try{
+								client.RunAsync(idx, ncm_pic.songs[0].album.picUrl, filename);
+							} catch (e) {
+								return;
+							}
 						}
 					} catch (e) {
 						catcherr(idx);
@@ -229,7 +241,11 @@ function search_artist(idx, Name, path, filename){
 						}
 					}
 					client.SavePath = path;
-					client.RunAsync(idx, pic_num[0], filename);
+					try{
+						client.RunAsync(idx, pic_num[0], filename);
+					} catch (e) {
+						return;
+					}
 				}else {
 					catcherr(idx);
 				}

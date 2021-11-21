@@ -1,7 +1,7 @@
 ﻿//Name"WSH Cover Panel"
 //Version 2.0.1f
 //Author Jensen (jensen-yg@163.com) ------------
-//mod for foobox http://blog.sina.com.cn/dream7180
+//mod for foobox https://github.com/dream7180
 var fbx_set = [];
 window.NotifyOthers("get_fbx_set", fbx_set);
 var zdpi = fbx_set[9];

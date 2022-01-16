@@ -742,40 +742,45 @@ function init_icons() {
 		c_normal = RGB(240, 240, 240),
 		c_hover = RGB(255, 255, 255),
 		c_down = RGB(200, 200, 200),
-		c_shadow_h = RGBA(0, 0, 0, 70),
-		c_shadow = RGBA(0, 0, 0, 90);
+		//c_shadow_h = RGBA(0, 0, 0, 90),
+		//c_shadow = RGBA(0, 0, 0, 110);
+		c_shadow_h = RGBA(255, 255, 255, 30),
+		c_shadow = RGBA(255, 255, 255, 20);
 		
 	try {
 		var _x5 = 5*zdpi, _x6 = 6*zdpi, _y6 = Math.floor(_x6), _x7 = 7*zdpi, _y7 = Math.floor(_x7), _x8 = 8*zdpi, _x9 = 9*zdpi, _y9 = Math.floor(_x9), _x10 = 10*zdpi, 
 			_x11 = 11 * zdpi, _x12 = 12 * zdpi, _x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, 
-			_x18 = 18*zdpi, _x19 = 19*zdpi, _x22 = 22*zdpi, _x23 = 23 * zdpi, _x24 = 24 * zdpi, _x28 = 28*zdpi;
+			_x18 = 18*zdpi, _x19 = 19*zdpi, _x21 = 21*zdpi, _x22 = 22*zdpi, _x23 = 23 * zdpi, _x24 = 24 * zdpi, _x26 = 26*zdpi; _x28 = 28*zdpi;
 		
 		img_playlist = gdi.CreateImage(imgw, imgh_p);
 		gb = img_playlist.GetGraphics();
-		gb.DrawLine(_x10, _y9, _x13,  _y9, 2, c_normal);
-		gb.DrawLine(_x10, _y9+_y7, _x13, _y9+_y7, 2, c_normal);
-		gb.DrawLine(_x10, _y9+_y7*2, _x13, _y9+_y7*2, 2, c_normal);
-		gb.DrawLine(_x16, _y9, Math.floor(_x28), _y9, 2, c_normal);
-		gb.DrawLine(_x16, _y9+_y7, Math.floor(_x28), _y9+_y7, 2, c_normal);
-		gb.DrawLine(_x16, _y9+_y7*2, Math.floor(_x28), _y9+_y7*2, 2, c_normal);
+		pointArr = Array(_x11, _x10, _x11, _x13+_y7, _x18, _x8+_y7);
+		gb.SetSmoothingMode(2);
+		gb.DrawPolygon(c_normal, 2, pointArr);
+		gb.SetSmoothingMode(0);
+		gb.DrawLine(_x16, _x8, _x28,  _x8, 2, c_normal);
+		gb.DrawLine(19.5*zdpi, _x8+_y7, _x28,  _x8+_y7, 2, c_normal);
+		gb.DrawLine(_x16, _x8+_y7*2, _x28,  _x8+_y7*2, 2, c_normal);
+		pointArr = Array(_x11, _x10+imgh, _x11, _x13+_y7+imgh, _x18, _x8+_y7+imgh);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(shadow_x, imgh, imgh, imgh, c_shadow_h);
+		gb.DrawPolygon(c_hover, 2, pointArr);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(_x10, _y9 + imgh, _x13,  _y9 + imgh, 2, c_hover);
-		gb.DrawLine(_x10, _y9+_y7 + imgh, _x13, _y9+_y7 + imgh, 2, c_hover);
-		gb.DrawLine(_x10, _y9+_y7*2 + imgh, _x13, _y9+_y7*2 + imgh, 2, c_hover);
-		gb.DrawLine(_x16, _y9 + imgh, Math.floor(_x28), _y9 + imgh, 2, c_hover);
-		gb.DrawLine(_x16, _y9+_y7 + imgh, Math.floor(_x28), _y9+_y7 + imgh, 2, c_hover);
-		gb.DrawLine(_x16, _y9+_y7*2 + imgh, Math.floor(_x28), _y9+_y7*2 + imgh, 2, c_hover);
+		gb.DrawLine(_x16, _x8+imgh, _x28,  _x8+imgh, 2, c_hover);
+		gb.DrawLine(19.5*zdpi, _x8+_y7+imgh, _x28,  _x8+_y7+imgh, 2, c_hover);
+		gb.DrawLine(_x16, _x8+_y7*2+imgh, _x28,  _x8+_y7*2+imgh, 2, c_hover);
+		pointArr = Array(_x11, _x10+imgh2, _x11, _x13+_y7+imgh2, _x18, _x8+_y7+imgh2);
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(shadow_x, imgh2, imgh, imgh, c_shadow);
+		gb.DrawPolygon(c_down, 2, pointArr);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(_x10, _y9 + imgh2, _x13,  _y9 + imgh2, 2, c_down);
-		gb.DrawLine(_x10, _y9+_y7 + imgh2, _x13, _y9+_y7 + imgh2, 2, c_down);
-		gb.DrawLine(_x10, _y9+_y7*2 + imgh2, _x13, _y9+_y7*2 + imgh2, 2, c_down);
-		gb.DrawLine(_x16, _y9 + imgh2, Math.floor(_x28), _y9 + imgh2, 2, c_down);
-		gb.DrawLine(_x16, _y9+_y7 + imgh2, Math.floor(_x28), _y9+_y7 + imgh2, 2, c_down);
-		gb.DrawLine(_x16, _y9+_y7*2 + imgh2, Math.floor(_x28), _y9+_y7*2 + imgh2, 2, c_down);
+		gb.DrawLine(_x16, _x8+imgh2, _x28,  _x8+imgh2, 2, c_down);
+		gb.DrawLine(19.5*zdpi, _x8+_y7+imgh2, _x28,  _x8+_y7+imgh2, 2, c_down);
+		gb.DrawLine(_x16, _x8+_y7*2+imgh2, _x28,  _x8+_y7*2+imgh2, 2, c_down);
+		//gb.DrawLine(_x10, _y9+_y7*2, _x13, _y9+_y7*2, 2, c_normal);
+		//gb.DrawLine(_x16, _y9, Math.floor(_x28), _y9, 2, c_normal);
+		//gb.DrawLine(_x16, _y9+_y7, Math.floor(_x28), _y9+_y7, 2, c_normal);
+		//gb.DrawLine(_x16, _y9+_y7*2, Math.floor(_x28), _y9+_y7*2, 2, c_normal);
 		img_playlist.ReleaseGraphics(gb);
 		
 		var _imgh = Math.floor(_x8);
@@ -859,15 +864,15 @@ function init_icons() {
 		gb.SetSmoothingMode(2);
 		gb.DrawEllipse(_x10, _x6, _x17, _x17, 2, c_normal);
 		gb.FillEllipse(_x16, _x12, 5.5*zdpi, 5.5*zdpi, c_normal);
-		gb.DrawLine(21*zdpi, _x15, 24.5*zdpi, 9.5*zdpi, 2, c_normal);
+		gb.DrawLine(_x21, _x15, 24.5*zdpi, 9.5*zdpi, 2, c_normal);
 		gb.FillEllipse(shadow_x, imgh+zdpi, imgh-zdpi, imgh-zdpi, c_shadow_h);
 		gb.DrawEllipse(_x10, _x6 + imgh, _x17, _x17, 2, c_hover);
 		gb.FillEllipse(_x16, _x12 + imgh, 5.5*zdpi, 5.5*zdpi, c_hover);
-		gb.DrawLine(21*zdpi, _x15 + imgh, 24.5*zdpi, 9.5*zdpi + imgh, 2, c_hover);
+		gb.DrawLine(_x21, _x15 + imgh, 24.5*zdpi, 9.5*zdpi + imgh, 2, c_hover);
 		gb.FillEllipse(shadow_x, imgh2+zdpi, imgh-zdpi, imgh-zdpi, c_shadow);
 		gb.DrawEllipse(_x10, _x6 + imgh2, _x17, _x17, 2, c_down);
 		gb.FillEllipse(_x16, _x12 + imgh2, 5.5*zdpi, 5.5*zdpi, c_down);
-		gb.DrawLine(21*zdpi, _x15 + imgh2, 24.5*zdpi, 9.5*zdpi + imgh2, 2, c_down);
+		gb.DrawLine(_x21, _x15 + imgh2, 24.5*zdpi, 9.5*zdpi + imgh2, 2, c_down);
 		gb.SetSmoothingMode(0);
 		img_genre.ReleaseGraphics(gb);
 		
@@ -880,7 +885,7 @@ function init_icons() {
 		gb.SetSmoothingMode(2);
 		gb.FillEllipse(shadow_x, imgh+zdpi, imgh-zdpi, imgh-zdpi, c_shadow_h);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(27*zdpi, _x23 + imgh, 27*zdpi, 12*zdpi + imgh, 2, c_hover);
+		gb.DrawLine(27*zdpi, _x23 + imgh, 27*zdpi, _x12 + imgh, 2, c_hover);
 		gb.DrawLine(_x22, _x23 + imgh, _x22, _x16 + imgh, 2, c_hover);
 		gb.DrawLine(_x17, _x23 + imgh, _x17, _x8 + imgh, 2, c_hover);
 		gb.DrawLine(_x12, _x23 + imgh, _x12, _x14 + imgh, 2, c_hover);
@@ -895,30 +900,40 @@ function init_icons() {
 		
 		img_settings = gdi.CreateImage(imgw, imgh_p);
 		gb = img_settings.GetGraphics();
-		gb.DrawLine(_x10, _x9, _x28, _x9, 2, c_normal);
-		gb.DrawLine(_x10, _x15, _x28, _x15, 2, c_normal);
-		gb.DrawLine(_x10, 21*zdpi, _x28, 21*zdpi, 2, c_normal);
-		gb.DrawLine(_x23, _x19, _x23, _x23, 3, c_normal);
-		gb.DrawLine(_x14, _x13, _x14, _x17, 3, c_normal);
-		gb.DrawLine(_x19, _x7, _x19, _x11, 3, c_normal);
 		gb.SetSmoothingMode(2);
+		gear_w = 2*zdpi+1;
+		gb.DrawEllipse(_x12, _x7, _x14, _x14, 2, c_normal);
+		gb.FillEllipse(_x17, _x12, 4*zdpi, 4*zdpi, c_normal);
+		gb.DrawLine(_x19, 4*zdpi, _x19, _x7, gear_w, c_normal);
+		gb.DrawLine(_x19, _x21, _x19, _x24, gear_w, c_normal);
+		gb.DrawLine(_x9, _x14, _x12, _x14, gear_w, c_normal);
+		gb.DrawLine(_x26, _x14, 29*zdpi, _x14, gear_w, c_normal);
+		gb.DrawLine(_x12, 7*zdpi, _x14, _x9, gear_w, c_normal);
+		gb.DrawLine(_x24, _x9, _x26, _x7, gear_w, c_normal);
+		gb.DrawLine(_x12, _x21, _x14, _x19, gear_w, c_normal);
+		gb.DrawLine(_x24, _x21, _x26, _x19, gear_w, c_normal);
 		gb.FillEllipse(shadow_x, imgh, imgh, imgh, c_shadow_h);
-		gb.SetSmoothingMode(0);
-		gb.DrawLine(_x10, _x9 + imgh, _x28, _x9 + imgh, 2, c_hover);
-		gb.DrawLine(_x10, _x15 + imgh, _x28, _x15 + imgh, 2, c_hover);
-		gb.DrawLine(_x10, 21*zdpi + imgh, _x28, 21*zdpi + imgh, 2, c_hover);
-		gb.DrawLine(_x23, _x19 + imgh, _x23, _x23 + imgh, 3, c_hover);
-		gb.DrawLine(_x14, _x13 + imgh, _x14, _x17 + imgh, 3, c_hover);
-		gb.DrawLine(_x19, _x7 + imgh, _x19, _x11 + imgh, 3, c_hover);
-		gb.SetSmoothingMode(2);
-		gb.FillEllipse(shadow_x, imgh2, imgh, imgh, c_shadow);
-		gb.SetSmoothingMode(0);		
-		gb.DrawLine(_x10, _x9 + imgh2, _x28, _x9 + imgh2, 2, c_down);
-		gb.DrawLine(_x10, _x15 + imgh2, _x28, _x15 + imgh2, 2, c_down);
-		gb.DrawLine(_x10, 21*zdpi + imgh2, _x28, 21*zdpi + imgh2, 2, c_down);
-		gb.DrawLine(_x23, _x19 + imgh2, _x23, _x23 + imgh2, 3, c_down);
-		gb.DrawLine(_x14, _x13 + imgh2, _x14, _x17 + imgh2, 3, c_down);
-		gb.DrawLine(_x19, _x7 + imgh2, _x19, _x11 + imgh2, 3, c_down);
+		gb.DrawEllipse(_x12, _x7+imgh, _x14, _x14, 2, c_hover);
+		gb.FillEllipse(_x17, _x12+imgh, 4*zdpi, 4*zdpi, c_hover);
+		gb.DrawLine(_x19, 4*zdpi+imgh, _x19, _x7+imgh, gear_w, c_hover);
+		gb.DrawLine(_x19, _x21+imgh, _x19, _x24+imgh, gear_w, c_hover);
+		gb.DrawLine(_x9, _x14+imgh, _x12, _x14+imgh, gear_w, c_hover);
+		gb.DrawLine(_x26, _x14+imgh, 29*zdpi, _x14+imgh, gear_w, c_hover);
+		gb.DrawLine(_x12, 7*zdpi+imgh, _x14, _x9+imgh, gear_w, c_hover);
+		gb.DrawLine(_x24, _x9+imgh, _x26, _x7+imgh, gear_w, c_hover);
+		gb.DrawLine(_x12, _x21+imgh, _x14, _x19+imgh, gear_w, c_hover);
+		gb.DrawLine(_x24, _x21+imgh, _x26, _x19+imgh, gear_w, c_hover);
+		gb.FillEllipse(shadow_x, imgh2, imgh, imgh, c_shadow_h);
+		gb.DrawEllipse(_x12, _x7+imgh2, _x14, _x14, 2, c_down);
+		gb.FillEllipse(_x17, _x12+imgh2, 4*zdpi, 4*zdpi, c_down);
+		gb.DrawLine(_x19, 4*zdpi+imgh2, _x19, _x7+imgh2, gear_w, c_down);
+		gb.DrawLine(_x19, _x21+imgh2, _x19, _x24+imgh2, gear_w, c_down);
+		gb.DrawLine(_x9, _x14+imgh2, _x12, _x14+imgh2, gear_w, c_down);
+		gb.DrawLine(_x26, _x14+imgh2, 29*zdpi, _x14+imgh2, gear_w, c_down);
+		gb.DrawLine(_x12, 7*zdpi+imgh2, _x14, _x9+imgh2, gear_w, c_down);
+		gb.DrawLine(_x24, _x9+imgh2, _x26, _x7+imgh2, gear_w, c_down);
+		gb.DrawLine(_x12, _x21+imgh2, _x14, _x19+imgh2, gear_w, c_down);
+		gb.DrawLine(_x24, _x21+imgh2, _x26, _x19+imgh2, gear_w, c_down);
 		img_settings.ReleaseGraphics(gb);
 		
 		_x2 = 7 * zdpi;
@@ -928,7 +943,7 @@ function init_icons() {
 		gb.SetSmoothingMode(2);
 		gb.DrawLine(19.7*zdpi, 8.5*zdpi, 24*zdpi, 11.5*zdpi, 2, c_normal);
 		gb.DrawEllipse(_x10, _x5, _x18, _x18, 2, c_normal);
-		gb.DrawEllipse(_x15, 14*zdpi, 4.7*zdpi, 4.7*zdpi, 2, c_normal);
+		gb.DrawEllipse(_x15, _x14, 4.7*zdpi, 4.7*zdpi, 2, c_normal);
 		gb.FillEllipse(shadow_x, imgh, imgh, imgh, c_shadow_h);
 		gb.SetSmoothingMode(0);
 		gb.DrawLine(19.7*zdpi, _x8+imgh, 19.7*zdpi, _x16+imgh, 2, c_hover);
@@ -942,7 +957,7 @@ function init_icons() {
 		gb.SetSmoothingMode(2);
 		gb.DrawLine(19.7*zdpi, 8.5*zdpi+imgh2, 24*zdpi, 11.5*zdpi+imgh2, 2, c_down);
 		gb.DrawEllipse(_x10, _x5+imgh2, _x18, _x18, 2, c_down);
-		gb.DrawEllipse(_x15, 14*zdpi+imgh2, 4.7*zdpi, 4.7*zdpi, 2, c_down);
+		gb.DrawEllipse(_x15, _x14+imgh2, 4.7*zdpi, 4.7*zdpi, 2, c_down);
 		gb.SetSmoothingMode(0);
 		img_lrc.ReleaseGraphics(gb);
 		
@@ -1001,7 +1016,7 @@ function init_icons() {
 		img_lib.ReleaseGraphics(gb);
 		
 		c_normal = RGB(225, 225, 225),
-		_imgh =  Math.floor(26*zdpi);
+		_imgh =  Math.floor(_x26);
 		imgh2 = 2*_imgh;
 		_y7 = Math.round(7*zdpi), _y9 = Math.round(9*zdpi);
 		var _y8 = Math.round(8*zdpi), _y18 = Math.round(18*zdpi);
@@ -1057,7 +1072,7 @@ function init_icons() {
 		gb.SetSmoothingMode(0);
 		gb.DrawLine(_x8, _x13+imgh2, _x18, _x13+imgh2, 2, c_down);
 		img_min.ReleaseGraphics(gb);
-
+		
 		img_fullscreen = gdi.CreateImage(_imgh, _imgh*3);
 		gb = img_fullscreen.GetGraphics();
 		gb.SetSmoothingMode(0);
@@ -1096,14 +1111,19 @@ function init_icons() {
 		img_menu = gdi.CreateImage(_imgh, _imgh*3);
 		gb = img_menu.GetGraphics();
 		gb.SetSmoothingMode(2);
-		gb.DrawLine(_x8, _x9, _x13, _x16, 2, c_normal);
-		gb.DrawLine(_x18, _x9, _x13, _x16, 2, c_normal);
-		gb.FillEllipse(1, 1+_imgh, _imgh - 2, _imgh - 2, c_shadow_h);
-		gb.DrawLine(_x8, _x9+_imgh, _x13, _x16+_imgh, 2, c_hover);
-		gb.DrawLine(_x18, _x9+_imgh, _x13, _x16+_imgh, 2, c_hover);
-		gb.FillEllipse(1, 1+imgh2, _imgh - 2, _imgh - 2, c_shadow);
-		gb.DrawLine(_x8, _x9+imgh2, _x13, _x16+imgh2, 2, c_down);
-		gb.DrawLine(_x18, _x9+imgh2, _x13, _x16+imgh2, 2, c_down);
+		gb.DrawLine(_x7, _x8, _x18, _x8, 2, c_normal);
+		gb.DrawLine(_x7, _x13, _x18, _x13, 2, c_normal);
+		gb.DrawLine(_x7, _x18, _x18, _x18, 2, c_normal);
+		//gb.DrawLine(_x8, _x9, _x13, _x16, 2, c_normal);
+		//gb.DrawLine(_x18, _x9, _x13, _x16, 2, c_normal);
+		gb.FillEllipse(0, 1+_imgh, _imgh - 2, _imgh - 2, c_shadow_h);
+		gb.DrawLine(_x7, _x8+_imgh, _x18, _x8+_imgh, 2, c_hover);
+		gb.DrawLine(_x7, _x13+_imgh, _x18, _x13+_imgh, 2, c_hover);
+		gb.DrawLine(_x7, _x18+_imgh, _x18, _x18+_imgh, 2, c_hover);
+		gb.FillEllipse(0, 1+imgh2, _imgh - 2, _imgh - 2, c_shadow_h);
+		gb.DrawLine(_x7, _x8+imgh2, _x18, _x8+imgh2, 2, c_down);
+		gb.DrawLine(_x7, _x13+imgh2, _x18, _x13+imgh2, 2, c_down);
+		gb.DrawLine(_x7, _x18+imgh2, _x18, _x18+imgh2, 2, c_down);
 		gb.SetSmoothingMode(0);
 		img_menu.ReleaseGraphics(gb);
 		

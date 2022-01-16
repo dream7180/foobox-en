@@ -92,22 +92,23 @@ oHeaderBar = function() {
 		this.slide_open_normal = gdi.CreateImage(cScrollBar.width, btn_h);
 		var gb = this.slide_open_normal.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(">", this.icoFont, color_txt & 0xaaffffff, 0, 0, cScrollBar.width, btn_h, cc_stringformat);
+		gb.SetSmoothingMode(2);
+		pointArr = Array(3*zdpi, btn_h/3, 5*zdpi, btn_h/2, 3*zdpi, btn_h*2/3, 9*zdpi, btn_h/2);
+		gb.FillPolygon(color_txt&0xaaffffff, 1, pointArr);
 		this.slide_open_normal.ReleaseGraphics(gb);
 
 		this.slide_open_hover = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.slide_open_hover.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,30));
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(">", this.icoFont, color_txt, 0, 0, cScrollBar.width, btn_h, cc_stringformat);
+		gb.SetSmoothingMode(2);
+		gb.FillPolygon(color_txt, 1, pointArr);
 		this.slide_open_hover.ReleaseGraphics(gb);
 
 		this.slide_open_down = gdi.CreateImage(cScrollBar.width, btn_h);
 		gb = this.slide_open_down.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, RGBA(0,0,0,50));
-		gb.SetTextRenderingHint(4);
-		gb.DrawString(">", this.icoFont, color_txt, 0, 0, cScrollBar.width, btn_h, cc_stringformat);
+		gb.SetSmoothingMode(2);
+		gb.FillPolygon(color_txt, 1, pointArr);
 		this.slide_open_down.ReleaseGraphics(gb);
 		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "Show Now Playing Track");
 	};

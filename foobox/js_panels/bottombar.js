@@ -391,8 +391,10 @@ function get_images() {
 	var c_normal = RGB(240, 240, 240),
 		c_hover = RGB(255, 255, 255),
 		c_down = RGB(200, 200, 200),
-		c_shadow_h = RGBA(0, 0, 0, 70),
-		c_shadow = RGBA(0, 0, 0, 90);
+		//c_shadow_h = RGBA(0, 0, 0, 90),
+		//c_shadow = RGBA(0, 0, 0, 110);
+		c_shadow_h = RGBA(255, 255, 255, 30),
+		c_shadow = RGBA(255, 255, 255, 20);
 	var _x1 = 1*zdpi, _x13 = 13*zdpi, _x9 = 9*zdpi, _x12 = 12*zdpi, _x18 = 18*zdpi, _x22 = 22*zdpi, _x25 = 25*zdpi, _x32 = 32*zdpi;
 	img_play = gdi.CreateImage(imgh, imgh * 3);
 	gb = img_play.GetGraphics();

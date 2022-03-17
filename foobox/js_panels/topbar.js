@@ -75,7 +75,7 @@ var buttons = Array();
 var hbtn = false;
 var search_x = x_offset + imgw*(6+show_vis) + btn_space*(6+show_vis)  + spacer,
 	search_y = 11*zdpi, x_lib = 0;
-search_w = 150*zdpi, search_h = 22*zdpi;
+search_w = 175*zdpi, search_h = 22*zdpi;
 window.DlgCode = DLGC_WANTALLKEYS;
 get_font();
 get_colors();
@@ -93,7 +93,7 @@ function on_size() {
 	search_y = Math.min(wh/2, 11*zdpi);
 	BtnSetSize_onsize();
 	caption_n_full(ui_noborder);
-	g_searchbox.setSize(search_x, search_y, search_w, search_h);
+	g_searchbox.setSize(search_x, search_y, Math.min(search_w, Math.max(150, ww/5)), search_h);
 	g_searchbox.inputbox.visible = true;
 }
 

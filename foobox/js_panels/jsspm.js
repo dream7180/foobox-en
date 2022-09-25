@@ -1668,7 +1668,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 				if (name == "Favorites") return images.mood_icon_hl;
 				else return images.icon_auto_pl_hl;
 			}else{
-				if (name.substr(0, 2) == "Radio") return images.radios_icon_hl;
+				if (name.substr(0, 5) == "Radio") return images.radios_icon_hl;
 				//if (name.substr(0, 2) == "榜单") return images.board_icon_hl;
 				else return images.icon_normal_pl_playing_hl;
 			}
@@ -1681,7 +1681,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 				if (name == "Favorites") return images.mood_icon;
 				else return images.icon_auto_pl;
 			}else{
-				if (name.substr(0, 2) == "Radio") return images.radios_icon;
+				if (name.substr(0, 5) == "Radio") return images.radios_icon;
 				//if (name.substr(0, 2) == "榜单") return images.board_icon;
 				else return images.icon_normal_pl;
 			}
@@ -1696,7 +1696,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 		if (name == "Favorites") return images.mood_icon;
 		else return images.icon_auto_pl;
 		} else{
-			if (name.substr(0, 2) == "Radio") return images.radios_icon;
+			if (name.substr(0, 5) == "Radio") return images.radios_icon;
 			//if (name.substr(0, 2) == "榜单") return images.board_icon;
 			if (playing_playlist) return images.icon_normal_pl_playing;
 			else return images.icon_normal_pl;

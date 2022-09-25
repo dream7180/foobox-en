@@ -30,18 +30,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 5:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
-			window.SetProperty("DOWNLOAD: auto skip", status);
-			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 8:
-			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("PLAYBACK: Repeat playlists", status);
-			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 9:
-			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
-			toolbar.disabled = properties.disableToolbar;
-			window.SetProperty("TOOLBAR: Always Disabled", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		};
@@ -119,7 +108,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			p.headerBar.initColumns();
 
 			// set minimum rows / cover column size
-			if (p.headerBar.columns[idx].ref == "封面") { // cover column added or removed
+			if (p.headerBar.columns[idx].ref == "Cover") { // cover column added or removed
 				if (p.headerBar.columns[idx].w > 0) {
 					cover.column = true;
 					cGroup.count_minimum = Math.ceil((p.headerBar.columns[idx].w) / cTrack.height);
@@ -191,6 +180,17 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 9:
 			if (status) {
+				esl_hcolor_auto = true;
+				window.NotifyOthers("set_eslhcolor_auto", esl_hcolor_auto);
+			}
+			else {
+				esl_hcolor_auto = false;
+				window.NotifyOthers("set_eslhcolor_auto", esl_hcolor_auto);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 10:
+			if (status) {
 				esl_font_auto = true;
 				window.NotifyOthers("set_eslfont_auto", esl_font_auto);
 			}
@@ -200,7 +200,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 10:
+		case 11:
 			if (status) {
 				esl_font_bold = true;
 				window.NotifyOthers("set_eslfont_bold", esl_font_bold);
@@ -211,7 +211,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 13:
+		case 12:
 			if (status) {
 				ui_noborder = true;
 				window.NotifyOthers("set_ui_noborders", ui_noborder);
@@ -221,7 +221,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				window.NotifyOthers("set_ui_noborders", ui_noborder);
 			}
 			break;
-		case 14:
+		case 13:
 			if (status) {
 				btn_fullscr = true;
 				window.NotifyOthers("show_button_fullscreen", btn_fullscr);
@@ -232,7 +232,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 15:
+		case 14:
 			if (status) {
 				album_front_disc = true;
 				window.NotifyOthers("set_album_cover", album_front_disc);
@@ -243,7 +243,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 16:
+		case 15:
 			if (status) {
 				follow_cursor = true;
 				window.NotifyOthers("Right_panel_follow_cursor", follow_cursor);
@@ -254,7 +254,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 17:
+		case 16:
 			if (status) {
 				auto_sw = true;
 				window.NotifyOthers("set_panels_interlock", auto_sw);
@@ -265,7 +265,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			}
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 18:
+		case 17:
 			if (status) {
 				show_shadow = true;
 				window.NotifyOthers("panel_show_shadow", show_shadow);
@@ -591,39 +591,41 @@ function settings_radioboxes_action(id, status, parentId) {
 			window.NotifyOthers("random_color_mode", random_mode);
 			get_colors();
 			break;
-		case 11:
-			p.settings.pages[pid].elements[11].status = true;
-			p.settings.pages[pid].elements[12].status = false;
+		case 20:
+			p.settings.pages[pid].elements[20].status = true;
+			p.settings.pages[pid].elements[21].status = false;
 			rating2tag = true;
 			window.NotifyOthers("set_rating_2_tag", rating2tag);
 			break;
-		case 12:
-			p.settings.pages[pid].elements[11].status = false;
-			p.settings.pages[pid].elements[12].status = true;
+		case 21:
+			p.settings.pages[pid].elements[20].status = false;
+			p.settings.pages[pid].elements[21].status = true;
 			rating2tag = false;
 			window.NotifyOthers("set_rating_2_tag", rating2tag);
 			break;
-		case 19:
-			p.settings.pages[pid].elements[19].status = true;
-			p.settings.pages[pid].elements[20].status = false;
+		case 18:
+			p.settings.pages[pid].elements[18].status = true;
+			p.settings.pages[pid].elements[19].status = false;
 			sys_scrollbar = true;
 			window.NotifyOthers("scrollbar_width", sys_scrollbar);
 			cScrollBar.width = get_system_scrollbar_width();
 			properties.cursor_max = 120*zdpi;
 			if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
 			else{
+				p.headerBar && p.headerBar.setButtons();
 				resize_panels();
 			}
 			break;
-		case 20:
-			p.settings.pages[pid].elements[19].status = false;
-			p.settings.pages[pid].elements[20].status = true;
+		case 19:
+			p.settings.pages[pid].elements[18].status = false;
+			p.settings.pages[pid].elements[19].status = true;
 			sys_scrollbar = false;
 			window.NotifyOthers("scrollbar_width", sys_scrollbar);
 			cScrollBar.width = 12*zdpi;
 			properties.cursor_max = 105*zdpi;
 			if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
 			else{
+				p.headerBar && p.headerBar.setButtons();
 				resize_panels();
 			}
 			break;
@@ -842,28 +844,6 @@ function settings_listboxes_action(pageId, id, selectedId) {
 
 function settings_textboxes_action(pageId, elementId) {
 	switch (pageId) {
-	case 0:
-		switch (elementId) {
-		case 6:
-			var prefolder = dl_prefix_folder;
-			var new_prefolder = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_prefolder == "" || !fso.FolderExists(new_prefolder)) new_prefolder = prefolder;
-			if (new_prefolder){
-				dl_prefix_folder = new_prefolder;
-				window.SetProperty("DOWNLOAD: prefix output folder", dl_prefix_folder);
-			}
-			break;
-		case 7:
-			var prern = dl_rename_by;
-			var new_prern = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_prern == "") new_prern = prern;
-			if (new_prern){
-				dl_rename_by = new_prern;
-				window.SetProperty("DOWNLOAD: auto rename by", dl_rename_by);
-			}
-			break;
-		}
-		break;
 	case 1:
 		// Columns
 		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
@@ -1902,16 +1882,12 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 4.25, "Smooth scrolling", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 5.25, "Touch scrolling control (disable drag'n drop)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
 
-			// Create radio buttons
+			// play option
 			var spaceBetween_w = zoom(70, zdpi);
 			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
-			// Tagging options
-			this.elements.push(new oCheckBox(5, txtbox_x + 30, cSettings.topBarHeight + rh * 9.25, "Skip existing file", "dl_skip", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_4, cHeaderBar.height, "Preset download folder. To customize it, ensure the path is valid (create it if the folder not existing).", dl_prefix_folder, "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 12.25), oTextBox_4, cHeaderBar.height, "Rename format for downloaded tracks", dl_rename_by, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 15.25, "Play the next playlist when finish current one (effective in default playback order, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 16.25, "Disable bottom toolbar, activated only on download", "properties.disableToolbar", "settings_checkboxes_action", this.id));
+
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 9.25, "Play next playlist at the end of current one (for default playback order only, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -2031,23 +2007,26 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 3.25, "White", (ui_mode_set == 1), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(2, zoom(120, zdpi), cSettings.topBarHeight + rh * 3.25, "Light", (ui_mode_set == 2), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(3, zoom(220, zdpi), cSettings.topBarHeight + rh * 3.25, "Dark", (ui_mode_set == 3), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(4, zoom(320, zdpi), cSettings.topBarHeight + rh * 3.25, "Darken", (ui_mode_set == 4), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, zoom(320, zdpi), cSettings.topBarHeight + rh * 3.25, "Darker", (ui_mode_set == 4), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(5, 20, cSettings.topBarHeight + rh * 5.25, "Random", (random_mode == 0), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(6, zoom(120, zdpi), cSettings.topBarHeight + rh * 5.25, "Black and white", (random_mode == 1), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(7, zoom(280, zdpi), cSettings.topBarHeight + rh * 5.25, "Keep current", (random_mode == 2), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 6.25, "Vary follow cover", "col_by_cover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 8.25, "Global font", "esl_font_auto ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(10, zoom(150, zdpi), cSettings.topBarHeight + rh * 8.25, "Bold", "esl_font_bold ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(11, 20, cSettings.topBarHeight + rh * 10.25, "Recorded by both playcount and file tags", (rating2tag == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(12, zoom(300, zdpi), cSettings.topBarHeight + rh * 10.25, "Recorded by playcount only", (rating2tag == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oCheckBox(13, 20, cSettings.topBarHeight + rh * 12.25, "No window border", "ui_noborder ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(14, zoom(180, zdpi), cSettings.topBarHeight + rh * 12.25, "Show full-screen button", "btn_fullscr ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 13.25, "Album cover = disc + front, and disc is prior to front", "album_front_disc ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(16, 20, cSettings.topBarHeight + rh * 14.25, "Right panels follow cursor (not recommended)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(17, 20, cSettings.topBarHeight + rh * 15.25, "Switch right panels automatically following main panels", "auto_sw ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(18, 20, cSettings.topBarHeight + rh * 16.25, "Shadow effect for top and bottom bars", "show_shadow ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(19, 20, cSettings.topBarHeight + rh * 18.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(20, zoom(120, zdpi), cSettings.topBarHeight + rh * 18.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 8.25, "Global highlight color", "esl_hcolor_auto ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(10, zoom(170, zdpi), cSettings.topBarHeight + rh * 8.25, "Global font", "esl_font_auto ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(11, zoom(300, zdpi), cSettings.topBarHeight + rh * 8.25, "Bold", "esl_font_bold ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(12, 20, cSettings.topBarHeight + rh * 10.25, "No window border", "ui_noborder ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(13, zoom(150, zdpi), cSettings.topBarHeight + rh * 10.25, "Show full-screen button", "btn_fullscr ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 11.25, "Album cover = disc + front, and disc is preferable", "album_front_disc ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 12.25, "Right panels follow cursor (not recommended)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(16, 20, cSettings.topBarHeight + rh * 13.25, "Switch right panels automatically following main panels", "auto_sw ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(17, 20, cSettings.topBarHeight + rh * 14.25, "Shadow effect for top and bottom bars", "show_shadow ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(18, 20, cSettings.topBarHeight + rh * 16.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(19, zoom(120, zdpi), cSettings.topBarHeight + rh * 16.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
+			if(foo_playcount){
+				this.elements.push(new oRadioButton(20, 20, cSettings.topBarHeight + rh * 18.25, "Recorded by both playcount and file tags", (rating2tag == true), "settings_radioboxes_action", this.id));
+				this.elements.push(new oRadioButton(21, zoom(280, zdpi), cSettings.topBarHeight + rh * 18.25, "Recorded by playcount only", (rating2tag == false), "settings_radioboxes_action", this.id));
+			}
 			break;
 		case 4:
 			//jssb options
@@ -2092,9 +2071,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.gdiDrawText("Layout", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.gdiDrawText("Behaviour", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.gdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("Web download options", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.viewdl_btn.draw(gr, txtbox_x + 40 + Math.min(500*zdpi - 60, 450*zdpi), cSettings.topBarHeight + rh * 11.05 - (this.offset * cSettings.rowHeight), 255);
-			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 1:
 			var listBoxWidth = zoom(120, zdpi);
@@ -2159,9 +2136,10 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.gdiDrawText("UI theme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.gdiDrawText("Color scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.gdiDrawText("ESLyric Font", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 7.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 9.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.gdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 9.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 15.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			if(!foo_playcount) gr.gdiDrawText("Playcount component not installed, rating will write to file tags", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			p.settings.opt_fb2k_btn.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 19.5 - (this.offset * cSettings.rowHeight), 255);
 			break;
 		case 4:
@@ -2407,29 +2385,6 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 		return state;
 	};
-	
-	this.viewdl_btn_Check = function(event, x, y) {
-		var state = p.settings.viewdl_btn.checkstate(event, x, y);
-		switch (event) {
-		case "up":
-			if (state == ButtonStates.hover) {
-				var WshShell = new ActiveXObject("WScript.Shell");
-				if (!fso.FolderExists(dl_prefix_folder)) {
-					try{
-						fso.CreateFolder(dl_prefix_folder)
-					} catch(e) {
-						fb.trace("Download: Invalid path");
-						break;
-					}
-				}
-				var filepath = dl_prefix_folder;
-				if (dl_prefix_folder.substring(0,1) == "B") filepath = filepath.replace('B:\\', fb.FoobarPath);
-				WshShell.Run("explorer.exe" + " \"" + filepath+ "\"");
-			};
-			break;
-		};
-		return state;
-	};
 
 	this.on_mouse = function(event, x, y, delta) {
 		this.ishover = (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
@@ -2463,14 +2418,6 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 
 		switch (this.id) {
-		case 0:
-			if(this.viewdl_btn_Check(event, x, y) != ButtonStates.hover) {
-				var fin = this.elements.length;
-				for (var i = 0; i < fin; i++) {
-					this.elements[i].on_mouse(event, x, y, delta);
-				};
-			};
-		break;
 		case 1:
 			if (this.delButtonCheck(event, x, y) != ButtonStates.hover) {
 				if (this.newButtonCheck(event, x, y) != ButtonStates.hover) {
@@ -2632,26 +2579,6 @@ oSettings = function() {
 		this.fb2k_ov.ReleaseGraphics(gb);
 
 		this.opt_fb2k_btn = new button(this.fb2k_off, this.fb2k_ov, this.fb2k_ov);
-		
-		// view download folder button
-		rect_w = gpic.CalcTextWidth("View downloaded", g_font_b) + g_z30;
-		this.viewdl = gdi.CreateImage(rect_w, x32);
-		gb = this.viewdl.GetGraphics();
-		gb.setSmoothingMode(2);
-		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
-		gb.SetTextRenderingHint(4);
-		gb.DrawString("View downloaded", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.viewdl.ReleaseGraphics(gb);
-
-		this.viewdl_ov = gdi.CreateImage(rect_w, x32);
-		gb = this.viewdl_ov.GetGraphics();
-		gb.setSmoothingMode(2);
-		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
-		gb.SetTextRenderingHint(4);
-		gb.DrawString("View downloaded", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
-		this.viewdl_ov.ReleaseGraphics(gb);
-
-		this.viewdl_btn = new button(this.viewdl, this.viewdl_ov, this.viewdl_ov);
 
 		// Close Settings Button (BACK)
 		this.close_off = gdi.CreateImage(75, 75);

@@ -5,20 +5,23 @@ var ui_mode_num = ui_mode ? ui_mode : Math.floor(Math.random() * 4 + 1);
 var ui_noborder = window.GetProperty("foobox.ui.noBorders", true);
 var random_color = window.GetProperty("foobox.RandomColor", 0);
 var follow_cursor = window.GetProperty("foobox.right-panels.follow.cursor", false);
+var esl_hcolor_auto = window.GetProperty("foobox.eslyric.highlight.color.auto", true);
 var esl_font_auto = window.GetProperty("foobox.eslyric.font.auto", true);
-var esl_font_bold = window.GetProperty("foobox.eslyric.font.bold", true);
+var esl_font_bold = window.GetProperty("foobox.eslyric.font.bold", false);
 var g_fname, g_fsize, g_fstyle, zdpi = 1;
 var rating2tag = window.GetProperty("foobox.rating.write.to.file", false);
 var album_front_disc = window.GetProperty("foobox.album.disc.front", false);
-var album_cover_dir = window.GetProperty("foobox.cover.album.dir", "B:\\MusicArt\\Album");
-var artist_cover_dir = window.GetProperty("foobox.cover.artist.dir", "B:\\MusicArt\\Artist");
-var genre_cover_dir = window.GetProperty("foobox.cover.genre.dir", "B:\\MusicArt\\Genre");
+var album_cover_dir = window.GetProperty("foobox.cover.album.dir", "B:\\profile\\MusicArt\\Album");
+var artist_cover_dir = window.GetProperty("foobox.cover.artist.dir", "B:\\profile\\MusicArt\\Artist");
+var genre_cover_dir = window.GetProperty("foobox.cover.genre.dir", "B:\\profile\\MusicArt\\Genre");
 var dir_cover_name = window.GetProperty("foobox.cover.dir.name", "cover");
 var auto_sw = window.GetProperty("foobox.panels.switch.interlock", true);
 var btn_fullscr = window.GetProperty("foobox.ui.fullscreen.button", false);
 var show_shadow = window.GetProperty("foobox.ui.show.shadow", true);
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var col_by_color = window.GetProperty("foobox.color.by.cover", true);
+var active_main = window.GetProperty("Panel.active.main", "playlist");
+var foo_playcount = utils.CheckComponent("foo_playcount", true);
 
 function get_font_sys() {
 	var font_error = false;
@@ -214,6 +217,9 @@ function on_notify_data(name, info) {
 		info[28] = show_shadow;
 		info[29] = sys_scrollbar;
 		info[30] = col_by_color;
+		info[31] = esl_hcolor_auto;
+		info[32] = foo_playcount;
+		info[33] = active_main;
 		break;
 	case "ui_mode":
 		ui_mode = info;
@@ -235,6 +241,10 @@ function on_notify_data(name, info) {
 	case "Right_panel_follow_cursor":
 		follow_cursor = info;
 		window.SetProperty("Always follow cursor", follow_cursor);
+		break;
+	case "set_eslhcolor_auto":
+		esl_hcolor_auto = info;
+		window.SetProperty("foobox.eslyric.highlight.color.auto", esl_hcolor_auto);
 		break;
 	case "set_eslfont_auto":
 		esl_font_auto = info;
@@ -315,6 +325,10 @@ function on_notify_data(name, info) {
 			reset_color();
 			window.NotifyOthers("set_random_color", color_arr);
 		}
+		break;
+	case "panel_main":
+		active_main = info;
+		window.SetProperty("Panel.active.main", active_main);
 		break;
 	}
 };

@@ -74,29 +74,6 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 	}
 };
 
-oDlItem = function(index, http_path, filename, file_title, file_artist, file_ext) {
-	this.index = index;
-	this.http_path = http_path;
-	this.filename = filename;
-	this.downloaded = 0;
-	this.file_title = file_title;
-	this.file_artist = file_artist;
-	this.file_ext = file_ext;
-	
-	this.draw = function(gr){
-		var item_y = toolbar.y - (this.index + 1) * toolbar.dl_rowh + 1;
-		var title_w = gr.CalcTextWidth(file_title, g_font);
-		title_w = Math.min(title_w, toolbar.width - 2*toolbar.dl_pctw-g_z16);
-		var art_w = toolbar.width - 2*toolbar.dl_pctw-g_z16-title_w;
-		gr.FillSolidRect(toolbar.x, item_y, toolbar.width, toolbar.dl_rowh, g_color_dl_bg);
-		var per_down = (this.downloaded == 999) ? "err" : this.downloaded + "%";
-		gr.gdiDrawText(per_down, g_font, g_color_dl_txt_perc, toolbar.x+g_z6, item_y, toolbar.dl_pctw, toolbar.dl_rowh, lcs_txt);
-		gr.gdiDrawText(this.file_title, g_font, g_color_dl_txt, toolbar.dl_titlex, item_y, title_w, toolbar.dl_rowh, lcs_txt);
-		if(art_w>40*zdpi) gr.gdiDrawText("  |  " + this.file_artist, g_font_2, g_color_dl_txt_art, toolbar.dl_titlex+title_w, item_y, art_w, toolbar.dl_rowh, lcs_txt);
-		gr.gdiDrawText(this.file_ext.toUpperCase(), g_font, g_color_dl_txt_ext, toolbar.x+toolbar.width-toolbar.dl_pctw-g_z6, item_y, toolbar.dl_pctw, toolbar.dl_rowh, ccs_txt);
-	}
-}
-
 oItem = function(playlist, row_index, type, handle, track_index, group_index, track_index_in_group, heightInRow, groupRowDelta, obj, empty_row_index) {
 	this.type = type;
 	this.playlist = playlist;
@@ -1174,7 +1151,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						p.list.SHIFT_start_id = null;
 					};
 					if (!utils.IsKeyPressed(VK_SHIFT)) {
+						//var g_path = tf_path.EvalWithMetadb(fb.GetFocusItem());
+						//g_track_type = TrackType(g_path);
 						g_track_type = TrackType(fb.GetFocusItem().rawpath.substring(0, 4));
+						if(g_track_type < 2) g_track_type = -1;
 						p.list.contextMenu(x, y, this.track_index, this.row_index);
 					};
 				};
@@ -1195,6 +1175,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							plman.SetPlaylistSelectionSingle(p.list.playlist, this.track_index, true);
 						};
 						//if (!utils.IsKeyPressed(VK_SHIFT)) {
+							//var g_path = tf_path.EvalWithMetadb(fb.GetFocusItem());
 							g_track_type = TrackType(fb.GetFocusItem().rawpath.substring(0, 4));
 							p.list.contextMenu(x, y, this.track_index, this.row_index);
 						//};
@@ -1341,7 +1322,6 @@ oList = function(object_name, playlist) {
 	this.count = this.handleList.Count;
 	this.groups = [];
 	this.items = [];
-	this.dlitems = [];
 	this.groupby = [];
 	this.totalGroupBy = window.GetProperty("SYSTEM.Groups.TotalGroupBy", 0);
 	this.metadblist_selection = plman.GetPlaylistSelectedItems(this.playlist);
@@ -1354,7 +1334,6 @@ oList = function(object_name, playlist) {
 	this.drawRectSel = false;
 	this.beam = 0;
 	this.item_clicked = false;
-	this.dl_num = 0;
 	this.name = plman.GetPlaylistName(this.playlist);
 
 	// items variables used in Item object (optimization)
@@ -2306,14 +2285,6 @@ oList = function(object_name, playlist) {
 			this.items[i].draw(gr, this.x, row_top_y, width, item_h);
 			row_top_y += item_h - (this.items[i].groupRowDelta * cTrack.height);
 		};
-		
-		if(this.dlitems.length > 0 && !toolbar.dl_hide){	
-			var last_id = Math.min(this.dlitems.length-1, 4);
-			for (var i = 0; i <= last_id; i++) {
-				this.dlitems[i].draw(gr);
-			}
-			gr.FillSolidRect(toolbar.x, toolbar.y - (last_id+1)* toolbar.dl_rowh - g_z5 + 1, toolbar.width, g_z5, g_color_dl_bg);
-		}
 
 		if (g_dragndrop_drop_forbidden) {
 			gr.FillsolidRect(this.x, this.y, this.w, this.h, RGBA(0, 0, 0, 100));
@@ -2366,7 +2337,7 @@ oList = function(object_name, playlist) {
 	};
 
 	this.isHoverObject = function(x, y) {
-		return (x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h && !toolbar.state);
+		return (x > this.x && x < this.x + this.w && y > this.y && y < this.y + this.h);
 	};
 
 	this.check = function(event, x, y, delta) {
@@ -2609,9 +2580,9 @@ oList = function(object_name, playlist) {
 
 		//_menu.AppendMenuItem(MF_STRING, 1, "面板设置...");
 		_menu.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
-		if(g_track_type == 3) {
-			_menu.AppendMenuItem(MF_STRING, 1013, "Download...");
-		}
+		/*if(g_track_type == 3) {
+			_menu.AppendMenuItem(MF_STRING, 1013, "下载...");
+		}*/
 		_menu.AppendMenuSeparator();
 		if (plman.GetPlaybackQueueCount() > 0) {
 			if (this.name != "Queue Content") {
@@ -2620,8 +2591,8 @@ oList = function(object_name, playlist) {
 		};
 		Context.BuildMenu(_menu, 3, -1);
 		
-		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (g_track_type < 2))
-			_menu.AppendMenuItem(MF_STRING, 1012, "Edit with Mp3tag");
+		if(fso.FileExists(fb.FoobarPath +"assemblies\\MusicTag\\MusicTag.exe") && (g_track_type < 2))
+			_menu.AppendMenuItem(MF_STRING, 1012, "Edit with MusicTag");
 		_child01.AppendTo(_menu, MF_STRING, "Selection...");
 		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
 		_child01.AppendMenuItem(fb.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "Crop");
@@ -2665,95 +2636,12 @@ oList = function(object_name, playlist) {
 				break;
 			case (ret == 1012):
 				var WshShell = new ActiveXObject("WScript.Shell");
-				var obj_file = fb.Titleformat("%path%").EvalWithMetadb(fb.GetFocusItem());
-				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
-				break;
-			case (ret == 1013):
-				if (!fso.FolderExists(dl_prefix_folder)) {
-					try{
-						fso.CreateFolder(dl_prefix_folder)
-					} catch(e) {
-						fb.trace("Download: Invalid path");
-						break;
-					}
-				}
-				client.SavePath = dl_prefix_folder;
-				for (i = 0; i < this.metadblist_selection.count; i++) {
-					var obj_file = fb.Titleformat("%path%").EvalWithMetadb(this.metadblist_selection.item(i));
-					var file_rename;
-					var file_ext = fb.Titleformat("$ext(%filename_ext%)").EvalWithMetadb(this.metadblist_selection.item(i));
-					if (dl_rename_by != "" || dl_rename_by != null){
-						try{
-							file_rename = fb.Titleformat(dl_rename_by).EvalWithMetadb(this.metadblist_selection.item(i)).replace(/(\\|:|\*|\?|"|<|>|\/|\|)/g, "") + "." + file_ext;
-						} catch(e) {
-							file_rename = fb.Titleformat("%filename_ext%").EvalWithMetadb(this.metadblist_selection.item(i));
-						}
-					}
-					else file_rename = fb.Titleformat("%filename_ext%").EvalWithMetadb(this.metadblist_selection.item(i));
-					var file_title = fb.Titleformat("%title%").EvalWithMetadb(this.metadblist_selection.item(i));
-					var file_artist = fb.Titleformat("%artist%").EvalWithMetadb(this.metadblist_selection.item(i));
-					if(!(dl_skip && fso.FileExists(dl_prefix_folder + "\\" + file_rename))){
-						dl_avoid_flush = true;
-						var index_tmp = this.dlitems.length;
-						this.dlitems.push(new oDlItem(index_tmp, obj_file, file_rename, file_title, file_artist, file_ext));
-						if(index_tmp < 5) {
-							try{
-								client.RunAsync(index_tmp, obj_file, file_rename);
-								p.list.dl_num += 1;
-							} catch(e){
-								this.dlitems[index_tmp].downloaded = 999;
-							}
-						}
-					}
-				};
-				if(!toolbar.dl_timer){
-					toolbar.dl_timer = window.SetInterval(function(){
-						if(p.list.dlitems.length > 0){
-							var group_comp = true;
-							var done_count = 0;
-							var last_id = Math.min(5, p.list.dlitems.length);
-							for (var i = 0; i < last_id; i++){
-								if(p.list.dlitems[i].downloaded < 100) group_comp = false;
-								else done_count += 1;
-							}
-							toolbar.dl_count = p.list.dlitems.length - done_count;
-							if(group_comp){
-								if(p.list.dlitems.length > 5){
-									p.list.dlitems.splice(0,5);
-									p.list.dl_num = 0;
-									last_id = Math.min(5, p.list.dlitems.length);
-									for (var i = 0; i < last_id; i++){
-										p.list.dlitems[i].index = i;
-										try{
-											client.RunAsync(i, p.list.dlitems[i].http_path, p.list.dlitems[i].filename);
-											p.list.dl_num += 1;
-										}catch(e){
-											this.dlitems[i].downloaded = 999;
-										}
-									}
-								}else{
-									var timer_exit = window.SetTimeout(function() {
-										if(!dl_avoid_flush){
-											p.list.dlitems.splice(0,p.list.dlitems.length);
-											p.list.dl_num -= p.list.dlitems.length;
-											toolbar.dlmode = false;
-											toolbar.repaint_dl();
-											toolbar.checkState("move", mouse_x, mouse_y);
-										}
-										timer_exit && window.ClearTimeout(timer_exit);
-										timer_exit = false;
-									}, 2500);
-									dl_avoid_flush = false;
-								}
-							}
-							toolbar.disabled = false;
-							toolbar.dlmode = true;
-							toolbar.repaint_dl();
-						} else {
-							window.ClearInterval(toolbar.dl_timer);
-							toolbar.dl_timer = false;
-						}
-					},500);
+				if (g_track_type > -1) {
+					var obj_file = fb.Titleformat("%path%").EvalWithMetadb(fb.GetFocusItem());
+					WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\" " + "\"" + obj_file + "\"", 5);
+				} else{
+					var obj_file = fb.Titleformat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
+					WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\" " + "\"" + obj_file + "\"", 5);
 				}
 				break;
 			case (ret == 4000):

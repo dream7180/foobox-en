@@ -447,12 +447,14 @@ button = function (normal, hover, down ,tooltipText) {
 	this.img = Array(normal, hover, down);
 	this.w = this.img[0].Width;
 	this.h = this.img[0].Height;
-	this.Tooltip = window.CreateTooltip("",g_fsize);
-	this.Tooltip.Text = tooltipText;
+	if(tooltipText){
+		this.Tooltip = window.CreateTooltip("",g_fsize);
+		this.Tooltip.Text = tooltipText;
+	}
 	this.state = ButtonStates.normal;
 	this.update = function (normal, hover, down, Tooltip) {
 		this.img = Array(normal, hover, down);
-		this.Tooltip.Text = Tooltip;
+		if(tooltipText)this.Tooltip.Text = Tooltip;
 		this.w = this.img[0].Width;
 		this.h = this.img[0].Height;
 	};
@@ -463,7 +465,7 @@ button = function (normal, hover, down ,tooltipText) {
 	};
 	this.display_context_menu = function (x, y, id) {}
 	this.repaint = function () {
-		this.Tooltip.Deactivate();
+		if(tooltipText)this.Tooltip.Deactivate();
 		window.RepaintRect(this.x, this.y, this.w, this.h);
 	};
 	this.changeTooltip = function (newTooltip){
@@ -497,19 +499,29 @@ button = function (normal, hover, down ,tooltipText) {
 			case ButtonStates.normal:
 			case ButtonStates.hover:
 				if(this.ishover){
-					this.Tooltip.Activate();
+					if(tooltipText)this.Tooltip.Activate();
+					this.state = ButtonStates.hover
+				} else{
+					this.state = ButtonStates.normal;
+					if (tooltipText && this.old != ButtonStates.normal){
+						this.Tooltip.Deactivate();
+						//window.SetCursor(32512);
+					}
+				}
+				/*if(this.ishover){
+					if(tooltipText)this.Tooltip.Activate();
 					//window.SetCursor(32649);
 				}
 				this.state = this.ishover ? ButtonStates.hover : ButtonStates.normal;
-				if (this.state == ButtonStates.normal && this.old != ButtonStates.normal){
+				if (tooltipText && this.state == ButtonStates.normal && this.old != ButtonStates.normal){
 					this.Tooltip.Deactivate();
 					//window.SetCursor(32512);
-				}
+				}*/
 				break;
 			};
 			break;
 		 case "leave":
-			this.Tooltip.Deactivate();
+			if(tooltipText)this.Tooltip.Deactivate();
 			//window.SetCursor(32512);
 			this.state = this.isdown ? ButtonStates.down : ButtonStates.normal;
 			break;
@@ -839,7 +851,7 @@ function TimeFmt(t) {
 		t -= h * 3600;
 		m = Math.floor(t / 60);
 		t -= m * 60, s = Math.floor(t);
-		return h.toString() + (h > 1 ? " hours " : " hour ") + m.toString() + (m > 1 ? " minutes " : " minute ") + zpad(s) + (s > 1 ? " seconds" : " second");	
+		return h.toString() + (h > 1 ? " hours " : " hour ") + m.toString() + (m > 1 ? " minutes " : " minute ") + zpad(s) + (s > 1 ? " seconds" : " second");
 	}
 	else{
 		m = Math.floor(t / 60);

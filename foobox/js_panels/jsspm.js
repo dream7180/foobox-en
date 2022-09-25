@@ -956,10 +956,10 @@ oBrowser = function(name) {
 		_newplaylist.AppendMenuItem(MF_STRING, 101, "New autoplaylist");
 		_autoplaylist.AppendTo(_newplaylist, MF_STRING, "Preset autoplaylists");
 		_autoplaylist.AppendMenuItem(MF_STRING, 200, "Library (full)");
-		_autoplaylist.AppendMenuItem(MF_STRING, 204, "Tracks never played");
-		_autoplaylist.AppendMenuItem(MF_STRING, 205, "History (tracks played in one week)");
-		_autoplaylist.AppendMenuItem(MF_STRING, 206, "Tracks played often");
-		_autoplaylist.AppendMenuItem(MF_STRING, 210, "Tracks recently added");
+		if(foo_playcount) _autoplaylist.AppendMenuItem(MF_STRING, 204, "Tracks never played");
+		if(foo_playcount) _autoplaylist.AppendMenuItem(MF_STRING, 205, "History (tracks played in one week)");
+		if(foo_playcount) _autoplaylist.AppendMenuItem(MF_STRING, 206, "Tracks played often");
+		if(foo_playcount) _autoplaylist.AppendMenuItem(MF_STRING, 210, "Tracks recently added");
 /*		_autoplaylist.AppendMenuItem(MF_STRING, 211, "网络广播");
 		_autoplaylist.AppendMenuItem(MF_STRING, 212, "External Files");
 		_autoplaylist.AppendMenuItem(MF_STRING, 213, "Podcasts");*/
@@ -1334,7 +1334,7 @@ var ww = 0,
 	wh = 0;
 //var g_metadb = null;
 var g_focus = false;
-//var foo_playcount = utils.CheckComponent("foo_playcount", true);
+var foo_playcount = fbx_set[32];
 clipboard = {
 	selection: null
 };
@@ -1668,8 +1668,8 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 				if (name == "Favorites") return images.mood_icon_hl;
 				else return images.icon_auto_pl_hl;
 			}else{
-				if (name.substr(0, 5) == "Radio") return images.radios_icon_hl;
-				//if (name.substr(0, 5) == "Board") return images.board_icon_hl;
+				if (name.substr(0, 2) == "Radio") return images.radios_icon_hl;
+				//if (name.substr(0, 2) == "榜单") return images.board_icon_hl;
 				else return images.icon_normal_pl_playing_hl;
 			}
 		} else {
@@ -1681,8 +1681,8 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 				if (name == "Favorites") return images.mood_icon;
 				else return images.icon_auto_pl;
 			}else{
-				if (name.substr(0, 5) == "Radio") return images.radios_icon;
-				//if (name.substr(0, 5) == "Board") return images.board_icon;
+				if (name.substr(0, 2) == "Radio") return images.radios_icon;
+				//if (name.substr(0, 2) == "榜单") return images.board_icon;
 				else return images.icon_normal_pl;
 			}
 		}
@@ -1696,9 +1696,9 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 		if (name == "Favorites") return images.mood_icon;
 		else return images.icon_auto_pl;
 		} else{
-			if (name.substr(0, 5) == "Radio") return images.radios_icon;
-			if (name.substr(0, 5) == "Board") return images.board_icon;
-			//if (playing_playlist) return images.icon_normal_pl_playing;
+			if (name.substr(0, 2) == "Radio") return images.radios_icon;
+			//if (name.substr(0, 2) == "榜单") return images.board_icon;
+			if (playing_playlist) return images.icon_normal_pl_playing;
 			else return images.icon_normal_pl;
 		}
 	}
@@ -1887,8 +1887,8 @@ function get_images() {
 	gb.DrawPolygon(g_color_playing_txt,1,point_arr);
 	gb.SetSmoothingMode(0);
 	images.mood_icon_hl.ReleaseGraphics(gb);
-	/*
-	images.board_icon_hl = gdi.CreateImage(imgw, imgh);
+	
+	/*images.board_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.board_icon_hl.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawLine(_x7, _x18, _x11, _x12, 1, g_color_playing_txt);

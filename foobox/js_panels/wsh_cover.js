@@ -1302,7 +1302,7 @@ function Display(x, y, w, h, prop) {
 				imgCache.text = "";
 			}
 
-		}(0, 0, Math.ceil(75*zdpi) + 5, Math.ceil(25*zdpi));
+		}(0, 0, Math.ceil(55*zdpi) + 5, Math.ceil(25*zdpi));
 
 		var btnStatus = -1; // -1: hide.
 		var bugx, bugy; // Prevent a windows menu behaviour bug.

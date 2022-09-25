@@ -93,7 +93,8 @@ oHeaderBar = function() {
 		var gb = this.slide_open_normal.GetGraphics();
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
 		gb.SetSmoothingMode(2);
-		pointArr = Array(3*zdpi, btn_h/3, 5*zdpi, btn_h/2, 3*zdpi, btn_h*2/3, 9*zdpi, btn_h/2);
+		var x_ini =  cScrollBar.width / 4;
+		pointArr = Array(x_ini, btn_h/3, x_ini + 2*zdpi, btn_h/2, x_ini, btn_h*2/3, x_ini + 6*zdpi, btn_h/2);
 		gb.FillPolygon(color_txt&0xaaffffff, 1, pointArr);
 		this.slide_open_normal.ReleaseGraphics(gb);
 
@@ -110,7 +111,7 @@ oHeaderBar = function() {
 		gb.SetSmoothingMode(2);
 		gb.FillPolygon(color_txt, 1, pointArr);
 		this.slide_open_down.ReleaseGraphics(gb);
-		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "Show Now Playing Track");
+		this.button = new button(this.slide_open_normal, this.slide_open_hover, this.slide_open_down, "");
 	};
 	this.setButtons();
 
@@ -365,10 +366,10 @@ oHeaderBar = function() {
 					fields.push(new Array("Cover", "State", "Index", "#", "Title", "Year", "Artist", "Album Artist", "Album", "Genre", "Mood", "Rating", "Plays", "Bitrate", "Codec", "Time"));
 					break;
 				case 1:
-					fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'Unknown artist')", "$if2(%album artist%,'Unknown artist')", "$if2(%album%,$if(%length%,'Single','Radio'))", "$if2(%genre%,'Other')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_counter%,$if2(%play_count%,0))", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
+					fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
 					break;
 				case 2:
-					fields.push(new Array("null", "null", "null", "$if2(%play_counter%,$if2(%play_count%,0))", "$if2(%album artist%,'Unknown artist')", "null", "null", "null", "$if2(%genre%,'Other')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
+					fields.push(new Array("null", "null", "null", "$if2(%play_count%,0)", "$if2(%album artist%,'未知艺术家')", "null", "null", "null", "$if2(%genre%,'其他')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
 					break;
 				case 3:
 					fields.push(new Array("0", "5000", "0", "5000", "40000", "0", "30000", "0", "0", "0", "0", "11000", "0", "0", "0", "9000"));
@@ -483,14 +484,13 @@ oHeaderBar = function() {
 				case "down":
 					if (state == ButtonStates.down) {
 						this.buttonClicked = true;
+						this.button.state = ButtonStates.hover;
 					};
 					break;
 				case "up":
 					if (this.buttonClicked && state == ButtonStates.hover) {
-						p.list.showNowPlaying();
-						p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
-						//this.contextMenu(ww - 161, cHeaderBar.height, 0);
-						//this.button.state = ButtonStates.hover;
+						this.contextMenu(ww - cScrollBar.width, cHeaderBar.height, 0);
+						this.button.state = ButtonStates.normal;
 					};
 					this.buttonClicked = false;
 					break;
@@ -740,10 +740,10 @@ oHeaderBar = function() {
 		};
 
 		// main Menu entries
-		_menu.AppendMenuItem(MF_STRING, 11, "Panel settings..."); 	        
+		_menu.AppendMenuItem(MF_STRING, 11, "Show now playing (F2)"); 	        
 		_menu.AppendMenuSeparator();
 		if (properties.showgroupheaders) {
-			_patterns.AppendTo(_menu, MF_STRING, "Edit groups...");
+			_patterns.AppendTo(_menu, MF_STRING, "Edit groups");
 			var groupByMenuIdx = 20;
 			var totalGroupBy = p.list.groupby.length;
 			for (var i = 0; i < totalGroupBy; i++) {
@@ -768,7 +768,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 212, "Rating");
 		_sorting.AppendMenuItem(MF_STRING, 213, "Bitrate");
 		_sorting.AppendMenuItem(MF_STRING, 214, "Modification");
-		_sorting.AppendMenuItem(MF_STRING, 215, "Plays");
+		if(foo_playcount) _sorting.AppendMenuItem(MF_STRING, 215, "Plays");
 		_sorting.AppendMenuItem(MF_STRING, 216, "Codec");
 		_sorting.AppendMenuItem(MF_STRING, 217, "Random");
 		_sorting.AppendMenuItem(MF_STRING, 218, "Reverse");
@@ -797,8 +797,8 @@ oHeaderBar = function() {
 			_groups.AppendMenuItem(MF_STRING, 19, "Enable playlist filter");
 			_groups.CheckMenuItem(19, properties.enablePlaylistFilter);
 			_groups.AppendMenuSeparator();
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "Collapse all (Tab)");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "Expand all (Ctrl+Tab)");	
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Ctrl+Tab)");	
 		};
 		_groups.AppendMenuSeparator();
 		_groups.AppendMenuItem(MF_STRING, 13, "Edit groups...");
@@ -807,14 +807,14 @@ oHeaderBar = function() {
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 16, "Refresh covers (F5)");
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 15, "View download folder");
+		_menu.AppendMenuItem(MF_STRING, 15, "Playlist view options");
 		_menu.AppendMenuItem(MF_STRING, 14, "Panel properties");
 		
 		idx = _menu.TrackPopupMenu(x, y);
 		switch (true) {
 		case (idx == 11):
-			show_setting(0);
-			window.NotifyOthers("topbar_show_settings", true);
+			p.list.showNowPlaying();
+			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 12):
 			show_setting(1, column_index);
@@ -828,13 +828,8 @@ oHeaderBar = function() {
 			window.ShowProperties();
 			break;
 		case (idx == 15):
-				var WshShell = new ActiveXObject("WScript.Shell");
-				var fso = new ActiveXObject("Scripting.FileSystemObject");
-				if (!fso.FolderExists(dl_prefix_folder)) fso.CreateFolder(dl_prefix_folder);
-				var filepath = dl_prefix_folder;
-				if (dl_prefix_folder.substring(0,1) == "B") filepath = filepath.replace('B:\\', fb.FoobarPath);
-				WshShell.Run("explorer.exe" + " \"" + filepath+ "\"");
-				break;
+			show_setting(0);
+			window.NotifyOthers("topbar_show_settings", true);
 			break;
 		case (idx == 16):
 			refresh_cover();

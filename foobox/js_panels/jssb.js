@@ -32,6 +32,8 @@ _TFsorting[3] = "%genre% | %album artist% | $if(%album%,%date%,'9999') | %album%
 _TFsorting[4] = "$directory_path(%path%) | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 var boxText_len = 0;
 var albumsource = 0;
+var panel_show = fbx_set[33];
+var populate_onhold = false;
 
 images = {
 	path: fb.FoobarPath + "themes\\foobox\\images\\",
@@ -102,6 +104,7 @@ ppt = {
 	textLineHeight: 10*zdpi
 	//rawBitmap: false
 };
+
 var _showAllItem = ppt.showAllItem;
 
 cTouch = {
@@ -340,7 +343,7 @@ image_cache = function() {
 							try {
 								brw.groups[albumIndex].load_requested = 1;
 								utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
-								}
+							}
 							catch(e) {}
 						};
 						timers.coverLoad && window.ClearTimeout(timers.coverLoad);
@@ -916,7 +919,7 @@ oBrowser = function(name) {
 	this.launch_populate = function() {
 		var launch_timer = window.SetTimeout(function() {
 			// populate browser with items
-			brw.populate(is_first_populate = true);
+			brw.populate();
 			// populate playlist popup panel list
 			pman.populate(exclude_active = false, reset_scroll = true);
 			// kill Timeout
@@ -1001,7 +1004,7 @@ oBrowser = function(name) {
 		scroll_ = scroll;
 
 		// scrollbar update       
-		this.scrollbar.updateScrollbar();
+		//this.scrollbar.updateScrollbar();
 
 		this.update();
 
@@ -1319,7 +1322,7 @@ oBrowser = function(name) {
 		//fb.trace("JSB POPULATE: init groups delay = " + Math.round(t2 - t1) + " /handleList count=" + total);
 	};
 
-	this.populate = function(is_first_populate) {
+	this.populate = function(/*is_first_populate*/) {
 		//fb.trace("--> populate");
 		if (this.list) this.list.Dispose();
 		if (this.list_unsorted) this.list_unsorted.Dispose();
@@ -1341,13 +1344,13 @@ oBrowser = function(name) {
 		};
 
 		this.init_groups();
-		get_metrics();
+		//if(is_first_populate) get_metrics();
 		this.setList();
 		this.update();
-		this.scrollbar.updateScrollbar();
+		//this.scrollbar.updateScrollbar();
 		this.showNowPlaying(true);
 		//this.repaint();
-		g_first_populate_done = true;
+		//g_first_populate_done = true;
 	};
 
 	this.activateItem = function(index, isplaying) {
@@ -2324,7 +2327,7 @@ oBrowser = function(name) {
 			//g_image_cache = new image_cache;
 			//CollectGarbage();
 			brw.reset_swbtn();
-			brw.populate(true);
+			brw.populate();
 			transfer_covertype();
 			break;
 		case (idx >= 113 && idx <= 114):
@@ -2338,7 +2341,7 @@ oBrowser = function(name) {
 			//g_image_cache = new image_cache;
 			//CollectGarbage();
 			brw.reset_swbtn();
-			brw.populate(true);
+			brw.populate();
 			transfer_covertype();
 			break;
 		case (idx >= 115 && idx <= 116):
@@ -2352,7 +2355,7 @@ oBrowser = function(name) {
 			//g_image_cache = new image_cache;
 			//CollectGarbage();
 			brw.reset_swbtn();
-			brw.populate(true);
+			brw.populate();
 			transfer_covertype();
 			break;
 		case (idx == 200):
@@ -2381,7 +2384,7 @@ oBrowser = function(name) {
 			if(brw.groups.length < 2) ppt.showAllItem = 0;
 			else ppt.showAllItem = _showAllItem;
 			window.SetProperty("_PROPERTY: Show ALL item", _showAllItem);
-			brw.populate(false);
+			brw.populate();
 			break;
 		case (idx == 912):
 			if (fso.FolderExists(fb.ProfilePath + "cache\\imgcache")){
@@ -2403,7 +2406,7 @@ oBrowser = function(name) {
 			brw.cover_repaint();
 			break;
 			//case (idx == 990):
-			//    brw.populate(true);
+			//    brw.populate();
 			//    break;
 		case (idx == 991):
 			window.ShowProperties();
@@ -2525,7 +2528,7 @@ var ww = 0,
 	wh = 0;
 var g_metadb = null;
 var g_focus = false;
-var foo_playcount = utils.CheckComponent("foo_playcount", true);
+var foo_playcount = fbx_set[32];
 clipboard = {
 	selection: null
 };
@@ -2535,7 +2538,7 @@ clipboard = {
 var m_x = 0,
 	m_y = 0;
 var g_active_playlist = null;
-var g_populate_opt = 1;
+//var g_populate_opt = 1;
 // color vars
 var g_color_normal_bg = 0;
 var g_color_selected_bg = 0;
@@ -2559,7 +2562,7 @@ var g_lbtn_click = false;
 var g_rbtn_click = false;
 //
 var g_total_duration_text = "";
-var g_first_populate_done = false;
+//var g_first_populate_done = false;
 var g_first_populate_launched = false;
 
 var repaintforced = false;
@@ -2672,7 +2675,7 @@ function on_paint(gr) {
 	gr.DrawLine(0, wh - 1, ww, wh - 1, 1, RGBA(0, 0, 0, 100));
 	if(ppt.dl_scrlock) {
 		gr.FillSolidRect(0, 0, ww, wh, g_syscolor_window_bg&0xbbffffff);
-		gr.GdiDrawText("正在下载封面 (剩余 " + DLQueue.length +" ) ...", g_font_lock, g_color_normal_txt, 0, 0, ww, wh, cc_txt);
+		gr.GdiDrawText("Downloading covers (" + DLQueue.length +" remaining) ...", g_font_lock, g_color_normal_txt, 0, 0, ww, wh, cc_txt);
 	}
 	if(show_shadow){
 		gr.DrawLine(0, 1, ww, 1, 1, RGBA(0, 0, 0, 60));
@@ -2703,9 +2706,9 @@ function SingleDownload(obj, alb_source){
 		var filename = (art? art + " - ": "") + alb + ".jpg";
 		if(album_cover_dir == "$directory_path(%path%)"){
 			if(brw.groups[obj.groupIndex].tracktype > 0) {
-				savepath = fb.FoobarPath + "MusicArt\\Album";
-				if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-				if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Album")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Album");
+				savepath = fb.ProfilePath + "MusicArt\\Album";
+				if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+				if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Album")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Album");
 			}
 			else savepath = fb.TitleFormat(album_cover_dir).EvalWithMetadb(brw.groups[obj.groupIndex].metadb);
 		} else savepath =  album_cover_dir;
@@ -2717,9 +2720,9 @@ function SingleDownload(obj, alb_source){
 		var filename = art + ".jpg";
 		if(artist_cover_dir == "$directory_path(%path%)"){
 			if(brw.groups[obj.groupIndex].tracktype > 0) {
-				savepath = fb.FoobarPath + "MusicArt\\Artist";
-				if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-				if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Artist")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Artist");
+				savepath = fb.ProfilePath + "MusicArt\\Artist";
+				if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+				if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Artist")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Artist");
 			}
 			else savepath = fb.TitleFormat(artist_cover_dir).EvalWithMetadb(brw.groups[obj.groupIndex].metadb);
 		} else savepath =  artist_cover_dir;
@@ -2865,20 +2868,20 @@ function on_mouse_lbtn_up(x, y) {
 					case 1:
 						ppt.albumMode = !ppt.albumMode;
 						window.SetProperty("_PROPERTY: Album Mode", ppt.albumMode);
-						brw.populate(true);
+						brw.populate();
 						break;
 					case 2:
 						ppt.artistMode = !ppt.artistMode;
 						window.SetProperty("_PROPERTY: Artist Mode", ppt.artistMode);
 						if (ppt.sourceMode != 0 && ppt.forceSorting) plman.SortByFormatV2(g_active_playlist, find_sorting(), 1);
-						brw.populate(true);
+						brw.populate();
 						transfer_covertype();
 						break;
 					case 3:
 						ppt.genre_dir = !ppt.genre_dir;
 						window.SetProperty("_PROPERTY: Genre or Directory", ppt.genre_dir);
 						if (ppt.sourceMode != 0 && ppt.forceSorting) plman.SortByFormatV2(g_active_playlist, find_sorting(), 1);
-						brw.populate(true);
+						brw.populate();
 						transfer_covertype();
 						break;
 				}
@@ -2887,7 +2890,7 @@ function on_mouse_lbtn_up(x, y) {
 			if (ppt.tagMode < 3 && brw.dl_btn.checkstate("up", x, y) == ButtonStates.hover) {
 				if(ppt.tagMode == 1){
 					var _menu = window.CreatePopupMenu();
-					_menu.AppendMenuItem(MF_STRING, 20, "All (iTunes preferable)");
+					_menu.AppendMenuItem(MF_STRING, 20, "Auto (iTunes preferable)");
 					_menu.AppendMenuSeparator();
 					_menu.AppendMenuItem(MF_STRING, 21, "iTunes");
 					_menu.AppendMenuItem(MF_STRING, 22, "Netease");
@@ -3150,7 +3153,8 @@ function get_images() {
 	images.loading_draw = images.img_loading.Resize(iw, iw, 7);
 
 	var nw = 250,
-		nh = 250;
+		nh = 250,
+		_x10 = 10*zdpi;
 	var _font = GdiFont(g_fname, Math.round(nh / 12 * 1.75), 1)
 	images.noart = gdi.CreateImage(nw, nh);
 	gb = images.noart.GetGraphics();
@@ -3182,43 +3186,40 @@ function get_images() {
 	images.sw_btn_n0 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n0.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(2*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,_x10, x5,x5, g_btn_color1);
+	gb.FillRoundRect(2*zdpi+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	images.sw_btn_n0.ReleaseGraphics(gb);
 	
 	images.sw_btn_n1 = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
 	gb = images.sw_btn_n1.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,10*zdpi, x5,x5, g_btn_color1);
-	gb.FillRoundRect(10*zdpi+2,x5+2, 10*zdpi-4,10*zdpi-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
+	gb.FillRoundRect(2*zdpi,x5, 18*zdpi,_x10, x5,x5, g_btn_color1);
+	gb.FillRoundRect(_x10+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	images.sw_btn_n1.ReleaseGraphics(gb);
-
-	var points = Array(10*zdpi,4*zdpi, 14*zdpi,4*zdpi, 14*zdpi,8*zdpi, 17*zdpi,8*zdpi, 12*zdpi,13.5*zdpi, 7*zdpi,8*zdpi, 10*zdpi,8*zdpi);
-	col_2 =g_btn_color2 & 0xccffffff;
-	images.down_all = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
+	
+	var points = Array(_x10-1,6*zdpi, _x10+1,6*zdpi, 11*zdpi,_x10, 13*zdpi,_x10, _x10,14*zdpi, 7*zdpi,_x10, _x10-1,_x10);
+	var col_2 =g_btn_color2 & 0xccffffff, img_size = 20*zdpi;
+	images.down_all = gdi.CreateImage(img_size, img_size);
 	gb = images.down_all.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_btn_color2, 2, points);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, g_btn_color2);
+	gb.DrawEllipse(2*zdpi, 2*zdpi, 16*zdpi, 16*zdpi, 2, g_btn_color2);
+	gb.FillPolygon(g_btn_color2, 0, points);
 	images.down_all.ReleaseGraphics(gb);
 	
-	images.down_all_h = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
+	images.down_all_h = gdi.CreateImage(img_size, img_size);
 	gb = images.down_all_h.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(zdpi, zdpi, cSwitchBtn.w - 2*zdpi, cSwitchBtn.h - 2*zdpi, 3*zdpi, 3*zdpi, g_color_normal_txt & 0x20ffffff);
-	gb.DrawPolygon(g_btn_color2, 2, points);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, g_btn_color2);
+	gb.FillEllipse(2*zdpi, 2*zdpi, 16*zdpi, 16*zdpi, g_color_normal_txt & 0x10ffffff);
+	gb.DrawEllipse(2*zdpi, 2*zdpi, 16*zdpi, 16*zdpi, 2, g_btn_color2);
+	gb.FillPolygon(g_btn_color2, 0, points);
 	images.down_all_h.ReleaseGraphics(gb);
 	
-	images.down_all_d = gdi.CreateImage(cSwitchBtn.w, cSwitchBtn.h);
+	images.down_all_d = gdi.CreateImage(img_size, img_size);
 	gb = images.down_all_d.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillRoundRect(zdpi, zdpi, cSwitchBtn.w - 2*zdpi, cSwitchBtn.h - 2*zdpi, 3*zdpi, 3*zdpi, g_color_normal_txt & 0x35ffffff);
-	gb.DrawPolygon(col_2, 2, points);
-	gb.SetSmoothingMode(0);
-	gb.DrawLine(x5, 14*zdpi+2, 19*zdpi, 14*zdpi+2, 2, col_2);
+	gb.FillEllipse(2*zdpi, 2*zdpi, 16*zdpi, 16*zdpi, g_color_normal_txt & 0x20ffffff);
+	gb.DrawEllipse(2*zdpi, 2*zdpi, 16*zdpi, 16*zdpi, 2, g_btn_color2);
+	gb.FillPolygon(g_btn_color2, 0, points);
 	images.down_all_d.ReleaseGraphics(gb);
 };
 
@@ -3629,7 +3630,7 @@ function on_playlist_switch() {
 	if (!ppt.locklibpl) g_active_playlist = plman.ActivePlaylist;
 	if (ppt.sourceMode == 1 && !ppt.locklibpl) {
 		scroll = scroll_ = 0;
-		brw.populate(is_first_populate = true);
+		brw.populate(/*is_first_populate = true*/);
 	};
 
 	// refresh playlists list
@@ -3644,7 +3645,7 @@ function on_playlist_items_added(playlist_idx) {
 
 	if (ppt.sourceMode == 1) {
 		if (playlist_idx == g_active_playlist) {
-			brw.populate(is_first_populate = false);
+			brw.populate(/*is_first_populate = false*/);
 		};
 	};
 };
@@ -3657,7 +3658,7 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 
 	if (ppt.sourceMode == 1) {
 		if (playlist_idx == g_active_playlist) {
-			brw.populate(is_first_populate = true);
+			brw.populate(/*is_first_populate = true*/);
 		};
 	};
 };
@@ -3665,7 +3666,7 @@ function on_playlist_items_removed(playlist_idx, new_count) {
 function on_playlist_items_reordered(playlist_idx) {
 	if (ppt.sourceMode == 1) {
 		if (playlist_idx == g_active_playlist) {
-			brw.populate(is_first_populate = true);
+			brw.populate(/*is_first_populate = true*/);
 		};
 	};
 };
@@ -3709,15 +3710,17 @@ function on_item_focus_change(playlist_idx, from, to) {
 };
 
 function on_metadb_changed(metadb_or_metadbs, fromhook) {
+	if (panel_show != "browser") {
+		populate_onhold = true;
+		return;
+	}
 	// rebuild list
-	//if (ppt.sourceMode == 1) {
-		if (filter_text.length > 0) {
-			brw.populate(is_first_populate = true);
-		};
-		else {
-			brw.populate(is_first_populate = false);
-		};
-	//};
+		//if (filter_text.length > 0) {
+		//	brw.populate(is_first_populate = true);
+		//};
+		//else {
+			brw.populate(/*is_first_populate = false*/);
+		//};
 };
 /*
 function on_item_selection_change() {
@@ -3781,7 +3784,7 @@ function g_sendResponse() {
 	};
 
 	// filter in current panel
-	brw.populate(true);
+	brw.populate();
 };
 
 function on_notify_data(name, info) {
@@ -3825,7 +3828,13 @@ function on_notify_data(name, info) {
 		window.Repaint();
 		break;
 	case "Set_browser_cover":
-		if(ppt.tagMode == info) break;
+		if(ppt.tagMode == info) {
+			if (populate_onhold){
+				brw.populate();
+				populate_onhold = false;
+			}
+			break;
+		}
 		ppt.tagMode = info;
 		window.SetProperty("_PROPERTY: Tag Mode", ppt.tagMode);
 		switch (ppt.tagMode) {
@@ -3843,7 +3852,7 @@ function on_notify_data(name, info) {
 		//g_image_cache = new image_cache;
 		//CollectGarbage();
 		brw.reset_swbtn();
-		brw.populate(true);
+		brw.populate();
 		transfer_covertype();
 		brw.showItemPanelInit();
 		break;
@@ -3852,12 +3861,12 @@ function on_notify_data(name, info) {
 		if(ppt.tagMode == 1){
 			g_image_cache = new image_cache;
 			CollectGarbage();
-			brw.populate(true);
+			brw.populate();
 		}
 		break;
 	case "show_Now_Playing":
 		brw.showNowPlaying();
-		//brw.repaint();
+		///////////brw.repaint();
 		break;
 	case "reload_cover_folder":
 		window.Reload();
@@ -3877,6 +3886,9 @@ function on_notify_data(name, info) {
 		brw.scrollbar.setCursorButton();
 		brw.scrollbar.setSize();
 		brw.repaint();
+		break;
+	case "panel_main":
+		panel_show = info;
 		break;
 	case "search this cover":
 		var tot = brw.groups.length;
@@ -3911,9 +3923,9 @@ function on_notify_data(name, info) {
 				var filename = (art? art + " - ": "") + alb + ".jpg";
 				if(album_cover_dir == "$directory_path(%path%)"){
 					if(TrackType(DL_metadb.rawpath.substring(0, 4)) > 0) {
-						savepath = fb.FoobarPath + "MusicArt\\Album";
-						if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-						if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Album")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Album");
+						savepath = fb.ProfilePath + "MusicArt\\Album";
+						if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+						if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Album")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Album");
 					}
 					else savepath = fb.TitleFormat(album_cover_dir).EvalWithMetadb(DL_metadb);
 				} else savepath =  album_cover_dir;
@@ -3926,9 +3938,9 @@ function on_notify_data(name, info) {
 				var filename = art + ".jpg";
 				if(artist_cover_dir == "$directory_path(%path%)"){
 					if(TrackType(DL_metadb.rawpath.substring(0, 4)) > 0) {
-						savepath = fb.FoobarPath + "MusicArt\\Artist";
-						if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-						if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Artist")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Artist");
+						savepath = fb.ProfilePath + "MusicArt\\Artist";
+						if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+						if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Artist")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Artist");
 					}
 					else savepath = fb.TitleFormat(artist_cover_dir).EvalWithMetadb(DL_metadb);
 				} else savepath =  artist_cover_dir;
@@ -4091,17 +4103,17 @@ function on_load() {
 		file.WriteLine(data);
 		file.Close();
 	};
-	if(album_cover_dir == fb.FoobarPath + "MusicArt\\Album") {
-		if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-		if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Album")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Album");
+	if(album_cover_dir == fb.ProfilePath + "MusicArt\\Album") {
+		if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+		if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Album")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Album");
 	}
-	if(artist_cover_dir == fb.FoobarPath + "MusicArt\\Artist") {
-		if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-		if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Artist")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Artist");
+	if(artist_cover_dir == fb.ProfilePath + "MusicArt\\Artist") {
+		if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+		if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Artist")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Artist");
 	}
-	if(genre_cover_dir == fb.FoobarPath + "MusicArt\\Genre") {
-		if (!fso.FolderExists(fb.FoobarPath + "MusicArt")) fso.CreateFolder(fb.FoobarPath + "MusicArt");
-		if (!fso.FolderExists(fb.FoobarPath + "MusicArt\\Genre")) fso.CreateFolder(fb.FoobarPath + "MusicArt\\Genre");
+	if(genre_cover_dir == fb.ProfilePath + "MusicArt\\Genre") {
+		if (!fso.FolderExists(fb.ProfilePath + "MusicArt")) fso.CreateFolder(fb.ProfilePath + "MusicArt");
+		if (!fso.FolderExists(fb.ProfilePath + "MusicArt\\Genre")) fso.CreateFolder(fb.ProfilePath + "MusicArt\\Genre");
 	}
 };
 

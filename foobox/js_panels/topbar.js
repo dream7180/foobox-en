@@ -13,11 +13,12 @@ var IFormat = DT_RIGHT | DT_BOTTOM | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS
 var search_hover = 0;
 var imgw = Math.floor(38*zdpi);
 var x_offset = 20*zdpi, btn_space = Math.floor(10*zdpi), spacer = Math.floor(9*zdpi);
-var img_close,img_max,img_min,img_playlist,img_artist,img_album,img_open,img_lrc,img_lib,img_lib_2,img_fullscreen,img_genre,img_shp,img_settings;
+var img_close,img_max,img_min,img_playlist,img_artist,img_album,img_mpv,img_lrc,img_lib,img_lib_2,img_fullscreen,img_genre,img_shp,img_settings;
 var auto_sw = fbx_set[26];
 var btn_fullscr = fbx_set[27];
 var JSSBLock = false;
 var show_vis = utils.CheckComponent("foo_vis_shpeck", true);
+var show_mpv = utils.CheckComponent("foo_mpv", true);
 //
 var VBE;
 try {
@@ -44,17 +45,17 @@ function AboutFoobox() {
 	else PopMessage(1, "File not found: \'" + HelpFile + "\'", 16);
 }
 //===============
-var show_playlist = window.GetProperty("Panel.show.playlist", true);
-var show_browser = window.GetProperty("Panel.show.cover.browser", false);
+var active_main = fbx_set[33];
 var show_coverlrc = window.GetProperty("Panel.show.coverlrc", true);
 var cover_type = window.GetProperty("Browser.cover.type", 2); //2-artist, 1-album, 3-genre
 var show_pl_setting = false;
-var show_libtree = window.GetProperty("Panel.show.library.tree", true);
+var show_libtree = window.GetProperty("Panel.show.library.tree", false);
 
 var panel = {
 	PSS: "PSSWindowContainer",
 	WSHMP: "uie_wsh_panel_mod_plus_class",
 	SHP: "{336638BD-8647-42CA-8A2F-2FB9C02A802F}",
+	MPV: "{EF25F318-A1F7-46CB-A86E-70F568ADDCE6}",
 	ESL: "uie_eslyric_wnd_class"
 }
 var GetWnd = utils.CreateWND(window.ID);
@@ -69,11 +70,15 @@ if(show_vis) {
 	var SHP = fb_hWnd.GetChild(panel.SHP, 1);
 	if(SHP == null) show_vis = 0;
 }
+if(show_mpv) {
+	var MPV = fb_hWnd.GetChild(panel.MPV, 1);
+	if(MPV == null) show_mpv = 0;
+}
 
 var img_min, img_max, img_close;
 var buttons = Array();
 var hbtn = false;
-var search_x = x_offset + imgw*(6+show_vis) + btn_space*(6+show_vis)  + spacer,
+var search_x = x_offset + imgw*(5+show_vis + show_mpv) + btn_space*(5+show_vis + show_mpv)  + spacer,
 	search_y = 11*zdpi, x_lib = 0;
 search_w = 175*zdpi, search_h = 22*zdpi;
 window.DlgCode = DLGC_WANTALLKEYS;
@@ -107,15 +112,18 @@ function on_paint(gr) {
 		buttons[2].Paint(gr);
 	}
 	for (i = 3; i < buttons.length - 1; i++) buttons[i].Paint(gr);
-	if(btn_fullscr) buttons[12 + show_vis].Paint(gr);
+	if(btn_fullscr) buttons[11 + show_vis + show_mpv].Paint(gr);
 	
-	tmp_x = x_offset + imgw*(4+show_vis) + btn_space*(3.5+show_vis) + spacer/2;
+	tmp_x = x_offset + imgw*4 + btn_space*3.5 + spacer/2;
 	gr.DrawLine(tmp_x, 13*zdpi, tmp_x, 33*zdpi, 1, c_separator);
 	tmp_x = x_lib + img_lrc.Width + spacer/2 + btn_space/2;
 	gr.DrawLine(tmp_x, 13*zdpi, tmp_x, 33*zdpi, 1, c_separator);
 
-	if (show_playlist) gr.FillSolidRect(x_offset - btn_space/2, line_y, imgw + btn_space, 3, tab_color);
-	else if(show_browser){
+	if (show_pl_setting){
+		gr.FillSolidRect(x_offset + imgw*(show_vis+4+show_mpv) + btn_space*(3.5+show_vis+show_mpv)  + spacer, line_y, imgw + btn_space, 3, tab_color);
+	}
+	else if (active_main == "playlist") gr.FillSolidRect(x_offset - btn_space/2, line_y, imgw + btn_space, 3, tab_color);
+	else if(active_main == "browser"){
 		switch(cover_type){
 			case 2:
 				gr.FillSolidRect(x_offset + imgw + btn_space/2, line_y, imgw + btn_space, 3, tab_color);
@@ -127,11 +135,10 @@ function on_paint(gr) {
 				gr.FillSolidRect(x_offset + imgw*3 + btn_space*2.5, line_y, imgw + btn_space, 3, tab_color);
 				break;
 		}
-	} else if (show_pl_setting){
-		gr.FillSolidRect(x_offset + imgw*(show_vis+5) + btn_space*(4.5+show_vis)  + spacer, line_y, imgw + btn_space, 3, tab_color);
+	}else {
+		if(show_mpv && active_main == "mpv") gr.FillSolidRect(x_offset + imgw*(4 + show_vis) + btn_space*(4.5 + show_vis), line_y, imgw + btn_space, 3, tab_color);
+		else if(show_vis) gr.FillSolidRect(x_offset + imgw*4 + btn_space*4.5, line_y, imgw + btn_space, 3, tab_color);
 	}
-	else if(show_vis) gr.FillSolidRect(x_offset + imgw*4 + btn_space*3.5, line_y, imgw + btn_space, 3, tab_color);
-
 	if (show_coverlrc) gr.FillSolidRect(x_lib - img_lrc.Width - btn_space*1.5, line_y, img_lrc.Width + btn_space, 3, tab_color);
 	else gr.FillSolidRect(x_lib - btn_space/2, line_y, img_lrc.Width + btn_space, 3, tab_color);
 
@@ -199,7 +206,7 @@ function on_mouse_move(x, y) {
 				window_ctl_state += 1;
 			}
 		}
-		var window_ctl_state = window_ctl_state + buttons[12 + show_vis].state;
+		var window_ctl_state = window_ctl_state + buttons[11 + show_vis + show_mpv].state;
 		if (state_sum > 0) mouseInControl = true;
 		else mouseInControl = false;
 		if(!fb_hWnd.IsMaximized()){
@@ -236,15 +243,13 @@ function on_mouse_lbtn_down(x, y) {
 }
 
 function on_mouse_lbtn_up(x, y) {
-	if (buttons[5].MouseUp()) {
+	if (buttons[4].MouseUp()) {
 		PLS.Show(1);
 		LIBB.Show(0);
 		if(show_vis) SHP.Show(0);
-		show_playlist = true;
-		show_browser = false;
+		if(show_mpv) MPV.Show(0);
+		active_main = "playlist";
 		show_pl_setting = false;
-		window.SetProperty("Panel.show.playlist", show_playlist);
-		window.SetProperty("Panel.show.cover.browser", show_browser);
 		window.NotifyOthers("jsplaylistview_show_playlist", true);
 		if(auto_sw){
 			show_coverlrc = true;
@@ -255,81 +260,96 @@ function on_mouse_lbtn_up(x, y) {
 		}
 		window.RepaintRect(0, wh-3, ww, 3);
 		auto_switch_libico();
+		window.NotifyOthers("panel_main", active_main);
 	}
-	if (buttons[6].MouseUp()) {
-		if(JSSBLock && show_browser) return;
-		PLS.Show(0);
-		LIBB.Show(1);
-		if(show_vis) SHP.Show(0);
-		show_playlist = false;
-		show_browser = true;
-		show_pl_setting = false;
+	if (buttons[5].MouseUp()) {
+		if(JSSBLock && active_main == "browser") return;
+		if(active_main != "browser"){
+			PLS.Show(0);
+			LIBB.Show(1);
+			if(show_vis) SHP.Show(0);
+			if(show_mpv) MPV.Show(0);
+			active_main = "browser";
+			show_pl_setting = false;
+			window.NotifyOthers("panel_main", active_main);
+		}
 		if(!JSSBLock) cover_type = 2;
-		window.SetProperty("Panel.show.playlist", show_playlist);
-		window.SetProperty("Panel.show.cover.browser", show_browser);
 		window.SetProperty("Browser.cover.type", cover_type);
 		window.NotifyOthers("Set_browser_cover", cover_type);
 		auto_switch_lib();
 		window.RepaintRect(0, wh-3, ww, 3);
 	}
-	if (buttons[7].MouseUp()) {
-		if(JSSBLock && show_browser) return;
-		PLS.Show(0);
-		LIBB.Show(1);
-		if(show_vis) SHP.Show(0);
-		show_playlist = false;
-		show_browser = true;
-		show_pl_setting = false;
+	if (buttons[6].MouseUp()) {
+		if(JSSBLock && active_main == "browser") return;
+		if(active_main != "browser"){
+			PLS.Show(0);
+			LIBB.Show(1);
+			if(show_vis) SHP.Show(0);
+			if(show_mpv) MPV.Show(0);
+			active_main = "browser";
+			show_pl_setting = false;
+			window.NotifyOthers("panel_main", active_main);
+		}
 		if(!JSSBLock) cover_type = 1;
-		window.SetProperty("Panel.show.playlist", show_playlist);
-		window.SetProperty("Panel.show.cover.browser", show_browser);
+		window.SetProperty("Browser.cover.type", cover_type);
+		window.NotifyOthers("Set_browser_cover", cover_type);
+		auto_switch_lib();
+		window.RepaintRect(0, line_y, ww, 3);
+	}
+	if (buttons[7].MouseUp()) {
+		if(JSSBLock && active_main == "browser") return;
+		if(active_main != "browser"){
+			PLS.Show(0);
+			LIBB.Show(1);
+			if(show_vis) SHP.Show(0);
+			if(show_mpv) MPV.Show(0);
+			active_main = "browser";
+			show_pl_setting = false;
+			window.NotifyOthers("panel_main", active_main);
+		}
+		if(!JSSBLock) cover_type = 3;
 		window.SetProperty("Browser.cover.type", cover_type);
 		window.NotifyOthers("Set_browser_cover", cover_type);
 		auto_switch_lib();
 		window.RepaintRect(0, line_y, ww, 3);
 	}
 	if (buttons[8].MouseUp()) {
-		if(JSSBLock && show_browser) return;
-		PLS.Show(0);
-		LIBB.Show(1);
-		if(show_vis) SHP.Show(0);
-		show_playlist = false;
-		show_browser = true;
-		show_pl_setting = false;
-		if(!JSSBLock) cover_type = 3;
-		window.SetProperty("Panel.show.playlist", show_playlist);
-		window.SetProperty("Panel.show.cover.browser", show_browser);
-		window.SetProperty("Browser.cover.type", cover_type);
-		window.NotifyOthers("Set_browser_cover", cover_type);
-		auto_switch_lib();
-		window.RepaintRect(0, line_y, ww, 3);
-	}
-	if (buttons[9].MouseUp()) {
 		PLS.Show(1);
 		LIBB.Show(0);
 		if(show_vis) SHP.Show(0);
+		if(show_mpv) MPV.Show(0);
+		active_main = "playlist";
+		window.NotifyOthers("panel_main", active_main);
 		show_pl_setting = true;
 		show_playlist = false;
-		show_browser = false;
-		//window.SetProperty("Panel.show.playlist", show_playlist);
-		//window.SetProperty("Panel.show.cover.browser", show_browser);
 		window.NotifyOthers("jsplaylistview_show_playlist", false);
 		window.RepaintRect(0, line_y, ww, 3);
 	}
-	if (show_vis && buttons[12].MouseUp()) {
+	if (show_vis && buttons[11].MouseUp()) {
 		PLS.Show(0);
 		LIBB.Show(0);
 		SHP.Show(1);
-		show_playlist = false;
-		show_browser = false;
+		if(show_mpv) MPV.Show(0);
+		active_main = "vis";
+		window.NotifyOthers("panel_main", active_main);
 		show_pl_setting = false;
-		window.SetProperty("Panel.show.playlist", show_playlist);
-		window.SetProperty("Panel.show.cover.browser", show_browser);
 		window.RepaintRect(0, line_y, ww, 3);
 	}
-	if (buttons[4].MouseUp()) fb.RunMainMenuCommand("Open...");
+	if (show_mpv && buttons[11 + show_vis].MouseUp()) {
+		PLS.Show(0);
+		LIBB.Show(0);
+		if(show_vis) SHP.Show(0);
+		MPV.Show(1);
+		active_main = "mpv";
+		window.NotifyOthers("panel_main", active_main);
+		show_pl_setting = false;
+		window.RepaintRect(0, line_y, ww, 3);
+		//auto_switch_lib();
+		//window.NotifyOthers("MPV", true);
+		window.RepaintRect(0, line_y, ww, 3);
+	}
 	//buttons[5].MouseUp();
-	if (buttons[10].MouseUp()) {
+	if (buttons[9].MouseUp()) {
 		COVERLRC.Show(1);
 		LIBTREE.Show(0);
 		VIEWPL.Show(0);
@@ -339,7 +359,7 @@ function on_mouse_lbtn_up(x, y) {
 		//window.SetProperty("Panel.show.library.tree", show_libtree);
 		window.RepaintRect(0, line_y, ww, 3);
 	}
-	if (buttons[11].MouseUp()) {
+	if (buttons[10].MouseUp()) {
 		if(show_coverlrc){
 			COVERLRC.Show(0);
 			if(show_libtree) {
@@ -358,7 +378,7 @@ function on_mouse_lbtn_up(x, y) {
 			switch_plview_libtree();
 		}
 	}
-	if (btn_fullscr && buttons[12 + show_vis].MouseUp()) {
+	if (btn_fullscr && buttons[11 + show_vis + show_mpv].MouseUp()) {
 		fb.RunMainMenuCommand("View/Fullscreen");
 	}
 	buttons[3].MouseUp();
@@ -500,7 +520,7 @@ function on_notify_data(name, info) {
 		}
 		if (radio_num != null) MGRankListid(MGRankList[radio_num][1], radio_name);
 		break;
-		*/
+	*/
 	case "show_button_fullscreen":
 		btn_fullscr = info;
 		BtnSetSize_onsize();
@@ -562,18 +582,17 @@ function init_buttons() {
 	buttons[1] = new ButtonUI(img_max, "");
 	buttons[2] = new ButtonUI(img_min, "");
 	buttons[3] = new ButtonUI(img_menu, "Menu");
-	buttons[4] = new ButtonUI(img_open, "Open...");
-	//buttons[5] = new ButtonUI(img_add, "添加...");
-	buttons[5] = new ButtonUI(img_playlist, "Playlists");
-	buttons[6] = new ButtonUI(img_artist, "Artist");
-	buttons[7] = new ButtonUI(img_album, "Album");
-	buttons[8] = new ButtonUI(img_genre, "Genre | Directory");
-	buttons[9] = new ButtonUI(img_settings, "Settings");
-	buttons[10] = new ButtonUI(img_lrc, "Track Info");
-	if(show_libtree) buttons[11] = new ButtonUI(img_lib, "Library");
-	else buttons[11] = new ButtonUI(img_lib_2, "Listview");
-	if(show_vis) buttons[12] = new ButtonUI(img_shp, "Visualization");
-	buttons[12 + show_vis] = new ButtonUI(img_fullscreen, "");
+	buttons[4] = new ButtonUI(img_playlist, "Playlist");
+	buttons[5] = new ButtonUI(img_artist, "Artist");
+	buttons[6] = new ButtonUI(img_album, "Album");
+	buttons[7] = new ButtonUI(img_genre, "Genre | Directory");
+	buttons[8] = new ButtonUI(img_settings, "Settings");
+	buttons[9] = new ButtonUI(img_lrc, "Track Info");
+	if(show_libtree) buttons[10] = new ButtonUI(img_lib, "Library");
+	else buttons[10] = new ButtonUI(img_lib_2, "Listview");
+	if(show_vis) buttons[11] = new ButtonUI(img_shp, "Visualization");
+	if(show_mpv) buttons[11 + show_vis] = new ButtonUI(img_mpv, "Video");
+	buttons[11 + show_vis + show_mpv] = new ButtonUI(img_fullscreen, "");
 
 	buttons[3].OnClick = function(x, y) {
 
@@ -614,11 +633,11 @@ function init_buttons() {
 		menuman5.BuildMenu(child5, 901, 300);
 		menuman6.BuildMenu(child6, 1201, 100);
 
-		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		if(fso.FileExists(fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe")){
-			basemenu.AppendMenuSeparator();
-			basemenu.AppendMenuItem(MF_STRING, 1319, "Mp3tag");
-		}
+		//var fso = new ActiveXObject("Scripting.FileSystemObject");
+		//if(fso.FileExists(fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe")){
+		//	basemenu.AppendMenuSeparator();
+		//	basemenu.AppendMenuItem(MF_STRING, 1319, "MusicTag");
+		//}
 		basemenu.AppendMenuSeparator();
 		basemenu.AppendMenuItem(MF_STRING, 1311, "foobox help");
 
@@ -652,10 +671,10 @@ function init_buttons() {
 		case (ret == 1311):
 			AboutFoobox();
 			break;
-		case (ret == 1319):
-			var WshShell = new ActiveXObject("WScript.Shell");
-			WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\"", false);
-			break;
+		//case (ret == 1319):
+		//	var WshShell = new ActiveXObject("WScript.Shell");
+		//	WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\"", 5);
+		//	break;
 		}
 		buttons[3].Reset();
 		basemenu.Dispose();
@@ -670,13 +689,13 @@ function init_buttons() {
 
 function BtnSetSize_onsize(){
 	
-	buttons[5].SetXY(x_offset, spacer);
-	buttons[6].SetXY(x_offset + imgw + btn_space, spacer);
-	buttons[7].SetXY(x_offset + imgw*2 + btn_space*2, spacer);
-	buttons[8].SetXY(x_offset + imgw*3 + btn_space*3, spacer);
-	buttons[4].SetXY(x_offset + imgw*(4+show_vis) + btn_space*(4+show_vis) + spacer, spacer);
-	buttons[9].SetXY(x_offset + imgw*(5+show_vis) + btn_space*(5+show_vis) + spacer, spacer);
-	if(show_vis) buttons[12].SetXY(x_offset + imgw*4 + btn_space*4, spacer);
+	buttons[4].SetXY(x_offset, spacer);
+	buttons[5].SetXY(x_offset + imgw + btn_space, spacer);
+	buttons[6].SetXY(x_offset + imgw*2 + btn_space*2, spacer);
+	buttons[7].SetXY(x_offset + imgw*3 + btn_space*3, spacer);
+	if(show_mpv) buttons[11+show_vis].SetXY(x_offset + imgw*(4+show_vis) + btn_space*(4+show_vis) + spacer, spacer);
+	buttons[8].SetXY(x_offset + imgw*(4+show_vis + show_mpv) + btn_space*(4+show_vis + show_mpv) + spacer, spacer);
+	if(show_vis) buttons[11].SetXY(x_offset + imgw*4 + btn_space*5, spacer);
 	
 	var bt_y2 = Math.max(0, (wh - img_close.Height/3)/2+1);
 	var x_offset2 = (btn_fullscr || ui_noborder)  ? x_offset/2 : x_offset;
@@ -687,37 +706,46 @@ function BtnSetSize_onsize(){
 	var x_menu = x_fullscreen - img_close.Width * btn_fullscr;
 	buttons[3].SetXY(x_menu, bt_y2);
 	x_lib = x_menu - img_lrc.Width - spacer - btn_space;
-	if(show_libtree) buttons[11].SetXY(x_lib, spacer);
-	else buttons[11].SetXY(x_lib, spacer);
-	buttons[10].SetXY(x_lib - img_lrc.Width - btn_space, spacer);
-	buttons[12 + show_vis].SetXY(x_fullscreen, bt_y2);
+	if(show_libtree) buttons[10].SetXY(x_lib, spacer);
+	else buttons[10].SetXY(x_lib, spacer);
+	buttons[9].SetXY(x_lib - img_lrc.Width - btn_space, spacer);
+	buttons[11 + show_vis + show_mpv].SetXY(x_fullscreen, bt_y2);
 }
 
 function update_libBtn(){
 	if(show_libtree){
-		buttons[11].img = img_lib;
-		buttons[11].Tooltip.Text = "Library";
+		buttons[10].img = img_lib;
+		buttons[10].Tooltip.Text = "Library";
 	} else{
-		buttons[11].img = img_lib_2;
-		buttons[11].Tooltip.Text = "Listview";
+		buttons[10].img = img_lib_2;
+		buttons[10].Tooltip.Text = "Listview";
 	}
-	buttons[11].Tooltip.Deactivate();
-	buttons[11].Repaint();
+	buttons[10].Tooltip.Deactivate();
+	buttons[10].Repaint();
 }
 
 function init_panels(){
-	if (show_playlist) {
+	if (active_main == "playlist") {
 		PLS.Show(1);
 		LIBB.Show(0);
 		if(show_vis) SHP.Show(0);
-	} else if(show_browser){
+		if(show_mpv) MPV.Show(0);
+	} else if(active_main == "browser"){
 		PLS.Show(0);
 		LIBB.Show(1);
 		if(show_vis) SHP.Show(0);
-	} else if(show_vis && !show_pl_setting){
+		if(show_mpv) MPV.Show(0);
+	} else if(show_mpv && active_main == "mpv") {
+		MPV.Show(1);
+		PLS.Show(0);
+		LIBB.Show(0);
+		SHP.Show(0)
+	}
+	else if (show_vis && active_main == "vis"){
 		PLS.Show(0);
 		LIBB.Show(0);
 		SHP.Show(1);
+		if(show_mpv) MPV.Show(0);
 	}
 	if (show_coverlrc) {
 		COVERLRC.Show(1);
@@ -733,6 +761,7 @@ function init_panels(){
 			LIBTREE.Show(0);
 		}
 	}
+	window.NotifyOthers("panel_main", active_main);
 }
 
 function init_icons() {
@@ -777,6 +806,7 @@ function init_icons() {
 		gb.DrawLine(_x16, _x8+imgh2, _x28,  _x8+imgh2, 2, c_down);
 		gb.DrawLine(19.5*zdpi, _x8+_y7+imgh2, _x28,  _x8+_y7+imgh2, 2, c_down);
 		gb.DrawLine(_x16, _x8+_y7*2+imgh2, _x28,  _x8+_y7*2+imgh2, 2, c_down);
+		//gb.DrawLine(_x10, _y9+_y7, _x13, _y9+_y7, 2, c_normal);
 		//gb.DrawLine(_x10, _y9+_y7*2, _x13, _y9+_y7*2, 2, c_normal);
 		//gb.DrawLine(_x16, _y9, Math.floor(_x28), _y9, 2, c_normal);
 		//gb.DrawLine(_x16, _y9+_y7, Math.floor(_x28), _y9+_y7, 2, c_normal);
@@ -835,29 +865,37 @@ function init_icons() {
 		gb.SetSmoothingMode(0);
 		img_album.ReleaseGraphics(gb);
 
-		img_open = gdi.CreateImage(imgw, imgh_p);
-		gb = img_open.GetGraphics();
-		gb.DrawLine(_x15, 17.5*zdpi, _x23, 17.5*zdpi	, 2, c_normal)
+		img_mpv = gdi.CreateImage(imgw, imgh_p);
+		gb = img_mpv.GetGraphics();
+		gb.DrawLine(_x10, _x7, _x28, _x7, 2, c_normal);
+		gb.DrawLine(_x28-1, _x7, _x28-1, _x22, 2, c_normal);
+		gb.DrawLine(_x10+1, _x7+1, _x10+1, _x22 + 1, 2, c_normal);
+		gb.DrawLine(_x10+2, _x22, _x28, _x22, 2, c_normal);
+		gb.FillSolidRect(_x14, _x11, _x5, _x7, c_normal);
 		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(_x10, _x5, _x18, _x18, 2, c_normal);
-		var point_arr = new Array( 14.6*zdpi, _x13, _x19, _x9, 23.4*zdpi, _x13);
-		gb.FillPolygon(c_normal, 0, point_arr);
+		pointArr = Array(20*zdpi, 12*zdpi, 20*zdpi, 17*zdpi, 24*zdpi, 19*zdpi, 24*zdpi, 10*zdpi);
+		gb.FillPolygon(c_normal, 0, pointArr);
 		gb.FillEllipse(shadow_x, imgh, imgh, imgh, c_shadow_h);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(_x15, 17.5*zdpi+imgh, _x23, 17.5*zdpi+imgh, 2, c_hover)
+		gb.DrawLine(_x10, _x7 + imgh, _x28, _x7 + imgh, 2, c_hover);
+		gb.DrawLine(_x28-1, _x7 + imgh, _x28-1, _x22 + imgh, 2, c_hover);
+		gb.DrawLine(_x10+1, _x7+1 + imgh, _x10+1, _x22 + 1 + imgh, 2, c_hover);
+		gb.DrawLine(_x10+2, _x22 + imgh, _x28, _x22 + imgh, 2, c_hover);
+		gb.FillSolidRect(_x14, _x11 + imgh, _x5, _x7, c_hover);
 		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(_x10, _x5+imgh, _x18, _x18, 2, c_hover);
-		point_arr = new Array( 14.6*zdpi, _x13+imgh, _x19, _x9+imgh, 23.4*zdpi, _x13+imgh);
-		gb.FillPolygon(c_hover, 0, point_arr);
+		pointArr = Array(20*zdpi, 12*zdpi + imgh, 20*zdpi, 17*zdpi + imgh, 24*zdpi, 19*zdpi + imgh, 24*zdpi, 10*zdpi + imgh);
+		gb.FillPolygon(c_hover, 0, pointArr);
 		gb.FillEllipse(shadow_x, imgh2, imgh, imgh, c_shadow);
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(_x15, 17.5*zdpi+imgh2, _x23, 17.5*zdpi+imgh2, 2, c_down)
+		gb.DrawLine(_x10, _x7 + imgh2, _x28, _x7 + imgh2, 2, c_down);
+		gb.DrawLine(_x28-1, _x7 + imgh2, _x28-1, _x22 + imgh2, 2, c_down);
+		gb.DrawLine(_x10+1, _x7+1 + imgh2, _x10+1, _x22 + 1 + imgh2, 2, c_down);
+		gb.DrawLine(_x10+2, _x22 + imgh2, _x28, _x22 + imgh2, 2, c_down);
+		gb.FillSolidRect(_x14, _x11 + imgh2, _x5, _x7, c_down);
 		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(_x10, _x5+imgh2, _x18, _x18, 2, c_down);
-		point_arr = new Array( 14.6*zdpi, _x13+imgh2, _x19, _x9+imgh2, 23.4*zdpi, _x13+imgh2);
-		gb.FillPolygon(c_down, 0, point_arr);
-		gb.SetSmoothingMode(0);
-		img_open.ReleaseGraphics(gb);
+		pointArr = Array(20*zdpi, 12*zdpi + imgh2, 20*zdpi, 17*zdpi + imgh2, 24*zdpi, 19*zdpi + imgh2, 24*zdpi, 10*zdpi + imgh2);
+		gb.FillPolygon(c_down, 0, pointArr);
+		img_mpv.ReleaseGraphics(gb);
 	
 		img_genre = gdi.CreateImage(imgw, imgh_p);
 		gb = img_genre.GetGraphics();
@@ -1114,8 +1152,6 @@ function init_icons() {
 		gb.DrawLine(_x7, _x8, _x18, _x8, 2, c_normal);
 		gb.DrawLine(_x7, _x13, _x18, _x13, 2, c_normal);
 		gb.DrawLine(_x7, _x18, _x18, _x18, 2, c_normal);
-		//gb.DrawLine(_x8, _x9, _x13, _x16, 2, c_normal);
-		//gb.DrawLine(_x18, _x9, _x13, _x16, 2, c_normal);
 		gb.FillEllipse(0, 1+_imgh, _imgh - 2, _imgh - 2, c_shadow_h);
 		gb.DrawLine(_x7, _x8+_imgh, _x18, _x8+_imgh, 2, c_hover);
 		gb.DrawLine(_x7, _x13+_imgh, _x18, _x13+_imgh, 2, c_hover);

@@ -56,9 +56,9 @@ function search_album_all(idx, title,artist,album, path, filename){
 					client.SavePath = path;
 					try{
 						client.RunAsync(idx, pic, filename);
-					} catch (e) {
+					} catch (e){
 						return;
-					}
+					}						
 				} else search_album_163(idx, title,artist,album, path, filename);
 			}
 		}
@@ -104,7 +104,7 @@ function search_album_itunes(idx, title,artist,album, path, filename){
 					client.SavePath = path;
 					try{
 						client.RunAsync(idx, pic, filename);
-					} catch (e) {
+					}catch (e){
 						return;
 					}
 				} else catcherr(idx);
@@ -203,7 +203,7 @@ function search_album_163(idx, title,artist,album, path, filename){
 							client.SavePath = path;
 							try{
 								client.RunAsync(idx, ncm_pic.songs[0].album.picUrl, filename);
-							} catch (e) {
+							}catch (e){
 								return;
 							}
 						}
@@ -243,7 +243,7 @@ function search_artist(idx, Name, path, filename){
 					client.SavePath = path;
 					try{
 						client.RunAsync(idx, pic_num[0], filename);
-					} catch (e) {
+					}catch (e){
 						return;
 					}
 				}else {

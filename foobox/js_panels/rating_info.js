@@ -9,15 +9,16 @@ var esl_font_bold = fbx_set[17];
 var follow_cursor = fbx_set[10];
 var rating_to_tag = fbx_set[18];
 var show_shadow = fbx_set[28];
-//font
-var g_font, g_font2, g_font_esl, font_size;
-get_font();
+var esl_hcolor_auto = fbx_set[31];
 var foo_spec = utils.CheckComponent("foo_uie_vis_channel_spectrum", true);
 var is_mood = window.GetProperty("Display.Mood", true);
 var spec_show_bg = window.GetProperty("Spectrum Background: Show bgcolor", true);
 var spec_show_grid = window.GetProperty("Spectrum Background: Show grid", true);
 var spec_grid_spacing = window.GetProperty("Spectrum Background: Grid spacing", 20);
-var ESL_color_delay = window.GetProperty("ESL colorized delayed", 600);
+var g_font, g_font2, font_size;
+var eslCtrl = new ActiveXObject("ESLyric");
+var eslPanels = eslCtrl.GetAll();
+get_font();
 if (spec_grid_spacing <= 0) spec_grid_spacing = 20;
 var spec_h = Math.floor(font_size * 3 / 12) * 20;
 if (spec_h > 300) spec_h = 300;
@@ -40,7 +41,7 @@ g_tfo = {
 	album: fb.TitleFormat("$if(%album%,  |  %album%,)"),
 	mood: fb.TitleFormat("%mood%"),
 	codec: fb.TitleFormat("%codec%"),
-	playcount: fb.TitleFormat("$if2(%play_count%,0)"),
+	//playcount: fb.TitleFormat("$if2(%play_count%,0)"),
 	bitrate: fb.TitleFormat("$if(%codec_profile%, | %codec_profile% | %bitrate%,  | %bitrate%)")
 }
 var rating, mood = false,
@@ -50,14 +51,14 @@ if (time_circle < 3000) time_circle = 3000;
 if (time_circle > 60000) time_circle = 60000;
 var rbutton = Array();
 var esl_bg, esl_txt_normal, esl_txt_hight, fontcolor, fontcolor2, linecolor, icocolor;
-var foo_playcount = utils.CheckComponent("foo_playcount", true);
+var foo_playcount = fbx_set[32];
 var tracktype;
 var img_rating_on, img_rating_off, btn_mood, mood_img;
 var col_spec, col_grid;
 
 get_colors();
-
-var timer_esl_1 = window.SetTimeout(function() {
+set_esl_color();
+/*var timer_esl_1 = window.SetTimeout(function() {
 	set_esl_color();
 	timer_esl_1 && window.ClearTimeout(timer_esl_1);
 	timer_esl_1 = false;
@@ -69,7 +70,7 @@ var timer_esl_2 = window.SetTimeout(function() {
 	timer_esl_2 = false;
 }, ESL_color_delay);
 //确保esl已经载入
-
+*/
 var pointArr = {
 	p1: Array(9*zdpi, 1*zdpi, 6.4*zdpi, 5.6*zdpi, 1*zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi),
 	p2: Array(2*zdpi,1*zdpi,2*zdpi,16*zdpi,8*zdpi,12*zdpi,14*zdpi,16*zdpi,14*zdpi,1*zdpi),
@@ -242,14 +243,16 @@ function get_font() {
 	font_size = fbx_set[14];
 	g_font = GdiFont(fbx_set[13], fbx_set[14] + 2, 1);
 	g_font2 = GdiFont(fbx_set[13], fbx_set[14], fbx_set[15]);
-	g_font_esl = GdiFont(fbx_set[13], fbx_set[14], esl_font_bold ? 1 : fbx_set[15]);
-	if (esl_font_auto) window.NotifyOthers("_eslyric_set_text_font_", g_font_esl);
+	if (esl_font_auto) {
+		eslPanels.SetTextFont(fbx_set[13], fbx_set[14], esl_font_bold ? 1 : fbx_set[15]);
+		//eslPanels.SetVariesFontDeltaHeight(13);
+	}
 }
 
 function set_esl_color() {
-	window.NotifyOthers("_eslyric_set_background_color_", esl_bg);
-	window.NotifyOthers("_eslyric_set_text_color_normal_", esl_txt_normal);
-	window.NotifyOthers("_eslyric_set_text_color_highlight_", esl_txt_hight);
+	eslPanels.SetBackgroundColor(esl_bg);
+	eslPanels.SetTextColor(esl_txt_normal);
+	if(esl_hcolor_auto) eslPanels.SetTextHighlightColor(esl_txt_hight);
 }
 
 function get_imgs() {
@@ -289,7 +292,7 @@ function on_mouse_lbtn_up(x, y) {
 	}
 	if (TextBtn_info.isXYInButton(x, y)) {
 		if (fb.IsPlaying) {
-			fb.RunMainMenuCommand("激活正在播放项目");
+			fb.RunMainMenuCommand("Show now playing");
 			window.NotifyOthers("show_Now_Playing", 1);
 		}
 	}
@@ -306,10 +309,10 @@ function on_mouse_rbtn_up(x, y) {
 		rMenu.AppendMenuItem(MF_STRING, 3, "Show Mood");
 		rMenu.CheckMenuItem(3, is_mood ? 1 : 0);
 		rMenu.AppendMenuSeparator();
-		rMenu.AppendMenuItem(MF_STRING, 1, "Activate now playing");
+		rMenu.AppendMenuItem(MF_STRING, 1, "Show now playing");
 		//var fso = new ActiveXObject("Scripting.FileSystemObject");
-		//if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe") && (tracktype < 2) && (follow_cursor || !fb.IsPlaying) && g_metadb)
-		//	rMenu.AppendMenuItem(MF_STRING, 4, "Edit with Mp3tag");
+		//if(fso.FileExists(fb.FoobarPath +"assemblies\\MusicTag\\MusicTag.exe") && (tracktype < 2) && (follow_cursor || !fb.IsPlaying) && g_metadb)
+		//	rMenu.AppendMenuItem(MF_STRING, 4, "用MusicTag编辑");
 		rMenu.AppendMenuItem(MF_STRING, 2, "Properties");
 		rMenu.AppendMenuSeparator();
 		rMenu.AppendMenuItem(MF_STRING, 5, "Panel properties");
@@ -317,7 +320,7 @@ function on_mouse_rbtn_up(x, y) {
 		switch (a) {
 		case 1:
 			if (fb.IsPlaying) {
-				fb.RunMainMenuCommand("Activate now playing");
+				fb.RunMainMenuCommand("Show now playing");
 				window.NotifyOthers("show_Now_Playing", 1);
 			}
 			break;
@@ -333,7 +336,7 @@ function on_mouse_rbtn_up(x, y) {
 		//case 4:
 		//	var WshShell = new ActiveXObject("WScript.Shell");
 		//	var obj_file = fb.Titleformat("%path%").EvalWithMetadb(g_metadb);
-		//	WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
+		//	WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\" " + "\"" + obj_file + "\"", 5);
 		//	break;
 		case 5:
 			window.ShowProperties();
@@ -396,9 +399,9 @@ function on_metadb_changed() {
 	}
 	txt_title = g_tfo.title.EvalWithMetadb(g_metadb);
 	txt_info = g_tfo.artist.EvalWithMetadb(g_metadb) + g_tfo.album.EvalWithMetadb(g_metadb);
-	var _playcount = g_tfo.playcount.EvalWithMetadb(g_metadb);
-	if(foo_playcount) txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K | " + _playcount + (_playcount > 1 ? " plays" : " play");
-	else txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K";
+	//if(foo_playcount) txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K | " + g_tfo.playcount.EvalWithMetadb(g_metadb) + "次";
+	//else 
+		txt_profile = g_tfo.codec.EvalWithMetadb(g_metadb) + g_tfo.bitrate.EvalWithMetadb(g_metadb) + "K";
 	var l_mood = g_tfo.mood.EvalWithMetadb(g_metadb);
 	if (l_mood != null && l_mood != "?") {
 		mood = true;
@@ -472,6 +475,10 @@ function on_notify_data(name, info) {
 	case "set_eslfont_bold":
 		esl_font_bold = info;
 		get_font();
+		break;
+	case "set_eslhcolor_auto":
+		esl_hcolor_auto = info;
+		set_esl_color();
 		break;
 	case "set_rating_2_tag":
 		rating_to_tag = info;

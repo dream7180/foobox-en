@@ -609,7 +609,7 @@ function GetQTFMRadiolist(){
 					if (ret && ret.length > 0) {
 						if(c == 0) c = ret.length + 1;
 						l = 0;
-						url = "http://rapi.qingting.fm/categories/" + 409 + "/channels?page=1&pagesize=50";
+						url = "http://rapi.qingting.fm/categories/" + 408 + "/channels?page=1&pagesize=100";//国家台409
 						xmlHttp2.open("GET", url, true);
 						xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
 						xmlHttp2.send(null);
@@ -618,7 +618,7 @@ function GetQTFMRadiolist(){
 								if (xmlHttp2.status == 200) {
 									//debug && fb.trace(l,url);
 									var ret1 = json(xmlHttp2.responseText)["Data"];
-									listid = (l==0?"国家台":ret[l-1].title) + ": g;";
+									listid = (l==0?"Web radio":ret[l-1].title) + ": g;";
 									if(ret1 != null){
 										for (var k = 0; k < ret1.length; k++) {
 											listid += ret1[k].title + ":" + ret1[k].content_id + ";"
@@ -779,7 +779,7 @@ function SaveAs(str, file) {
 		ado.WriteText(str);
 		ado.SaveToFile(file);
 	} catch (e) {
-		fb.trace("ADODB.Stream: failed to write in file.");
+		fb.trace("ADODB.Stream: failed to write file.");
 	}
 	ado.flush();
 	ado.Close();

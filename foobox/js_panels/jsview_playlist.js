@@ -133,7 +133,7 @@ olist = function() {
 		Context.InitContext(this.metadblist_selection);
 		Context.BuildMenu(_menu, 1, -1);
 		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		if(fso.FileExists(fb.FoobarPath +"assemblies\\Mp3tag\\Mp3tag.exe")) _menu.AppendMenuItem(MF_STRING, 803, "Edit with Mp3tag");
+		if(fso.FileExists(fb.FoobarPath +"assemblies\\MusicTag\\MusicTag.exe")) _menu.AppendMenuItem(MF_STRING, 803, "Edit with MusicTag");
 		_child01.AppendTo(_menu, MF_STRING, "Send to...");
 		_child01.AppendMenuItem(MF_STRING, 801, "New playlist");
 		_menu.AppendMenuSeparator();
@@ -166,7 +166,7 @@ olist = function() {
 			case 803:
 				var WshShell = new ActiveXObject("WScript.Shell");
 				var obj_file = fb.Titleformat("%path%").EvalWithMetadb(fb.GetFocusItem());
-				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\Mp3tag\\Mp3tag.exe" + "\" " + "\"" + obj_file + "\"", false);
+				WshShell.Run("\"" + fb.FoobarPath + "assemblies\\MusicTag\\MusicTag.exe" + "\" " + "\"" + obj_file + "\"", 5);
 				break;
 			default:
 				var insert_index = plman.PlaylistItemCount(ret - 1000);
@@ -397,9 +397,9 @@ function get_font() {
 }
 
 function check_pidx() {
-	var total = plman.PlaylistCount;
 	if (show_active_pl) pidx = plman.ActivePlaylist;
 	else {
+		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
 			if (plman.GetPlaylistName(i) == "Library View") {
 				pidx = i;
@@ -514,8 +514,10 @@ function on_playlists_changed() {
 	}
 }
 function on_playlist_switch() {
-	check_pidx();
-	if (show_active_pl || pidx == plman.ActivePlaylist) load_pl(20);
+	if (show_active_pl) {
+		check_pidx();
+		load_pl(20);
+	}
 }
 function on_playlist_items_selection_change() {
 	glist.focus_id = plman.GetPlaylistFocusItemIndex(pidx);
@@ -689,6 +691,12 @@ function on_notify_data(name, info) {
 		gcursor.bar_w = sys_scrollbar ? utils.GetSystemMetrics(2) : 12*zdpi;
 		repaint_main1 = repaint_main2;
 		break;
+	/*case "MPV":
+		show_active_pl = true;
+		update_swBtn();
+		check_pidx();
+		load_pl(20);
+		break;*/
 	}
 }
 function on_script_unload() {

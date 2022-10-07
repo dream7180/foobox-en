@@ -12,7 +12,7 @@ CLS
 ECHO.
 ECHO.==== green foobox ====
 ECHO.
-ECHO. 1 Register components (ShellExt and sacd decoder)
+ECHO. 1 Register components (ShellExt and sacd decoder, if exist)
 ECHO. 2 Create desktop shortcut
 ECHO.---------------------------
 ECHO. 3 Unregister components
@@ -31,14 +31,14 @@ set "ID="
 
 :cmd1
 regsvr32.exe "%~dp0ShellExt32.dll"
-regsvr32.exe "%~dp0ShellExt64.dll"
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (regsvr32.exe "%~dp0ShellExt64.dll")
 if exist "%~dp0profile\user-components\foo_input_sacd\dsd_transcoder_x64.dll" (regsvr32.exe "%~dp0profile\user-components\foo_input_sacd\dsd_transcoder_x64.dll")
 echo Press any key to return to menu
 goto backtomenu
 
 :cmd3
 regsvr32.exe /u "%~dp0ShellExt32.dll"
-regsvr32.exe /u "%~dp0ShellExt64.dll"
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (regsvr32.exe /u "%~dp0ShellExt64.dll")
 if exist "%~dp0profile\user-components\foo_input_sacd\dsd_transcoder_x64.dll" (regsvr32.exe /u "%~dp0profile\user-components\foo_input_sacd\dsd_transcoder_x64.dll")
 echo Press any key to return to menu
 goto backtomenu

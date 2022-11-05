@@ -1915,7 +1915,7 @@ function get_colors() {
 		g_color_normal_txt = RGB(36, 36, 36);
 		g_color_selected_txt = RGB(20, 20, 20);
 		g_color_normal_bg = RGB(255,255,255);
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_bt_overlay = RGBA(0, 0, 0, 30);
 		g_scroll_color = fbx_set[0];
 		g_color_selected_bg = fbx_set[7];
@@ -1925,7 +1925,7 @@ function get_colors() {
 		g_color_normal_txt = RGB(36, 36, 36);
 		g_color_selected_txt = RGB(20, 20, 20);
 		g_color_normal_bg = fbx_set[3];
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_bt_overlay = RGBA(0, 0, 0, 30);
 		g_scroll_color = fbx_set[0];
 		g_color_selected_bg = fbx_set[7];
@@ -1935,7 +1935,7 @@ function get_colors() {
 		g_color_normal_txt = RGB(235, 235, 235);
 		g_color_selected_txt = RGB(255, 255, 255);
 		g_color_normal_bg = fbx_set[0];
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 30);
 		g_color_bt_overlay = RGBA(255, 255, 255, 30);
 		g_scroll_color = fbx_set[5];
 		g_color_selected_bg = fbx_set[7];
@@ -1945,7 +1945,7 @@ function get_colors() {
 		g_color_normal_txt = RGB(235, 235, 235);
 		g_color_selected_txt = RGB(255, 255, 255);
 		g_color_normal_bg = fbx_set[2];
-		g_color_line = RGBA(0, 0, 0, 55);
+		g_color_line = RGBA(0, 0, 0, 45);
 		g_color_bt_overlay = RGBA(255, 255, 255, 30);
 		g_scroll_color = fbx_set[5];
 		g_color_selected_bg = (random_color == 1 || g_color_normal_bg == RGB(10, 10, 10)) ? RGBA(255, 255, 255, 30) : fbx_set[7];

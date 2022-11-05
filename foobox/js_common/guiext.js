@@ -144,12 +144,19 @@ function UITooltip(x, y, txt, FontObj, color, TipBG) {
 	}
 }
 
-function UITextView(x, y, w, h, txt, FontObj, color, formatStr) {
-	this.X = x;
-	this.Y = y;
-	this.Width = w;
-	this.Height = h;
+function UITextView(txt, FontObj, color, formatStr) {
+	this.X = 0;
+	this.Y = 0;
+	this.Width = 0;
+	this.Height = 0;
 	this.Text = txt;
+	
+	this.SetSize = function(x, y, w, h) {
+		this.X = x;
+		this.Y = y;
+		this.Width = w;
+		this.Height = h;
+	}
 
 	this.ChangeText = function(txt) {
 		this.Text = txt;

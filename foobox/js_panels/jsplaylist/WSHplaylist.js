@@ -1075,14 +1075,13 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							if (this.l_rating != this.rating) {
 								if (this.metadb) {
 									if (rating2tag && this.tracktype < 2) this.metadb.UpdateFileInfoSimple("RATING", this.l_rating);
-									fb.RunContextCommandWithMetadb("Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
+									fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
 									this.rating = this.l_rating;
 								};
 							};
 							else {
 								if (rating2tag && this.tracktype < 2) this.metadb.UpdateFileInfoSimple("RATING", "");
-								fb.RunContextCommandWithMetadb("Rating/<not set>", this.metadb);
-
+								fb.RunContextCommandWithMetadb("Playback Statistics/Rating/<not set>", this.metadb);
 								this.rating = 0;
 							};
 						};

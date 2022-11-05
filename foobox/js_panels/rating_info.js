@@ -526,12 +526,12 @@ function ButtonUI_R() {
 				if (derating_flag) {
 					if (foo_playcount) {
 						if (rating_to_tag && tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", "");
-						fb.RunContextCommandWithMetadb("Rating" + "/" + "<not set>", g_metadb);// || fb.RunContextCommandWithMetadb("等级" + "/" + "<不设置>", g_metadb);
+						fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + "<not set>", g_metadb);// || fb.RunContextCommandWithMetadb("播放统计信息/等级/" + "<未设置>", g_metadb);
 					} else if (tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", "");
 				} else {
 					if (foo_playcount) {
 						if (rating_to_tag && tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", i);
-						fb.RunContextCommandWithMetadb("Rating" + "/" + i, g_metadb);// || fb.RunContextCommandWithMetadb("等级" + "/" + i, g_metadb);;
+						fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + i, g_metadb);// || fb.RunContextCommandWithMetadb("播放统计信息/等级/" + i, g_metadb);
 					} else if (tracktype < 2) g_metadb.UpdateFileInfoSimple("RATING", i);
 				}
 			}

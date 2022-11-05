@@ -342,7 +342,7 @@ function get_colors() {
 		bgcolor = RGB(255, 255, 255);
 		fontcolor = RGB(36, 36, 36);
 		fontcolor2 = RGB(100, 100, 100);
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[0];
 		g_btn_color1 = RGBA(0, 0, 0, 60);
@@ -353,7 +353,7 @@ function get_colors() {
 		bgcolor = fbx_set[4];
 		fontcolor = RGB(36, 36, 36);
 		fontcolor2 = RGB(100, 100, 100);
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[0];
 		g_btn_color1 = RGBA(0, 0, 0, 60);
@@ -364,7 +364,7 @@ function get_colors() {
 		bgcolor = fbx_set[1];
 		fontcolor = RGB(235, 235, 235);
 		fontcolor2 = RGB(200, 200, 200);
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 30);
 		g_color_selected_bg = fbx_set[7];
 		g_scroll_color = fbx_set[5];
 		g_btn_color1 = RGBA(255, 255, 255, 45);
@@ -375,7 +375,7 @@ function get_colors() {
 		bgcolor = fbx_set[8];
 		fontcolor = RGB(235, 235, 235);
 		fontcolor2 = RGB(200, 200, 200);
-		g_color_line = RGBA(0, 0, 0, 55);
+		g_color_line = RGBA(0, 0, 0, 45);
 		g_color_selected_bg = (random_mode == 1 || bgcolor == RGB(20, 20, 20)) ? RGBA(255, 255, 255, 30) : fbx_set[7];
 		g_scroll_color = fbx_set[5];
 		g_btn_color1 = RGBA(255, 255, 255, 40);

@@ -532,6 +532,7 @@ button = function (normal, hover, down ,tooltipText) {
 };
 
 //=================================================// Tools (general)
+/*
 function decode_colour(opt_colour, resultype) {
 	var XYZ_colour = {
 		RGBcolour: 0,
@@ -707,7 +708,7 @@ function DrawColoredText(gr, text, font, default_color, x, y, w, h, alignment, f
 		};
 	};
 };
-
+*/
 function DrawPolyStar(gr, x, y, out_radius, in_radius, points, line_thickness, line_color, fill_color, angle, opacity){
 	// ---------------------
 	// code by ExtremeHunter

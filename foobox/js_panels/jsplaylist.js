@@ -25,7 +25,7 @@ var show_shadow = fbx_set[28];
 var sys_scrollbar = fbx_set[29];
 var col_by_cover = fbx_set[30];
 // GLOBALS
-var g_script_version = "6.6.12";
+var g_script_version = "6.6.13";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -2451,7 +2451,7 @@ function get_colors() {
 	switch (ui_mode) {
 	case (1):
 		g_color_normal_bg = RGB(255,255,255);
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_line_div = RGBA(0, 0, 0, 80);
 		g_color_selected_txt = RGB(25, 25, 25);
 		g_color_normal_txt = RGB(36, 36, 36);
@@ -2462,7 +2462,7 @@ function get_colors() {
 		break;
 	case (2):
 		g_color_normal_bg = fbx_set[3];
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 25);
 		g_color_line_div = RGBA(0, 0, 0, 80);
 		g_color_selected_txt = RGB(25, 25, 25);
 		g_color_normal_txt = RGB(36, 36, 36);
@@ -2473,7 +2473,7 @@ function get_colors() {
 		break;
 	case (3):
 		g_color_normal_bg = fbx_set[0];
-		g_color_line = RGBA(0, 0, 0, 35);
+		g_color_line = RGBA(0, 0, 0, 30);
 		g_color_line_div = RGBA(0, 0, 0, 75);
 		g_color_selected_txt = RGB(255, 255, 255);
 		g_color_normal_txt = RGB(235, 235, 235);
@@ -2484,7 +2484,7 @@ function get_colors() {
 		break;
 	case (4):
 		g_color_normal_bg = fbx_set[2];
-		g_color_line = RGBA(0, 0, 0, 55);
+		g_color_line = RGBA(0, 0, 0, 45);
 		g_color_line_div = RGBA(0, 0, 0, 110);
 		g_color_selected_txt = RGB(255, 255, 255);
 		g_color_normal_txt = RGB(235, 235, 235);

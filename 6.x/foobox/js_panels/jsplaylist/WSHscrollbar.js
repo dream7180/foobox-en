@@ -16,7 +16,7 @@ oScrollbar = function( /*themed*/ ) {
 			this.cursorWidth = this.w;
 			// calc cursor height
 			this.cursorHeight = Math.round((totalRowVisible / totalRows) * this.area_h);
-			if (this.cursorHeight < properties.cursor_min) this.cursorHeight = properties.cursor_min;
+			if (this.cursorHeight < properties.cursor_min) this.cursorHeight = properties.cursor_min; //this.w - 2 || this.cursorHeight > p.list.h) this.cursorHeight = this.w - 2;
 			if (this.cursorHeight > properties.cursor_max) this.cursorHeight = properties.cursor_max;
 			// cursor pos
 			var ratio = offset / (totalRows - totalRowVisible);
@@ -346,7 +346,6 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 	this.itemHeight = item_height;
 	this.offset = offset;
 	this.parentObject = parent_object;
-	this.cursorColor = RGB(105, 105, 105);
 	this.buttons = Array(null, null, null);
 	this.buttonType = {
 		cursor: 0,
@@ -369,20 +368,20 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 		// normal cursor Image
 		this.cursorImage_normal = gdi.CreateImage(this.cursorWidth, this.cursorHeight);
 		var gb = this.cursorImage_normal.GetGraphics();
-		if(isbox) gb.FillSolidRect(0, 0, this.cursorWidth, this.cursorHeight, this.cursorColor);
-		else gb.FillSolidRect(this.cursorWidth - 4, 0, 4, this.cursorHeight, this.cursorColor);
+		if(isbox) gb.FillSolidRect(0, 0, this.cursorWidth, this.cursorHeight, g_scroll_color);
+		else gb.FillSolidRect(this.cursorWidth - 4, 0, 4, this.cursorHeight, g_scroll_color);
 		this.cursorImage_normal.ReleaseGraphics(gb);
 
 		// hover cursor Image
 		this.cursorImage_hover = gdi.CreateImage(this.cursorWidth, this.cursorHeight);
 		gb = this.cursorImage_hover.GetGraphics();
-		gb.FillSolidRect(0, 0, this.cursorWidth, this.cursorHeight, this.cursorColor);
+		gb.FillSolidRect(0, 0, this.cursorWidth, this.cursorHeight, g_scroll_color);
 		this.cursorImage_hover.ReleaseGraphics(gb);
 
 		// down cursor Image
 		this.cursorImage_down = gdi.CreateImage(this.cursorWidth, this.cursorHeight);
 		gb = this.cursorImage_down.GetGraphics();
-		gb.FillSolidRect(0, 0, this.cursorWidth, this.cursorHeight, this.cursorColor);
+		gb.FillSolidRect(0, 0, this.cursorWidth, this.cursorHeight, g_scroll_color);
 		this.cursorImage_down.ReleaseGraphics(gb);
 
 		// create/refresh cursor Button in buttons array
@@ -489,7 +488,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 			this.buttonHeight = this.buttons[this.buttonType.up].h;
 			this.cursorAreaY = this.y + this.buttonHeight;
 			this.cursorAreaHeight = this.h - (this.buttonHeight * 2);
-		}
+		};
 		else {
 			this.buttonHeight = 0;
 			this.cursorAreaY = this.y;
@@ -643,7 +642,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 										eval(obj.parentObject).offset = obj.offset;
 										obj.updateCursorPos(obj.offset);
 										obj.parentRepaint();
-									}
+									};
 									else {
 										cScrollBar.timerCounter++;
 									};
@@ -670,7 +669,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 										eval(obj.parentObject).offset = obj.offset;
 										obj.updateCursorPos(obj.offset);
 										obj.parentRepaint();
-									}
+									};
 									else {
 										cScrollBar.timerCounter++;
 									};
@@ -716,7 +715,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 									eval(obj.parentObject).offset = obj.offset;
 									obj.reSet(obj.total, obj.itemHeight, obj.offset);
 									obj.parentRepaint();
-								}
+								};
 								else {
 									cScrollBar.timerCounter++;
 								};
@@ -740,7 +739,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 									eval(obj.parentObject).offset = obj.offset;
 									obj.reSet(obj.total, obj.itemHeight, obj.offset);
 									obj.parentRepaint();
-								}
+								};
 								else {
 									cScrollBar.timerCounter++;
 								};
@@ -759,7 +758,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 					eval(this.parentObject).offset = this.offset;
 					this.reSet(this.total, this.itemHeight, this.offset);
 					this.parentRepaint();
-				}
+				};
 				else {
 					this.offset = (this.offset < (this.total - this.totalRowsFull - this.scrollStep) ? (this.offset + this.scrollStep) : (this.total - this.totalRowsFull));
 					eval(this.parentObject).offset = this.offset;
@@ -790,7 +789,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 							eval(obj.parentObject).offset = obj.offset;
 							obj.updateCursorPos(obj.offset);
 							obj.parentRepaint();
-						}
+						};
 						else {
 							cScrollBar.timerCounter++;
 						};
@@ -811,7 +810,7 @@ oScrollBar = function(id, object_name, x, y, w, h, total_items, item_height, off
 							eval(obj.parentObject).offset = obj.offset;
 							obj.updateCursorPos(obj.offset);
 							obj.parentRepaint();
-						}
+						};
 						else {
 							cScrollBar.timerCounter++;
 						};

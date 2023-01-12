@@ -1,5 +1,5 @@
 ﻿//by Asion, mod for foobox https://github.com/dream7180
-ppts = {
+ppt = {
 	source: window.GetProperty("Search Source", 1),
 	autosearch: window.GetProperty("Search Box: Auto-validation", false),
 	scope: window.GetProperty("Search Box: Scope", 0),
@@ -12,6 +12,7 @@ ppts = {
 
 //=================================================// 定义变量
 var fso = new ActiveXObject("Scripting.FileSystemObject");
+if (!fso.FolderExists(fb.ProfilePath + "cache")) fso.CreateFolder(fb.ProfilePath + "cache");
 var xmlHttp = new ActiveXObject("Msxml2.XMLHTTP.6.0"),
 xmlHttp2 = new ActiveXObject("Msxml2.XMLHTTP.6.0");
 var debug = false;
@@ -19,7 +20,7 @@ var oldsearch = oldpid = 0;
 var SearchListName, cachefile;
 var qtfm_arr = fb.ProfilePath + "\\cache\\qtfm.arr";
 if (fso.FileExists(qtfm_arr))
-	ppts.webkqtradioarr = utils.ReadTextFile(qtfm_arr).split("|");
+	ppt.webkqtradioarr = utils.ReadTextFile(qtfm_arr).split("|");
 //=================================================// 搜索框
 var g_searchbox = null;
 searchbox = function() {
@@ -40,82 +41,83 @@ searchbox = function() {
 	this.repaint = function() {
 		window.RepaintRect(this.x, this.y, this.w, this.h);
 	}
-
+/*	
+	this.getTooltip = function(){
+		switch (ppt.source){
+			case 1:
+				return "列表";
+				break;
+			case 2:
+				return "媒体库";
+				break;
+		}
+		
+	}
+*/
 	this.getImages = function() {
 		var gb;
 		var x2 = 2 * zdpi, x4 = 4 * zdpi, x5 = 5 * zdpi, x11 = 11 * zdpi, x12 = 12 * zdpi, 
 			x14 = Math.ceil(14 * zdpi), x17 = 17 * zdpi, x18 = Math.ceil(18 * zdpi);
+		// 搜索图标
+		var on_colour = RGB(220,220,220);
+		var reset_off_color = RGB(220,220,220);
 
 		this.images.resetIcon_off = gdi.CreateImage(x18, x18);
 		gb = this.images.resetIcon_off.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(x5, x5, x12, x12, 1, g_color_normal_txt);
-		gb.DrawLine(x5, x12, x12, x5, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.setSmoothingMode(2);
+		gb.FillEllipse(0, 0, x17, x17, RGBA(0, 0, 0, 30));
+		gb.DrawLine(x5, x5, x12, x12, 2.0, reset_off_color);
+		gb.DrawLine(x5, x12, x12, x5, 2.0, reset_off_color);
+		gb.setSmoothingMode(0);
 		this.images.resetIcon_off.ReleaseGraphics(gb);
 
 		this.images.resetIcon_ov = gdi.CreateImage(x18, x18);
 		gb = this.images.resetIcon_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.FillEllipse(0, 0, x17, x17, g_color_bt_overlay);
-		gb.DrawLine(x5, x5, x12, x12, 1, g_color_normal_txt);
-		gb.DrawLine(x5, x12, x12, x5, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.setSmoothingMode(2);
+		gb.FillEllipse(0, 0, x17, x17, RGBA(0, 0, 0, 50));
+		gb.DrawLine(x5, x5, x12, x12, 2.0, on_colour);
+		gb.DrawLine(x5, x12, x12, x5, 2.0, on_colour);
+		gb.setSmoothingMode(0);
 		this.images.resetIcon_ov.ReleaseGraphics(gb);
 
-		this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_ov);
-
-		this.images.source_switch = gdi.CreateImage(Math.ceil(20 * zdpi), x18);
+		if (typeof(this.reset_bt) == "undefined") {
+			this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_ov);
+		} else {
+			this.reset_bt.img[0] = this.images.resetIcon_off;
+			this.reset_bt.img[1] = this.images.resetIcon_ov;
+			this.reset_bt.img[2] = this.images.resetIcon_ov;
+		}
+		
+		this.images.source_switch = gdi.CreateImage(x18, x18);
 		gb = this.images.source_switch.GetGraphics();
 		this.images.source_switch.ReleaseGraphics(gb);
 		
-		this.images.source_switch_ov = gdi.CreateImage(Math.ceil(20 * zdpi), x18);
-		gb = this.images.source_switch_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.FillRoundRect(zdpi, zdpi, z(18), z(16), x2, x2, g_color_bt_overlay);
-		this.images.source_switch_ov.ReleaseGraphics(gb);
-		
 		this.images.source_pl = gdi.CreateImage(x14, x14);
 		gb = this.images.source_pl.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(x2, x2, x2, x2, 1, g_color_normal_txt);
-		gb.DrawEllipse(x2, 6*zdpi, x2, x2, 1, g_color_normal_txt);
-		gb.DrawEllipse(x2, 10*zdpi, x2, x2, 1, g_color_normal_txt);
-		
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(6*zdpi, 3*zdpi, x12, 3*zdpi, 1, g_color_normal_txt);
-		gb.DrawLine(6*zdpi, 7*zdpi, x12, 7*zdpi, 1, g_color_normal_txt);
-		gb.DrawLine(6*zdpi, x11, x12, x11, 1, g_color_normal_txt);
+		var _x2 = Math.ceil(x2);
+		gb.DrawRect(x2, x2, x11, x11, 1, on_colour);
+		gb.DrawLine(x4, x5, x11, x5, 1, on_colour);
+		gb.DrawLine(x4,x5+_x2, x11, x5+_x2, 1, on_colour);
+		gb.DrawLine(x4, x5+_x2*2, x11, x5+_x2*2, 1, on_colour);
 		this.images.source_pl.ReleaseGraphics(gb);
 		
 		var img_arc = gdi.CreateImage(x14, x14);
 		gb = img_arc.GetGraphics();
 		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(0, -3*zdpi, x11, x5, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.DrawEllipse(0, -3*zdpi, x11, x5, 1, on_colour);
 		img_arc.ReleaseGraphics(gb);
 		
 		this.images.source_lib = gdi.CreateImage(x14, x14);
 		gb = this.images.source_lib.GetGraphics();
 		gb.SetSmoothingMode(2);
-		gb.DrawEllipse(0, x2, x11, x5, 1, g_color_normal_txt);
+		gb.DrawEllipse(0, x2, x11, x5, 1, on_colour);
 		gb.DrawImage(img_arc, 0, 8*zdpi, x14, zoom(8,zdpi), 0, 0, x14, zoom(8,zdpi), 0, 255);
 		gb.DrawImage(img_arc, 0, x11, x14, zoom(8,zdpi), 0, 0, x14, zoom(8,zdpi), 0, 255);
-		gb.DrawLine(0, x4, 0, x11, 1, g_color_normal_txt);
-		gb.DrawLine(x11, x4, x11, x11, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.DrawLine(0, x4, 0, x11, 1, on_colour);
+		gb.DrawLine(x11, x4, x11, x11, 1, on_colour);
 		this.images.source_lib.ReleaseGraphics(gb);
-		this.menu_btn = new button(this.images.source_switch, this.images.source_switch_ov, this.images.source_switch_ov, "");
-		this.src_btn = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, "");
-		
-		this.images.ico_menu = gdi.CreateImage(x14, x14);
-		gb = this.images.ico_menu.GetGraphics();
-		var point_arr = new Array(3*zdpi,5*zdpi,11*zdpi,5*zdpi,7*zdpi,10*zdpi);
-		gb.SetSmoothingMode(2);
-		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
-		gb.SetSmoothingMode(0);
-		this.images.ico_menu.ReleaseGraphics(gb);
-		
+		this.src_switch = new button(this.images.source_switch, this.images.source_switch, this.images.source_switch, ""/*this.getTooltip()*/);
 	}
 	this.getImages();
 
@@ -124,32 +126,35 @@ searchbox = function() {
 		this.y = y;
 		this.w = w;
 		this.h = h;
-		this.inputbox.setSize(this.w - 45 * zdpi, this.h - 4);
+		this.on_init();
 	};
 
 	this.on_init = function() {
-		this.inputbox = new oInputbox(0, 0, "", (ppts.source == 1) ? "Search in playlist" : "Search in library", g_color_normal_txt, 0, 0, g_color_selected_bg, g_onSearch, "g_searchbox");
-		this.inputbox.autovalidation = (ppts.source > 1) ? false : ppts.autosearch;
+		this.inputbox = new oInputbox(this.w - 45 * zdpi, this.h - 4, "", "", g_color_normal_txt, g_color_normal_bg, 0, g_color_selected_txt, g_sendResponse, "g_searchbox");
+		this.inputbox.autovalidation = (ppt.source == 3) ? false : ppt.autosearch;
 	}
 
 	this.reset_colors = function() {
+		this.inputbox.backcolor = g_color_normal_bg;
 		this.inputbox.textcolor = g_color_normal_txt;
-		this.inputbox.backselectioncolor = g_color_selected_bg;
+		this.inputbox.backselectioncolor = g_color_selected_txt;
 	};
 
 	this.draw = function(gr) {
 		// 绘制搜索框背景
-		this.menu_btn.draw(gr, Math.round(ww - this.images.ico_menu.Width - cScrollBar.width - 2*zdpi), Math.round(this.y + 2 * zdpi), 255);
-		this.src_btn.draw(gr, this.x + 4 - 2*zdpi, Math.round(this.y + zdpi), 255);
-		this.inputbox.draw(gr, this.x + this.images.source_pl.Width + 10, this.y + 2, 0, 0);
-		if(ppts.source == 1){
-			var src_img = this.images.source_pl;
-		}else{
-			var src_img = this.images.source_lib;
-		}
-		if ((this.inputbox.text.length > 0 || ppts.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, this.x + this.inputbox.w + 22 * zdpi, this.y + 3 * zdpi, 255);
-		gr.DrawImage(src_img, this.x + 5, Math.round(this.y + 3 * zdpi), src_img.Width, src_img.Height, 0, 0, src_img.Width, src_img.Height, 0, 255);
-		gr.DrawImage(this.images.ico_menu, Math.round(ww - this.images.ico_menu.Width - cScrollBar.width + zdpi), Math.round(this.y + 3 * zdpi + 1), this.images.ico_menu.Width, this.images.ico_menu.Height, 0, 0, this.images.ico_menu.Width, this.images.ico_menu.Height, 0, 255);
+		gr.SetSmoothingMode(0);
+		gr.FillSolidRect(this.x, this.y, this.w, this.h, RGBA(0, 0, 0, 30));
+		gr.FillSolidRect(this.x + 1, this.y + 1, this.w - 2, this.h - 2, g_color_normal_bg);
+		gr.SetSmoothingMode(0);
+
+		//if (this.inputbox.edit) {
+		//}
+		var g_z14 = Math.ceil(14 * zdpi);
+		this.src_switch.draw(gr, this.x + 5, this.y + 3 * zdpi, 255);
+		this.inputbox.draw(gr, this.x + g_z14 + 10, this.y + 2, 0, 0);
+		var src_img = ((ppt.source == 1) ? this.images.source_pl : this.images.source_lib);
+		gr.DrawImage(src_img, this.x + 5, this.y + 3 * zdpi + 1, g_z14, g_z14, 0, 0, g_z14, g_z14, 0, 255);
+		if ((this.inputbox.text.length > 0 || ppt.showreset) && this.inputbox.edit) this.reset_bt.draw(gr, this.x + this.inputbox.w + 22 * zdpi, this.y + 3 * zdpi, 255);
 	}
 
 	this.historylist = Array();
@@ -166,7 +171,7 @@ searchbox = function() {
 			var currentdate = new Date();
 			datetime = typeof datetime !== 'undefined' ? datetime : currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
 			this.historylist[this.historylist.length] = Array(search_item, datetime);
-			if (this.historylist.length > ppts.historymaxitems) this.historylist.shift();
+			if (this.historylist.length > ppt.historymaxitems) this.historylist.shift();
 			return true;
 		}
 		return false;
@@ -184,7 +189,7 @@ searchbox = function() {
 				for (var i = 0; i < argSearchHistory.length; i++) {
 					if (i > 0) SearchHistory += " $$ ";
 					SearchHistory += argSearchHistory[i][0] + " ## " + argSearchHistory[i][1];
-					if (i == ppts.historymaxitems) break;
+					if (i == ppt.historymaxitems) break;
 				}
 				window.SetProperty("Search Box: Search History", SearchHistory)
 			} catch (e) {}
@@ -192,8 +197,8 @@ searchbox = function() {
 	}
 
 	this.get_searchhistory = function() {
-		if (ppts.historytext.length > 0) {
-			historytext = ppts.historytext.split(" $$ ");
+		if (ppt.historytext.length > 0) {
+			historytext = ppt.historytext.split(" $$ ");
 			try {
 				for (var i = 0; i < historytext.length; i++) {
 					arguments = historytext[i].split(" ## ");
@@ -209,36 +214,24 @@ searchbox = function() {
 	this.on_mouse = function(event, x, y, delta) {
 		switch (event) {
 		case "lbtn_down":
-			//this.src_switch.checkstate("down", x, y);
-			if (this.menu_btn.checkstate("down", x, y) == ButtonStates.down) {
-				this.buttonClicked = true;
-				this.menu_btn.state = ButtonStates.hover;
-			};
+			this.src_switch.checkstate("down", x, y);
 			this.inputbox.check("down", x, y);
-			if (this.inputbox.text.length > 0 || ppts.showreset) this.reset_bt.checkstate("down", x, y);
+			if (this.inputbox.text.length > 0 || ppt.showreset) this.reset_bt.checkstate("down", x, y);
 			break;
 		case "lbtn_up":
-			if (this.buttonClicked && this.menu_btn.checkstate("up", x, y) == ButtonStates.hover) {
-				Show_Menu_Searchbox(Math.round(ww - this.images.ico_menu.Width - cScrollBar.width - 2*zdpi),  Math.round(cSearchBox.y + cSearchBox.h - 2*zdpi));
-				this.menu_btn.state = ButtonStates.normal;
-				this.menu_btn.repaint();
-			}
-			this.buttonClicked = false;
-			if (this.src_btn.checkstate("up", x, y) == ButtonStates.hover) {
-				ppts.source = 3 - ppts.source;
-				if (ppts.source > 2 || ppts.source < 1) ppts.source = 1;
-				window.SetProperty("Search Source", ppts.source);
-				this.inputbox.autovalidation = (ppts.source > 1) ? false : ppts.autosearch;
-				this.inputbox.empty_text = (ppts.source == 1) ? "Search in playlist" : "Search in library";
+			if (this.src_switch.checkstate("up", x, y) == ButtonStates.hover) {
+				Show_Menu_Searchbox(x, y);
+				this.inputbox.autovalidation = ppt.autosearch;
+				this.inputbox.empty_text = "";
+				
 				this.repaint();
 			}
 			this.inputbox.check("up", x, y);
-			if (this.inputbox.text.length > 0 || ppts.showreset) {
+			if (this.inputbox.text.length > 0 || ppt.showreset) {
 				if (this.reset_bt.checkstate("up", x, y) == ButtonStates.hover) {
 					this.inputbox.text = "";
 					this.inputbox.offset = 0;
-					g_onSearch();
-					this.reset_bt.state = ButtonStates.normal;
+					g_sendResponse();
 					this.repaint();
 				}
 			}
@@ -247,14 +240,22 @@ searchbox = function() {
 			this.inputbox.check("dblclk", x, y);
 			break;
 		case "rbtn_down":
+			if (this.src_switch.checkstate("up", x, y) == ButtonStates.hover) {
+				ppt.source = 3 - ppt.source;
+				if (ppt.source > 2 || ppt.source < 1) ppt.source = 1;
+				//this.src_switch.changeTooltip(this.getTooltip());
+				window.SetProperty("Search Source", ppt.source);
+			}
 			this.inputbox.check("right", x, y);
 			break;
 		case "move":
+			var bt_state_2 = this.src_switch.checkstate("move", x, y);
 			this.inputbox.check("move", x, y);
-			this.menu_btn.checkstate("move", x, y);
-			if (!this.inputbox.hover && (this.inputbox.text.length > 0 || ppts.showreset)) this.reset_bt.checkstate("move", x, y);
+			if (this.inputbox.text.length > 0 || ppt.showreset) var bt_state_3 = this.reset_bt.checkstate("move", x, y);
+			return (this.inputbox.hover || bt_state_2 == ButtonStates.hover || bt_state_3 == ButtonStates.hover);
 			break;
 		case "leave":
+			this.src_switch.checkstate("leave", 0, 0);
 			this.inputbox.check("leave", 0, 0);
 			this.reset_bt.checkstate("leave", 0, 0);
 		}
@@ -277,7 +278,7 @@ searchbox = function() {
 	}
 }
 
-function g_onSearch() {
+function g_sendResponse() {
 	var s1 = g_searchbox.inputbox.text;
 	var s2 = s1.toLowerCase();
 	var pl_to_remove = new Array;
@@ -288,7 +289,7 @@ function g_onSearch() {
 	g_searchbox.historyadd(s1);
 	g_searchbox.save_searchhistory(g_searchbox.historylist);
 
-	if (ppts.source == 1) {
+	if (ppt.source == 1) {
 
 		var handle_list = plman.GetPlaylistItems(plman.ActivePlaylist);
 		var count = handle_list.Count;
@@ -309,32 +310,32 @@ function g_onSearch() {
 		}
 
 		for (var i = start; i < count; i++) {
-			if ((ppts.scope == 0 || ppts.scope == 1) && tf_artist.EvalWithMetadb(handle_list[i]).toLowerCase().search(s2) > -1) {
+			if ((ppt.scope == 0 || ppt.scope == 1) && tf_artist.EvalWithMetadb(handle_list.Item(i)).toLowerCase().search(s2) > -1) {
 				pid = i;
 				(i == count - 1) ? oldpid = 0 : oldpid = i + 1;
 				break;
 			};
-			if ((ppts.scope == 0 || ppts.scope == 2) && tf_title.EvalWithMetadb(handle_list[i]).toLowerCase().search(s2) > -1) {
+			if ((ppt.scope == 0 || ppt.scope == 2) && tf_title.EvalWithMetadb(handle_list.Item(i)).toLowerCase().search(s2) > -1) {
 				pid = i;
 				(i == count - 1) ? oldpid = 0 : oldpid = i + 1;
 				break;
 			};
-			if ((ppts.scope == 0 || ppts.scope == 3) && tf_album.EvalWithMetadb(handle_list[i]).toLowerCase().search(s2) > -1) {
+			if ((ppt.scope == 0 || ppt.scope == 3) && tf_album.EvalWithMetadb(handle_list.Item(i)).toLowerCase().search(s2) > -1) {
 				pid = i;
 				(i == count - 1) ? oldpid = 0 : oldpid = i + 1;
 				break;
 			};
-			if ((ppts.scope == 0 || ppts.scope == 4) && tf_genre.EvalWithMetadb(handle_list[i]).toLowerCase().search(s2) > -1) {
+			if ((ppt.scope == 0 || ppt.scope == 4) && tf_genre.EvalWithMetadb(handle_list.Item(i)).toLowerCase().search(s2) > -1) {
 				pid = i;
 				(i == count - 1) ? oldpid = 0 : oldpid = i + 1;
 				break;
 			};
-			if ((ppts.scope == 0 || ppts.scope == 5) && tf_date.EvalWithMetadb(handle_list[i]).toLowerCase().search(s2) > -1) {
+			if ((ppt.scope == 0 || ppt.scope == 5) && tf_date.EvalWithMetadb(handle_list.Item(i)).toLowerCase().search(s2) > -1) {
 				pid = i;
 				(i == count - 1) ? oldpid = 0 : oldpid = i + 1;
 				break;
 			};
-			if (ppts.scope == 6 && tf_comment.EvalWithMetadb(handle_list[i]).toLowerCase().search(s2) > -1) {
+			if (ppt.scope == 6 && tf_comment.EvalWithMetadb(handle_list.Item(i)).toLowerCase().search(s2) > -1) {
 				pid = i;
 				(i == count - 1) ? oldpid = 0 : oldpid = i + 1;
 				break;
@@ -352,13 +353,14 @@ function g_onSearch() {
 			plman.SetPlaylistFocusItem(plman.ActivePlaylist, focusedTrackId);
 		};
 
-	} else{
+		handle_list.Dispose();
+	} else if (ppt.source == 2) {
 		// 搜索列表索引
 		var isFound = false;
 		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i).substr(0, 8) == "Search |") {
-				if (!ppts.multiple) {
+			if (plman.GetPlaylistName(i).substr(0, 8) == "Search [") {
+				if (!ppt.multiple) {
 					if (!isFound) {
 						var plIndex = i;
 						isFound = true;
@@ -368,7 +370,7 @@ function g_onSearch() {
 			}
 		}
 
-		if (isFound && !ppts.multiple) {
+		if (isFound && !ppt.multiple) {
 			var r = pl_to_remove.length - 1;
 			while (r >= 0) {
 				plman.RemovePlaylist(pl_to_remove[r]);
@@ -388,15 +390,15 @@ function g_onSearch() {
 			5: "%date% HAS ",
 			6: "%comment% HAS "
 		};
-		if (scopecases[ppts.scope]) {
-			plman.CreateAutoPlaylist(plIndex, "Search | " + s1, scopecases[ppts.scope] + s1, "", 0);
+		if (scopecases[ppt.scope]) {
+			fb.CreateAutoPlaylist(plIndex, "Search [" + s1 + "]", scopecases[ppt.scope] + s1, "", 0);
 		} else {
-			plman.CreateAutoPlaylist(plIndex, "Search | " + s1, scopecases[1]+s1 + " OR " + scopecases[2]+s1 + " OR " + scopecases[3]+s1 + " OR " + scopecases[4]+s1 + " OR " + scopecases[5]+s1, "", 0);
+			fb.CreateAutoPlaylist(plIndex, "Search [" + s1 + "]", s1, "", 0);
 		};
 
 		// 转换自动列表为普通列表
-		//plman.DuplicatePlaylist(plIndex, plman.GetPlaylistName(plIndex));
-		//plman.RemovePlaylist(plIndex);
+		plman.DuplicatePlaylist(plIndex, "Search [" + s1 + "]");
+		plman.RemovePlaylist(plIndex);
 		plman.ActivePlaylist = plIndex;
 	}
 }
@@ -404,18 +406,25 @@ function g_onSearch() {
 //=================================================// 搜索框菜单
 
 function Show_Menu_Searchbox(x, y) {
+	var MF_SEPARATOR = 0x00000800;
+	var MF_STRING = 0x00000000;
+	var MF_GRAYED = 0x00000001;
+	var MF_DISABLED = 0x00000002;
+	var MF_POPUP = 0x00000010;
 	var idx;
 
 	var _menu = window.CreatePopupMenu();
+	if (typeof x == "undefined") x = ww;
+	if (typeof y == "undefined") y = 30;
 	
 	_menu.AppendMenuItem(MF_STRING, 21, "Search in playlist");
 	_menu.AppendMenuItem(MF_STRING, 22, "Search in library");
-	_menu.CheckMenuRadioItem(21, 22, ppts.source + 20);
+	_menu.CheckMenuRadioItem(21, 22, ppt.source + 20);
 	_menu.AppendMenuSeparator();
 	var WebQTRadioMenu = window.CreatePopupMenu();
-	if(ppts.webkqtradioarr.length > 1){
-		for (var k = 0; k < ppts.webkqtradioarr.length; k++) {
-			WebQTRadioMenu.AppendMenuItem(MF_STRING, 501+k, ppts.webkqtradioarr[k].split(":")[0]);
+	if(ppt.webkqtradioarr.length > 1){
+		for (var k = 0; k < ppt.webkqtradioarr.length; k++) {
+			WebQTRadioMenu.AppendMenuItem(MF_STRING, 501+k, ppt.webkqtradioarr[k].split(":")[0]);
 		}
 		WebQTRadioMenu.AppendMenuSeparator();
 	}
@@ -432,14 +441,16 @@ function Show_Menu_Searchbox(x, y) {
 		SearchHistoryMenu.AppendMenuItem(MF_GRAYED, 40, "No history");
 	} else {
 		SearchHistoryMenu.AppendMenuSeparator();
-		SearchHistoryMenu.AppendMenuItem(MF_STRING, ppts.historymaxitems + 60, "Clear history");
+		SearchHistoryMenu.AppendMenuItem(MF_STRING, ppt.historymaxitems + 60, "Clear history");
 	}
 
 	SearchHistoryMenu.AppendTo(_menu, MF_STRING, "Search history");
 
-	if (ppts.source == 1) {
+	//_menu.AppendMenuSeparator();
+
+	if (ppt.source == 1) {
 		_menu.AppendMenuItem(MF_STRING, 1, "Auto-validation");
-		_menu.CheckMenuItem(1, ppts.autosearch ? 1 : 0);
+		_menu.CheckMenuItem(1, ppt.autosearch ? 1 : 0);
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		_menu.AppendMenuItem(MF_STRING, 2, "Search: Auto");
 		_menu.AppendMenuItem(MF_STRING, 3, "Search: Artist");
@@ -449,9 +460,9 @@ function Show_Menu_Searchbox(x, y) {
 		_menu.AppendMenuItem(MF_STRING, 7, "Search: Date");
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		_menu.AppendMenuItem(MF_STRING, 8, "Search: Comment");
-		_menu.CheckMenuRadioItem(2, 8, ppts.scope + 2);
+		_menu.CheckMenuRadioItem(2, 8, ppt.scope + 2);
 
-	} else if (ppts.source == 2) {
+	} else if (ppt.source == 2) {
 		var now_playing_track = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
 		var quickSearchMenu = window.CreatePopupMenu();
 		quickSearchMenu.AppendMenuItem(MF_STRING, 36, "Same artist");
@@ -459,8 +470,11 @@ function Show_Menu_Searchbox(x, y) {
 		quickSearchMenu.AppendMenuItem(MF_STRING, 38, "Same genre");
 		quickSearchMenu.AppendMenuItem(MF_STRING, 39, "Same date");
 		quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search...");
+		//_menu.AppendMenuSeparator();
+		//_menu.AppendMenuItem(MF_STRING, 1, "启用自动搜索");
+		_menu.CheckMenuItem(1, ppt.autosearch ? 1 : 0);
 		_menu.AppendMenuItem(MF_STRING, 9, "Keep previous search playlist");
-		_menu.CheckMenuItem(9, ppts.multiple ? 1 : 0);
+		_menu.CheckMenuItem(9, ppt.multiple ? 1 : 0);
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		_menu.AppendMenuItem(MF_STRING, 2, "Search: Auto");
 		_menu.AppendMenuItem(MF_STRING, 3, "Search: Artist");
@@ -470,29 +484,30 @@ function Show_Menu_Searchbox(x, y) {
 		_menu.AppendMenuItem(MF_STRING, 7, "Search: Date");
 		_menu.AppendMenuItem(MF_SEPARATOR, 0, "");
 		_menu.AppendMenuItem(MF_STRING, 8, "Search: Comment");
-		_menu.CheckMenuRadioItem(2, 8, ppts.scope + 2);
+		_menu.CheckMenuRadioItem(2, 8, ppt.scope + 2);
 	}
 
-	idx = _menu.TrackPopupMenu(x, y);
+	idx = _menu.TrackPopupMenu(search_x + 5, search_y + 20*zdpi);
 	switch (true) {
 	case (idx == 1):
-		ppts.autosearch = !ppts.autosearch;
-		g_searchbox.inputbox.autovalidation = ppts.autosearch;
-		window.SetProperty("Search Box: Auto-validation", ppts.autosearch);
+		ppt.autosearch = !ppt.autosearch;
+		g_searchbox.inputbox.autovalidation = ppt.autosearch;
+		window.SetProperty("Search Box: Auto-validation", ppt.autosearch);
 		break;
 	case (idx >= 2 && idx <= 8):
-		ppts.scope = idx - 2;
-		window.SetProperty("Search Box: Scope", ppts.scope);
+		ppt.scope = idx - 2;
+		window.SetProperty("Search Box: Scope", ppt.scope);
 		break;
 	case (idx == 9):
-		ppts.multiple = !ppts.multiple;
-		window.SetProperty("Search Box: Keep Playlist", ppts.multiple);
+		ppt.multiple = !ppt.multiple;
+		window.SetProperty("Search Box: Keep Playlist", ppt.multiple);
 		break;
 
 	case (idx >= 21 && idx <= 22):
-		window.SetProperty("Search Source", ppts.source = idx - 20);
-		g_searchbox.inputbox.autovalidation = (ppts.source > 1) ? false : ppts.autosearch;
-		g_searchbox.inputbox.empty_text = (ppts.source == 1) ? "Search in playlist" : "Search in library";
+		window.SetProperty("Search Source", ppt.source = idx - 20);
+		//g_searchbox.src_switch.changeTooltip(g_searchbox.getTooltip());
+		g_searchbox.inputbox.autovalidation = ppt.autosearch;
+		g_searchbox.inputbox.empty_text = "";
 		g_searchbox.repaint();
 		break;
 	case (idx == 36):
@@ -507,21 +522,24 @@ function Show_Menu_Searchbox(x, y) {
 	case (idx == 39):
 		quickSearch(now_playing_track, "date");
 		break;
-	case (idx >= 51 && idx <= ppts.historymaxitems + 51):
+	case (idx >= 51 && idx <= ppt.historymaxitems + 51):
 		g_searchbox.inputbox.text = g_searchbox.historylist[idx - 51][0];
 		g_searchbox.on_char();
 		g_searchbox.repaint();
 		break;
-	case (idx == ppts.historymaxitems + 60):
+	case (idx == ppt.historymaxitems + 60):
 		g_searchbox.historyreset();
 		break;
 	case (idx == 500):
 		GetQTFMRadiolist();
 		break;
-	case ((idx >= 501 && idx <= 501+ppts.webkqtradioarr.length)):
-		QTFMRadiolist(ppts.webkqtradioarr[idx-501].split(";"),ppts.webkqtradioarr[idx-501].split(":")[0]);
+	case ((idx >= 501 && idx <= 501+ppt.webkqtradioarr.length)):
+		QTFMRadiolist(ppt.webkqtradioarr[idx-501].split(";"),ppt.webkqtradioarr[idx-501].split(":")[0]);
 		break;
 	}
+	SearchHistoryMenu.Dispose();
+	//SearchModeMenu.Dispose();
+	_menu.Dispose();
 }
 
 //=================================================// 快速搜索
@@ -576,53 +594,63 @@ function trimstr(str) {
 function GetQTFMRadiolist(){
 	g_searchbox.inputbox.edit = false;
 	SetBoxText("Updating radio menu...");
-	var qtlistid = "";
-	var listid = "";
-	var ret = {
-		id: [433,442,429,439,432,441,430,431,440,438,435,436,434],
-		title: ["资讯台","音乐台","交通台","经济台","文艺台","都市台","体育台","双语台","综合台","生活台","旅游台","曲艺台","方言台"],
-		count:[300,300,300,100,100,100,20,20,500,100,50,20,50]
-	};
-	var c = ret.id.length;
-	var l = 0;
-	url = "http://rapi.qingting.fm/categories/" + ret.id[l] + "/channels?page=1&pagesize="+ret.count[l];
-	try{
-		xmlHttp2.open("GET", url, true);
-		xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
-		xmlHttp2.send(null);
-		xmlHttp2.onreadystatechange = function() {
-			if (xmlHttp2.readyState == 4) {
-				if (xmlHttp2.status == 200) {
-					var ret1 = json(xmlHttp2.responseText)["Data"];
-					listid = ret.title[l] + ": g;";
-					if(ret1 != null){
-						for (var k = 0; k < ret1.length; k++) {
-							listid += ret1[k].title + ":" + ret1[k].content_id + ";"
-						}
-						if(listid.charAt(listid.length-1) == ";") qtlistid += listid.slice(0,listid.length-1) + "|";
-						if(l+1==c) {
-							try {fso.DeleteFile(qtfm_arr);}catch(e) {};
-							qtlistid = qtlistid.slice(0,qtlistid.length-1);
-							SaveAs(qtlistid, qtfm_arr);
-							ppts.webkqtradioarr = qtlistid.split("|");
-						};
-					}
-				}
-				l++;
-				if (l < c){
-					var URL_Timer = window.SetTimeout(function () {
-						url = "http://rapi.qingting.fm/categories/" + ret.id[l] + "/channels?page=1&pagesize="+ret.count[l];
+    var searchURL = "http://rapi.qingting.fm/regions";
+	try {
+		var qtlistid = ""
+		xmlHttp.open("GET", searchURL, true);
+		xmlHttp.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
+		xmlHttp.send(null);
+		xmlHttp.onreadystatechange = function () {
+			if (xmlHttp.readyState == 4) {
+				if (xmlHttp.status == 200) {
+					var listid = "";
+					var c = 0;
+					var ret = json(xmlHttp.responseText)["Data"];
+					if (ret && ret.length > 0) {
+						if(c == 0) c = ret.length + 1;
+						l = 0;
+						url = "http://rapi.qingting.fm/categories/" + 408 + "/channels?page=1&pagesize=100";//国家台409
 						xmlHttp2.open("GET", url, true);
 						xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
 						xmlHttp2.send(null);
-						URL_Timer && window.ClearTimeout(URL_Timer);
-					}, 5);
+						xmlHttp2.onreadystatechange = function() {
+							if (xmlHttp2.readyState == 4) {
+								if (xmlHttp2.status == 200) {
+									//debug && fb.trace(l,url);
+									var ret1 = json(xmlHttp2.responseText)["Data"];
+									listid = (l==0?"Web radio":ret[l-1].title) + ": g;";
+									if(ret1 != null){
+										for (var k = 0; k < ret1.length; k++) {
+											listid += ret1[k].title + ":" + ret1[k].content_id + ";"
+										}
+										if(listid.charAt(listid.length-1) == ";") qtlistid += listid.slice(0,listid.length-1) + "|";
+										if(l+1==c) {
+											try {fso.DeleteFile(qtfm_arr);}catch(e) {};
+											qtlistid = qtlistid.slice(0,qtlistid.length-1);
+											SaveAs(qtlistid, qtfm_arr);
+											ppt.webkqtradioarr = qtlistid.split("|");
+										};
+									}
+								}
+								l++;
+								if (l > 0 && l < c){
+									var URL_Timer = window.SetTimeout(function () {
+										url = "http://rapi.qingting.fm/categories/" + ret[l-1].id + "/channels?page=1&pagesize=100";
+										xmlHttp2.open("GET", url, true);
+										xmlHttp2.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
+										xmlHttp2.send(null);
+										URL_Timer && window.ClearTimeout(URL_Timer);
+									}, 5);
+								}
+							}
+						}
+					}
 				}
 			}
 		}
 		UpdateDone("Radio menu updated!");
 	} catch(e) {
-		console.log("Update failed");
+		fb.trace("Update failed");
 		return;
 	}
 }
@@ -630,10 +658,14 @@ function GetQTFMRadiolist(){
 function QTFMRadiolist(id, listname){
 	g_searchbox.inputbox.edit = false;
 	SetBoxText("Fetching radio list...");
+	//cachefile = fb.ProfilePath + "\\cache\\RadioList.asx";
 	cachefile = fb.ProfilePath + "\\cache\\" + listname + ".asx";
 	try {
+		//debug && fb.trace(id,listname)
 		var filedata = '<asx version="3.0">\r\n\r\n';
+		//var ret = id.split(":");
 		for (var i = 1; i < id.length; i++) {
+			//debug && fb.trace(i,id[i].split(":")[0],id[i].split(":")[1]);
 			filedata = filedata + '<entry>\r\n'
 			 + '<title>' + id[i].split(":")[0] + '</title>\r\n'
 			 + '<author>' + listname + '</author>\r\n'
@@ -645,7 +677,7 @@ function QTFMRadiolist(id, listname){
 		UpdateList("Radio | " + listname);
 		SetBoxText(null);
 	} catch(e) {
-		console.log("Fetch failed");
+		fb.trace("Fetch failed");
 		return;
 	}
 	Deltempfile(cachefile);
@@ -666,6 +698,45 @@ function UpdateDone(text){
 	}, 4000);
 }
 
+function DisposeList(typename, namelen, listname, pageid, switchpage){
+	if (switchpage) {
+		var playlistIndex = plman.ActivePlaylist;
+		plman.ClearPlaylist(playlistIndex);
+		plman.AddLocations(playlistIndex, [cachefile]);
+		plman.RenamePlaylist(playlistIndex, typename + " | " + listname + " | " + pageid);
+	} else {
+		if(pageid != null) var addpageid = " | " + pageid;
+		else var addpageid = "";
+		var pl_to_remove = new Array;
+		var isFound = false;
+		var total = plman.PlaylistCount;
+		for (var i = 0; i < total; i++) {
+			if (plman.GetPlaylistName(i).substr(0, namelen) == typename + " |") {
+				if (!ppt.multiple) {
+					if (!isFound) {
+						var plIndex = i;
+						isFound = true;
+					}
+					pl_to_remove.push(i);
+				}
+			}
+		}
+		if (isFound && !ppt.multiple) {
+			var r = pl_to_remove.length - 1;
+			while (r >= 0) {
+				plman.RemovePlaylist(pl_to_remove[r]);
+				r--;
+			}
+			plIndex = plman.PlaylistCount;
+		} else {
+			plIndex = total;
+		}
+		fb.CreatePlaylist(plIndex, typename + " | " + listname + addpageid);
+		plman.AddLocations(plIndex, [cachefile]);
+		plman.ActivePlaylist = plIndex;
+	}
+}
+
 function UpdateList(listname){
 	var isFound = false;
 	var total = plman.PlaylistCount;
@@ -682,7 +753,7 @@ function UpdateList(listname){
 		plman.ClearPlaylist(plIndex);
 	} else {
 		plIndex = total;
-		plman.CreatePlaylist(plIndex, listname);
+		fb.CreatePlaylist(plIndex, listname);
 	}
 	plman.AddLocations(plIndex, [cachefile]);
 	plman.ActivePlaylist = plIndex;
@@ -692,7 +763,7 @@ function Deltempfile(tmpfile){
 	var DelFile = window.SetTimeout(function() {
 		try {
 			fso.DeleteFile(tmpfile);
-		} catch(e) {};
+		}; catch(e) {};
 		DelFile && window.ClearTimeout(DelFile);
 		DelFile = false;
 	}, 6000);
@@ -701,17 +772,26 @@ function Deltempfile(tmpfile){
 function SaveAs(str, file) {
 	var ado = new ActiveXObject("ADODB.Stream");
 	ado.Type = 2;
-	ado.Mode = 3;
+	ado.mode = 3;
 	ado.Charset = "UTF-8";
-	ado.Open();
+	ado.open();
 	try {
 		ado.WriteText(str);
 		ado.SaveToFile(file);
 	} catch (e) {
-		console.log("ADODB.Stream: failed to write file.");
+		fb.trace("ADODB.Stream: failed to write file.");
 	}
-	ado.Flush();
+	ado.flush();
 	ado.Close();
+}
+
+function StringFilter(s) {
+	s = s.replace(/\'|·|\&|–/g, "");
+	//truncate all symbols
+	s = s.replace(/\(.*?\)|\[.*?]|{.*?}|（.*?/g, "");
+	s = s.replace(/[-/:-@[-`{-~]+/g, "");
+	s = s.replace(/[\u2014\u2018\u201c\u2026\u3001\u3002\u300a\u300b\u300e\u300f\u3010\u3011\u30fb\uff01\uff08\uff09\uff0c\uff1a\uff1b\uff1f\uff5e\uffe5]+/g, "");
+	return s;
 }
 
 function json(text) {
@@ -721,4 +801,17 @@ function json(text) {
 	} catch (e) {
 		return false;
 	}
+}
+
+function reconvert(str){ 
+	str = str.replace(/(\\u)(\w{1,4})/gi,function($0){ 
+		return (String.fromCharCode(parseInt((escape($0).replace(/(%5Cu)(\w{1,4})/g,"$2")),16))); 
+	}); 
+	str = str.replace(/(&#x)(\w{1,4});/gi,function($0){ 
+		return String.fromCharCode(parseInt(escape($0).replace(/(%26%23x)(\w{1,4})(%3B)/g,"$2"),16)); 
+	}); 
+	str = str.replace(/(&#)(\d{1,6});/gi,function($0){ 
+		return String.fromCharCode(parseInt(escape($0).replace(/(%26%23)(\d{1,6})(%3B)/g,"$2"))); 
+	}); 
+	return str; 
 }

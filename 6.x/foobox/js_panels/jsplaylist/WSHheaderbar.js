@@ -64,7 +64,7 @@ oColumn = function() {
 };
 
 oHeaderBar = function() {
-	//this.visible = true;
+	this.visible = true;
 	this.columns = [];
 	this.borders = [];
 	this.totalColumns = window.GetProperty("SYSTEM.HeaderBar.TotalColumns", 0);
@@ -94,7 +94,7 @@ oHeaderBar = function() {
 		gb.FillSolidRect(0, 0, cScrollBar.width, btn_h, g_color_topbar);
 		gb.SetSmoothingMode(2);
 		var x_ini =  cScrollBar.width / 4;
-		pointArr = Array(x_ini, btn_h/3, x_ini + g_z2, btn_h/2, x_ini, btn_h*2/3, x_ini + g_z6, btn_h/2);
+		pointArr = Array(x_ini, btn_h/3, x_ini + 2*zdpi, btn_h/2, x_ini, btn_h*2/3, x_ini + 6*zdpi, btn_h/2);
 		gb.FillPolygon(color_txt&0xaaffffff, 1, pointArr);
 		this.slide_open_normal.ReleaseGraphics(gb);
 
@@ -148,7 +148,7 @@ oHeaderBar = function() {
 					// end <<
 				};
 				tmp = this.columns[i].x + this.columns[i].w;
-			}
+			};
 			else {
 				this.columns[i].x = tmp;
 				this.columns[i].y = this.y;
@@ -158,9 +158,9 @@ oHeaderBar = function() {
 		};
 	};
 
-	//this.drawHiddenPanel = function(gr) {
-	//	gr.FillSolidRect(this.x, this.y, this.w + cScrollBar.width, 1, g_color_normal_bg); //g_color_normal_txt & 0x09ffffff);
-	//}
+	this.drawHiddenPanel = function(gr) {
+		gr.FillSolidRect(this.x, this.y, this.w + cScrollBar.width, 1, g_color_normal_bg); //g_color_normal_txt & 0x09ffffff);
+	}
 
 	this.drawColumns = function(gr) {
 		var j = 0,
@@ -198,11 +198,11 @@ oHeaderBar = function() {
 					// draw column header bg
 					if (this.columnRightClicked == j) {
 						gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-					}
+					};
 					else { // normal box
 						if (this.columnDragged == 1 && j == this.columnDraggedId) {
 							gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-						}
+						};
 						else {
 							gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
 						};
@@ -219,10 +219,10 @@ oHeaderBar = function() {
 						};
 					};
 					gr.GdiDrawText(this.columns[j].label, g_font_b, g_color_normal_txt, cx + (this.borderWidth * 2), cy + 1, cw - (this.borderWidth * 4) - 1, this.h, this.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
-				}
-				//else if (j == this.columnDraggedId && this.columnDragged == 2) {
-					//gr.FillGradRect(cx, cy, cw, this.h, 90, RGBA(0, 0, 0, 60), 0, 1.0);
-				//};
+				};
+				else if (j == this.columnDraggedId && this.columnDragged == 2) {
+					gr.FillGradRect(cx, cy, cw, this.h, 90, RGBA(0, 0, 0, 60), 0, 1.0);
+				};
 			};
 
 			if (this.borders[i].drag) {
@@ -242,11 +242,11 @@ oHeaderBar = function() {
 					// draw last column bg
 					if (this.columnRightClicked == j) {
 						gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-					}
+					};
 					else { // normal box
 						if (this.columnDragged == 1 && j == this.columnDraggedId) {
 							gr.FillSolidRect(cx, cy, cw, this.h, g_color_normal_txt & 0x30ffffff);
-						}
+						};
 						else {
 							gr.FillSolidRect(cx, cy, cw, this.h, g_color_topbar);
 						};
@@ -263,10 +263,10 @@ oHeaderBar = function() {
 						};
 					};
 					gr.GdiDrawText(this.columns[j].label, g_font_b, g_color_normal_txt, cx + (this.borderWidth * 2), cy + 1, cw - (this.borderWidth * 4) - 1, this.h, this.columns[j].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
-				}
-				//else if (j == this.columnDraggedId && this.columnDragged == 2) {
-					//gr.FillGradRect(cx, cy, cw, this.h, 90, RGBA(0, 0, 0, 70), 0, 1.0);
-				//};
+				};
+				else if (j == this.columnDraggedId && this.columnDragged == 2) {
+					gr.FillGradRect(cx, cy, cw, this.h, 90, RGBA(0, 0, 0, 70), 0, 1.0);
+				};
 				break;
 			};
 		};
@@ -276,13 +276,13 @@ oHeaderBar = function() {
 			cx = Math.floor(mouse_x - this.clickX) + 2;
 			cy = this.y + 3;
 			// shadow
-			//gr.FillSolidRect(cx + 4, cy + 3, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 10));
-			//gr.FillSolidRect(cx + 3, cy + 2, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 15));
-			//gr.FillSolidRect(cx + 2, cy + 1, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 30));
+			gr.FillSolidRect(cx + 4, cy + 3, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 10));
+			gr.FillSolidRect(cx + 3, cy + 2, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 15));
+			gr.FillSolidRect(cx + 2, cy + 1, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, RGBA(0, 0, 0, 30));
 			// header bg
-			gr.FillSolidRect(cx, cy, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h-2, g_color_normal_txt & 0x80ffffff);
+			gr.FillSolidRect(cx, cy, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h, g_color_normal_txt & 0x66ffffff);
 			gr.DrawRect(cx, cy + 1, Math.floor(this.columns[this.columnDraggedId].w - 2), this.h - 2, 2.0, g_color_normal_txt);
-			//gr.DrawRect(cx + 1, cy + 2, Math.floor(this.columns[this.columnDraggedId].w - 5), this.h - 5, 1.0, blendColors(g_color_normal_txt, g_color_normal_bg, 0.55));
+			gr.DrawRect(cx + 1, cy + 2, Math.floor(this.columns[this.columnDraggedId].w - 5), this.h - 5, 1.0, blendColors(g_color_normal_txt, g_color_normal_bg, 0.55));
 			// header text info
 			gr.GdiDrawText(this.columns[this.columnDraggedId].label, g_font_b, g_color_normal_bg, cx + (this.borderWidth * 2), cy + 1, this.columns[this.columnDraggedId].w - (this.borderWidth * 4) - 2, this.h, this.columns[this.columnDraggedId].DT_align | DT_VCENTER | DT_CALCRECT | DT_NOPREFIX | DT_END_ELLIPSIS);
 		};
@@ -366,19 +366,19 @@ oHeaderBar = function() {
 					fields.push(new Array("Cover", "State", "Index", "#", "Title", "Year", "Artist", "Album Artist", "Album", "Genre", "Mood", "Rating", "Plays", "Bitrate", "Codec", "Time"));
 					break;
 				case 1:
-					fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'Unknown artist')", "$if2(%album artist%,'Unknown artist')", "$if2(%album%,$if(%length%,'Single','Radio'))", "$if2(%genre%,'Other')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
+					fields.push(new Array("null", "null", "$num(%list_index%,$len(%list_total%))", "$if2($num(%discnumber%,1)'.',)$if2($num(%tracknumber%,2),' ')", "$if2(%title%,%filename_ext%)", "$if(%date%,$year($replace(%date%,/,-,.,-)),'-')", "$if2(%artist%,'未知艺术家')", "$if2(%album artist%,'未知艺术家')", "$if2(%album%,$if(%length%,'单曲','网络电台'))", "$if2(%genre%,'其他')", "$rgb(255,120,170)$if(%mood%,1,0)", "$rgb(255,255,50)$if2(%rating%,0)", "$if2(%play_count%,0)", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),' '$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))", "%codec%", "$if(%isplaying%,$if(%length%,-%playback_time_remaining%,'0:00'),$if2(%length%,'00:00'))"));
 					break;
 				case 2:
-					fields.push(new Array("null", "null", "null", "$if2(%play_count%,0)", "$if2(%album artist%,'Unknown artist')", "null", "null", "null", "$if2(%genre%,'Other')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
+					fields.push(new Array("null", "null", "null", "$if2(%play_count%,0)", "$if2(%album artist%,'未知艺术家')", "null", "null", "null", "$if2(%genre%,'其他')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
 					break;
 				case 3:
-					fields.push(new Array("8000", "5000", "0", "5000", "38000", "0", "27000", "0", "0", "0", "0", "10000", "0", "0", "0", "7000"));
+					fields.push(new Array("0", "5000", "0", "5000", "40000", "0", "30000", "0", "0", "0", "0", "11000", "0", "0", "0", "9000"));
 					break;
 				case 4:
 					fields.push(new Array("Cover", "State", "Index", "Tracknumber", "Title", "Date", "Artist", "Album Artist", "Album", "Genre", "Mood", "Rating", "Plays", "Bitrate", "Codec", "Duration"));
 					break;
 				case 5:
-					fields.push(new Array("1", "1", "1", "2", "0", "2", "0", "0", "0", "0", "1", "1", "2", "1", "1", "2"));
+					fields.push(new Array("0", "1", "1", "2", "0", "2", "0", "0", "0", "0", "1", "1", "2", "1", "1", "2"));
 					break;
 				case 6:
 					fields.push(new Array(sort_pattern_albumartist, sort_pattern_queue, "null", sort_pattern_tracknumber, sort_pattern_title, sort_pattern_date, sort_pattern_artist, sort_pattern_albumartist, sort_pattern_album, sort_pattern_genre, "%mood% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%", sort_pattern_rating, sort_pattern_playcount, sort_pattern_bitrate, sort_pattern_codec, "$if2(%length%,' 0:00') | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%"));
@@ -431,7 +431,7 @@ oHeaderBar = function() {
 				};
 			};
 
-		}
+		};
 		else {
 			var fields = [];
 			var tmp;
@@ -489,7 +489,7 @@ oHeaderBar = function() {
 					break;
 				case "up":
 					if (this.buttonClicked && state == ButtonStates.hover) {
-						this.contextMenu(ww, 0, 0);//this.contextMenu(ww - cScrollBar.width, cHeaderBar.height, 0);
+						this.contextMenu(ww - cScrollBar.width, cHeaderBar.height, 0);
 						this.button.state = ButtonStates.normal;
 					};
 					this.buttonClicked = false;
@@ -534,7 +534,7 @@ oHeaderBar = function() {
 									if (this.columns[i].tf != "null" || this.columns[i].sortOrder != "null") {
 										this.columnDragged = 1;
 										window.SetCursor(IDC_ARROW);
-									}
+									};
 									else {
 										this.columnDragged = 2;
 										window.SetCursor(IDC_SIZEALL);
@@ -574,7 +574,7 @@ oHeaderBar = function() {
 						this.borderDragged = false;
 						this.borderDraggedId = -1;
 						this.on_mouse("move", x, y); // call "Move" to set mouse cursor if border hover
-					}
+					};
 					else if (this.columnDragged > 0) {
 						if (this.columnDragged == 1) {
 							if (this.columnDraggedId == 0) {
@@ -590,19 +590,18 @@ oHeaderBar = function() {
 								cHeaderBar.sortRequested = true;
 								if (this.columns[this.columnDraggedId].sortOrder != "null") {
 									plman.SortByFormatV2(plman.ActivePlaylist, this.columns[this.columnDraggedId].sortOrder, this.sortedColumnDirection);
-								}
+								};
 								else {
 									plman.SortByFormatV2(plman.ActivePlaylist, this.columns[this.columnDraggedId].tf, this.sortedColumnDirection);
 								};
-								window.NotifyOthers("Sorting format null", true);
 								update_playlist(properties.collapseGroupsByDefault);
-							}
+							};
 							else {
 								this.columns[this.columnDraggedId].drag = false;
 								this.columnDragged = 0;
 								this.columnDragged_saved = 0;
 							};
-						}
+						};
 						else {
 							for (var i = 0; i < this.columns.length; i++) {
 								this.columns[i].on_mouse(event, x, y);
@@ -663,7 +662,7 @@ oHeaderBar = function() {
 								};
 							};
 						};
-					}
+					};
 					else if (this.columnDraggedId != 0 && (this.columnDragged == 1 || this.columnDragged == 2)) {
 						this.columnDragged = 2;
 						window.SetCursor(IDC_SIZEALL);
@@ -677,7 +676,7 @@ oHeaderBar = function() {
 										// move sortColumnId too !
 										if (i == this.sortedColumnId) {
 											this.sortedColumnId = this.columnDraggedId;
-										}
+										};
 										else if (this.columnDraggedId == this.sortedColumnId) {
 											this.sortedColumnId = i;
 										};
@@ -723,7 +722,7 @@ oHeaderBar = function() {
 			for (var m = 0; m < p.list.groupby.length; m++) {
 				if (default_pattern_index > -1 && found) {
 					break;
-				}
+				};
 				else if (p.list.groupby[m].playlistFilter.length > 0) {
 					var arr_pl = p.list.groupby[m].playlistFilter.split(";");
 					for (var n = 0; n < arr_pl.length; n++) {
@@ -743,24 +742,8 @@ oHeaderBar = function() {
 		// main Menu entries
 		_menu.AppendMenuItem(MF_STRING, 11, "Show now playing (F2)"); 	        
 		_menu.AppendMenuSeparator();
-		_menu.AppendMenuItem(MF_STRING, 12, "foobox settings");
-		_groups.AppendTo(_menu, MF_STRING, "Group options");
-		_groups.AppendMenuItem(MF_STRING, 18, "Enable group");
-		_groups.CheckMenuItem(18, properties.showgroupheaders);
 		if (properties.showgroupheaders) {
-			_groups.AppendMenuItem(MF_STRING, 17, "Disable group for radio");
-			_groups.CheckMenuItem(17, properties.NetDisableGroup);
-			_groups.AppendMenuItem(MF_STRING, 19, "Enable playlist filter");
-			_groups.CheckMenuItem(19, properties.enablePlaylistFilter);
-			_groups.AppendMenuSeparator();
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "Collapse all (Tab)");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "Expand all (Shift+Tab)");	
-		};
-		_groups.AppendMenuSeparator();
-		_groups.AppendMenuItem(MF_STRING, 13, "Edit groups...");
-		_menu.AppendMenuSeparator();
-		if (properties.showgroupheaders) {
-			_patterns.AppendTo(_menu, MF_STRING, "Group pattern");
+			_patterns.AppendTo(_menu, MF_STRING, "Edit groups");
 			var groupByMenuIdx = 20;
 			var totalGroupBy = p.list.groupby.length;
 			for (var i = 0; i < totalGroupBy; i++) {
@@ -768,7 +751,7 @@ oHeaderBar = function() {
 			};
 			if (!found && default_pattern_index < 0) {
 				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, cGroup.pattern_idx + groupByMenuIdx);
-			}
+			};
 			else {
 				_patterns.CheckMenuRadioItem(groupByMenuIdx, groupByMenuIdx + totalGroupBy - 1, playlist_pattern_index + groupByMenuIdx);
 			};
@@ -785,7 +768,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 212, "Rating");
 		_sorting.AppendMenuItem(MF_STRING, 213, "Bitrate");
 		_sorting.AppendMenuItem(MF_STRING, 214, "Modification");
-		/*if(foo_playcount) */_sorting.AppendMenuItem(MF_STRING, 215, "Plays");
+		if(foo_playcount) _sorting.AppendMenuItem(MF_STRING, 215, "Plays");
 		_sorting.AppendMenuItem(MF_STRING, 216, "Codec");
 		_sorting.AppendMenuItem(MF_STRING, 217, "Random");
 		_sorting.AppendMenuItem(MF_STRING, 218, "Reverse");
@@ -797,16 +780,34 @@ oHeaderBar = function() {
 		for (var i = 0; i < this.columns.length; i++) {
 			if (i == column_index) {
 				_columns.AppendMenuItem(MF_STRING, columnMenuIdx + i, "[" + this.columns[i].label + "]");
-			}
+			};
 			else {
 				_columns.AppendMenuItem(MF_STRING, columnMenuIdx + i, this.columns[i].label);
 			};
 			_columns.CheckMenuItem(columnMenuIdx + i, this.columns[i].w > 0 ? 1 : 0);
 		};
 		// Columns submenu entries
-	
+		_menu.AppendMenuSeparator();
+		_groups.AppendTo(_menu, MF_STRING, "Group options");
+		_groups.AppendMenuItem(MF_STRING, 18, "Enable group");
+		_groups.CheckMenuItem(18, properties.showgroupheaders);
+		if (properties.showgroupheaders) {
+			_groups.AppendMenuItem(MF_STRING, 17, "Disable group for radio playlist");
+			_groups.CheckMenuItem(17, properties.NetDisableGroup);
+			_groups.AppendMenuItem(MF_STRING, 19, "Enable playlist filter");
+			_groups.CheckMenuItem(19, properties.enablePlaylistFilter);
+			_groups.AppendMenuSeparator();
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "折叠全部 (Tab)");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !properties.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "展开全部 (Ctrl+Tab)");	
+		};
+		_groups.AppendMenuSeparator();
+		_groups.AppendMenuItem(MF_STRING, 13, "Edit groups...");
+		_menu.AppendMenuItem(MF_STRING, 12, "Edit columns...");
+		
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 16, "Refresh covers (F5)");
+		_menu.AppendMenuSeparator();
+		_menu.AppendMenuItem(MF_STRING, 15, "Playlist view options");
 		_menu.AppendMenuItem(MF_STRING, 14, "Panel properties");
 		
 		idx = _menu.TrackPopupMenu(x, y);
@@ -816,13 +817,19 @@ oHeaderBar = function() {
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 12):
-			show_setting(3, column_index);
+			show_setting(1, column_index);
+			window.NotifyOthers("topbar_show_settings", true);
 			break;
 		case (idx == 13):
 			show_setting(2, cGroup.pattern_idx);
+			window.NotifyOthers("topbar_show_settings", true);
 			break;
 		case (idx == 14):
 			window.ShowProperties();
+			break;
+		case (idx == 15):
+			show_setting(0);
+			window.NotifyOthers("topbar_show_settings", true);
 			break;
 		case (idx == 16):
 			refresh_cover();
@@ -846,7 +853,7 @@ oHeaderBar = function() {
 		case (idx >= 20 && idx < 50):
 			cGroup.pattern_idx = idx - groupByMenuIdx;
 			window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-			window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+			window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 			// if a Playlist Filter is defined for the Active Playlist (current), DO NOT try to change current pattern!
 			if (!found && default_pattern_index < 0) { // no filter found, we can apply selected pattern and sort the playlist
 				plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[cGroup.pattern_idx].sortOrder, 1);
@@ -856,6 +863,12 @@ oHeaderBar = function() {
 				full_repaint();
 			};
 			break;
+		/*case (idx >= 50 && idx < 80):
+			if ((!found && default_pattern_index < 0) || playlist_pattern_index == idx - sortByMenuIdx) {
+				plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[idx - sortByMenuIdx].sortOrder, 1);
+			};
+			break;
+			*/
 		case (idx == 80):
 			resize_panels();
 			p.list.updateHandleList(plman.ActivePlaylist, true);
@@ -901,7 +914,7 @@ oHeaderBar = function() {
 					this.columns[k].w = Math.abs(this.w * this.columns[k].percent / 100000);
 				};
 				this.saveColumns();
-			}
+			};
 			else {
 				// check if it's not the last column visible, otherwise, we coundn't hide it!
 				var nbvis = 0;
@@ -945,8 +958,8 @@ oHeaderBar = function() {
 
 				cover.previous_max_size = this.columns[0].w;
 				g_image_cache = new image_cache;
-				//CollectGarbage();
-			}
+				CollectGarbage();
+			};
 			else {
 				cover.column = false;
 				cGroup.count_minimum = cGroup.default_count_minimum;
@@ -958,7 +971,7 @@ oHeaderBar = function() {
 			if(!properties.showgroupheaders){
 				cGroup.pattern_idx = 2;
 				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+				window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 			}
             break;
 		case (idx == 219):
@@ -966,7 +979,7 @@ oHeaderBar = function() {
 			if(!properties.showgroupheaders){
 				cGroup.pattern_idx = 3;
 				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+				window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 			}
             break;
 		case (idx == 206):
@@ -974,66 +987,57 @@ oHeaderBar = function() {
 			if(!properties.showgroupheaders){
 				cGroup.pattern_idx = 0;
 				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+				window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 			}
             break;
 		case (idx == 207):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_tracknumber, 1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 208):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_title, 1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 209):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_path, 1);
 			if(!properties.showgroupheaders){
 				cGroup.pattern_idx = 5;
 				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+				window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 			}
             break;
 		case (idx == 210):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_date, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 211):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_genre, 1);
 			if(!properties.showgroupheaders){
 				cGroup.pattern_idx = 4;
 				window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-				window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+				window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 			}
             break;
 		case (idx == 212):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_rating, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 213):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_bitrate, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 214):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_modified, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 215):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_playcount, -1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 216):
 			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_codec, 1);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 217):
 			plman.SortByFormat(plman.ActivePlaylist,"",false);
-			window.NotifyOthers("Sorting format null", true);
             break;
 		case (idx == 218):
 			fb.RunMainMenuCommand("Edit/Sort/Reverse");
-			window.NotifyOthers("Sorting format null", true);
             break;
 		};
+		_menu.Dispose();
 		this.columnRightClicked = -1;
 		full_repaint();
 		return true;

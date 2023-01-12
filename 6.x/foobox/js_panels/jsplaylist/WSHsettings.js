@@ -7,21 +7,26 @@ function settings_checkboxes_action(id, status, parentId) {
 	var fin;
 	switch (parentId) {
 	case 0:
+		// page 0 : General
 		switch (id) {
 		case 0:
+			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
+			window.SetProperty("SYSTEM.HeaderBar.Locked", status);
+			if (!cHeaderBar.locked) {
+				p.headerBar.visible = false;
+			};
+			resize_panels();
+			full_repaint();
+			break;
+		case 1:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("CUSTOM Enable Smooth Scrolling", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 1:
+		case 2:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("SYSTEM.Enable Touch Scrolling", status);
 			p.settings.pages[parentId].elements[id].repaint();
-		case 4:
-			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
-			window.SetProperty("CUSTOM Enable Selection Menu", status);
-			p.settings.pages[parentId].elements[id].repaint();
-			break;
 			break;
 		case 5:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
@@ -62,7 +67,7 @@ function settings_checkboxes_action(id, status, parentId) {
 					p.headerBar.columns[k].w = Math.abs(p.headerBar.w * p.headerBar.columns[k].percent / 100000);
 				};
 				p.headerBar.saveColumns();
-			}
+			};
 			else {
 				// check if it's not the last column visible, otherwise, we coundn't hide it!
 				var nbvis = 0;
@@ -108,7 +113,7 @@ function settings_checkboxes_action(id, status, parentId) {
 					cover.column = true;
 					cGroup.count_minimum = Math.ceil((p.headerBar.columns[idx].w) / cTrack.height);
 					if (cGroup.count_minimum < cGroup.default_count_minimum) cGroup.count_minimum = cGroup.default_count_minimum;
-				}
+				};
 				else {
 					cover.column = false;
 					cGroup.count_minimum = cGroup.default_count_minimum;
@@ -117,7 +122,7 @@ function settings_checkboxes_action(id, status, parentId) {
 				g_image_cache = new image_cache;
 				CollectGarbage();
 				update_playlist(properties.collapseGroupsByDefault);
-			}
+			};
 			else {
 				full_repaint();
 			};
@@ -131,7 +136,7 @@ function settings_checkboxes_action(id, status, parentId) {
 		case 16:
 			if (status) {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].showCover = "1";
-			}
+			};
 			else {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].showCover = "0";
 			};
@@ -141,7 +146,7 @@ function settings_checkboxes_action(id, status, parentId) {
 		case 17:
 			if (status) {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].autoCollapse = "1";
-			}
+			};
 			else {
 				p.list.groupby[p.settings.pages[parentId].elements[0].selectedId].autoCollapse = "0";
 			};
@@ -151,7 +156,7 @@ function settings_checkboxes_action(id, status, parentId) {
 		case 22:
 			if (status) {
 				l2_addinfo = true;
-			}
+			};
 			else {
 				l2_addinfo = false;
 			};
@@ -162,46 +167,116 @@ function settings_checkboxes_action(id, status, parentId) {
 		break;
 	case 3:
 		switch (id) {
-		case 2:
+		case 8:
 			if (status) {
-				rating2tag = true;
+				col_by_cover = true;
+				window.NotifyOthers("color_by_color", col_by_cover);
 			}
 			else {
-				rating2tag = false;
+				col_by_cover = false;
+				window.NotifyOthers("color_by_color", col_by_cover);
 			}
-			window.NotifyOthers("set_rating_2_tag", rating2tag);
-			window.SetProperty("foobox.rating.write.to.file", rating2tag);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 3:
+		case 9:
+			if (status) {
+				esl_hcolor_auto = true;
+				window.NotifyOthers("set_eslhcolor_auto", esl_hcolor_auto);
+			}
+			else {
+				esl_hcolor_auto = false;
+				window.NotifyOthers("set_eslhcolor_auto", esl_hcolor_auto);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 10:
+			if (status) {
+				esl_font_auto = true;
+				window.NotifyOthers("set_eslfont_auto", esl_font_auto);
+			}
+			else {
+				esl_font_auto = false;
+				window.NotifyOthers("set_eslfont_auto", esl_font_auto);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 11:
+			if (status) {
+				esl_font_bold = true;
+				window.NotifyOthers("set_eslfont_bold", esl_font_bold);
+			}
+			else {
+				esl_font_bold = false;
+				window.NotifyOthers("set_eslfont_bold", esl_font_bold);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 12:
+			if (status) {
+				ui_noborder = true;
+				window.NotifyOthers("set_ui_noborders", ui_noborder);
+			}
+			else {
+				ui_noborder = false;
+				window.NotifyOthers("set_ui_noborders", ui_noborder);
+			}
+			break;
+		case 13:
+			if (status) {
+				btn_fullscr = true;
+				window.NotifyOthers("show_button_fullscreen", btn_fullscr);
+			}
+			else {
+				btn_fullscr = false;
+				window.NotifyOthers("show_button_fullscreen", btn_fullscr);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 14:
+			if (status) {
+				album_front_disc = true;
+				window.NotifyOthers("set_album_cover", album_front_disc);
+			}
+			else {
+				album_front_disc = false;
+				window.NotifyOthers("set_album_cover", album_front_disc);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 15:
 			if (status) {
 				follow_cursor = true;
+				window.NotifyOthers("Right_panel_follow_cursor", follow_cursor);
 			}
 			else {
 				follow_cursor = false;
+				window.NotifyOthers("Right_panel_follow_cursor", follow_cursor);
 			}
-			window.NotifyOthers("foobox_infoArt_followcursor", follow_cursor);
-			window.SetProperty("foobox.infoArt.follow.cursor", follow_cursor);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 4:
+		case 16:
 			if (status) {
-				color_bycover = true;
+				auto_sw = true;
+				window.NotifyOthers("set_panels_interlock", auto_sw);
 			}
 			else {
-				color_bycover = false;
+				auto_sw = false;
+				window.NotifyOthers("set_panels_interlock", auto_sw);
 			}
-			window.NotifyOthers("foobox_color_bycover", color_bycover);
-			if(!color_bycover) {
-				window.NotifyOthers("color_scheme_updated", null);
-				if(g_color_highlight != c_default_hl){
-					g_color_highlight = c_default_hl;
-					get_images_color();
-					full_repaint();
-				}
-			}
-			window.SetProperty("foobox.color.by.cover", color_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 17:
+			if (status) {
+				show_shadow = true;
+				window.NotifyOthers("panel_show_shadow", show_shadow);
+			}
+			else {
+				show_shadow = false;
+				window.NotifyOthers("panel_show_shadow", show_shadow);
+			}
+			p.settings.pages[parentId].elements[id].repaint();
+			window.RepaintRect(0,0,ww,5);
+			window.RepaintRect(0,wh-5,ww,5);
 			break;
 		}
 		break;
@@ -213,15 +288,15 @@ function settings_radioboxes_action(id, status, parentId) {
 	switch (pid) {
 	case 0:
 		switch (id) {
-		case 2:
-			p.settings.pages[pid].elements[2].status = true;
-			p.settings.pages[pid].elements[3].status = false;
+		case 3:
+			p.settings.pages[pid].elements[3].status = true;
+			p.settings.pages[pid].elements[4].status = false;
 			properties.defaultPlaylistItemAction = "Play";
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
-		case 3:
-			p.settings.pages[pid].elements[2].status = false;
-			p.settings.pages[pid].elements[3].status = true;
+		case 4:
+			p.settings.pages[pid].elements[3].status = false;
+			p.settings.pages[pid].elements[4].status = true;
 			properties.defaultPlaylistItemAction = "Add to playback queue";
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
@@ -450,29 +525,109 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 0:
 			p.settings.pages[pid].elements[0].status = true;
 			p.settings.pages[pid].elements[1].status = false;
-			sys_scrollbar = true;
-			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			cScrollBar.width = get_system_scrollbar_width();
-			properties.cursor_max = 125*zdpi;
-			//if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
-			//else{
-				p.headerBar && p.headerBar.setButtons();
-				resize_panels();
-			//}
+			p.settings.pages[pid].elements[2].status = false;
+			p.settings.pages[pid].elements[3].status = false;
+			p.settings.pages[pid].elements[4].status = false;
+			ui_mode_set = 0;
+			window.NotifyOthers("ui_mode", ui_mode_set);
 			break;
 		case 1:
 			p.settings.pages[pid].elements[0].status = false;
 			p.settings.pages[pid].elements[1].status = true;
-			sys_scrollbar = false;
-			window.SetProperty("foobox.ui.scrollbar.system", sys_scrollbar);
+			p.settings.pages[pid].elements[2].status = false;
+			p.settings.pages[pid].elements[3].status = false;
+			p.settings.pages[pid].elements[4].status = false;
+			ui_mode_set = 1;
+			window.NotifyOthers("ui_mode", ui_mode_set);
+			break;
+		case 2:
+			p.settings.pages[pid].elements[0].status = false;
+			p.settings.pages[pid].elements[1].status = false;
+			p.settings.pages[pid].elements[2].status = true;
+			p.settings.pages[pid].elements[3].status = false;
+			p.settings.pages[pid].elements[4].status = false;
+			ui_mode_set = 2;
+			window.NotifyOthers("ui_mode", ui_mode_set);
+			break;
+		case 3:
+			p.settings.pages[pid].elements[0].status = false;
+			p.settings.pages[pid].elements[1].status = false;
+			p.settings.pages[pid].elements[2].status = false;
+			p.settings.pages[pid].elements[3].status = true;
+			p.settings.pages[pid].elements[4].status = false;
+			ui_mode_set = 3;
+			window.NotifyOthers("ui_mode", ui_mode_set);
+			break;
+		case 4:
+			p.settings.pages[pid].elements[0].status = false;
+			p.settings.pages[pid].elements[1].status = false;
+			p.settings.pages[pid].elements[2].status = false;
+			p.settings.pages[pid].elements[3].status = false;
+			p.settings.pages[pid].elements[4].status = true;
+			ui_mode_set = 4;
+			window.NotifyOthers("ui_mode", ui_mode_set);
+			break;
+		case 5:
+			p.settings.pages[pid].elements[5].status = true;
+			p.settings.pages[pid].elements[6].status = false;
+			p.settings.pages[pid].elements[7].status = false;
+			random_mode = 0;
+			window.NotifyOthers("random_color_mode", random_mode);
+			get_colors();
+			break;
+		case 6:
+			p.settings.pages[pid].elements[5].status = false;
+			p.settings.pages[pid].elements[6].status = true;
+			p.settings.pages[pid].elements[7].status = false;
+			random_mode = 1;
+			window.NotifyOthers("random_color_mode", random_mode);
+			get_colors();
+			break;
+		case 7:
+			p.settings.pages[pid].elements[5].status = false;
+			p.settings.pages[pid].elements[6].status = false;
+			p.settings.pages[pid].elements[7].status = true;
+			random_mode = 2;
+			window.NotifyOthers("random_color_mode", random_mode);
+			get_colors();
+			break;
+		case 20:
+			p.settings.pages[pid].elements[20].status = true;
+			p.settings.pages[pid].elements[21].status = false;
+			rating2tag = true;
+			window.NotifyOthers("set_rating_2_tag", rating2tag);
+			break;
+		case 21:
+			p.settings.pages[pid].elements[20].status = false;
+			p.settings.pages[pid].elements[21].status = true;
+			rating2tag = false;
+			window.NotifyOthers("set_rating_2_tag", rating2tag);
+			break;
+		case 18:
+			p.settings.pages[pid].elements[18].status = true;
+			p.settings.pages[pid].elements[19].status = false;
+			sys_scrollbar = true;
 			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			cScrollBar.width = 12*zdpi;
-			properties.cursor_max = 110*zdpi;
-			//if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
-			//else{
+			cScrollBar.width = get_system_scrollbar_width();
+			properties.cursor_max = 120*zdpi;
+			if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
+			else{
 				p.headerBar && p.headerBar.setButtons();
 				resize_panels();
-			//}
+			}
+			break;
+		case 19:
+			p.settings.pages[pid].elements[18].status = false;
+			p.settings.pages[pid].elements[19].status = true;
+			sys_scrollbar = false;
+			window.NotifyOthers("scrollbar_width", sys_scrollbar);
+			cScrollBar.width = 12*zdpi;
+			properties.cursor_max = 105*zdpi;
+			if (!properties.showscrollbar) {p.settings.setSize(0, 0, ww, wh);}
+			else{
+				p.headerBar && p.headerBar.setButtons();
+				resize_panels();
+			}
 			break;
 		};
 		full_repaint();
@@ -528,9 +683,9 @@ function settings_listboxes_action(pageId, id, selectedId) {
 				};
 				// update checkbox status / selected column Id in the listbox
 				p.settings.pages[1].elements[0].status = (p.headerBar.columns[selectedId].percent > 0);
-			}
+			};
 			catch (e) {
-				console.log("WSH Error catched: settings_listboxes_action");
+				fb.trace("WSH Error catched: settings_listboxes_action");
 			};
 			full_repaint();
 			break;
@@ -678,7 +833,7 @@ function settings_listboxes_action(pageId, id, selectedId) {
 				};
 
 			} catch (e) {
-				console.log("WSH Error catched: settings_listboxes_action");
+				fb.trace("WSH Error catched: settings_listboxes_action");
 			};
 			full_repaint();
 			break;
@@ -689,18 +844,6 @@ function settings_listboxes_action(pageId, id, selectedId) {
 
 function settings_textboxes_action(pageId, elementId) {
 	switch (pageId) {
-	case 0:
-		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
-		switch (elementId) {
-		case 6:
-			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_dir != ""){
-				track_edit_app = new_dir;
-				window.SetProperty("foobox.track.editor", track_edit_app);
-			}
-			break;
-		}
-		break;
 	case 1:
 		// Columns
 		var selectedColumnId = p.settings.pages[pageId].elements[0].selectedId;
@@ -853,9 +996,39 @@ function settings_textboxes_action(pageId, elementId) {
 			break;
 		};
 		break;
-	case 3:
+	case 4:
 		switch (elementId) {
-		case 5:
+		case 0:
+			var _dir = album_cover_dir;
+			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			if (new_dir == "") new_dir = _dir;
+			if (new_dir != "%path%" && !fso.FolderExists(new_dir)) new_dir = _dir;
+			if (new_dir){
+				album_cover_dir = new_dir;
+			}
+			window.NotifyOthers("set_album_dir", album_cover_dir);
+			break;
+		case 1:
+			var _dir = artist_cover_dir;
+			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			if (new_dir == "") new_dir = _dir;
+			if (new_dir != "%path%" && !fso.FolderExists(new_dir)) new_dir = _dir;
+			if (new_dir){
+				artist_cover_dir = new_dir;
+			}
+			window.NotifyOthers("set_artist_dir", artist_cover_dir);
+			break;
+		case 2:
+			var _dir = genre_cover_dir;
+			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			if (new_dir == "") new_dir = _dir;
+			if (!fso.FolderExists(new_dir)) new_dir = _dir;
+			if (new_dir){
+				genre_cover_dir = new_dir;
+			}
+			window.NotifyOthers("set_genre_dir", genre_cover_dir);
+			break;
+		case 3:
 			var _dir = dir_cover_name;
 			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_dir == "") new_dir = _dir;
@@ -863,97 +1036,13 @@ function settings_textboxes_action(pageId, elementId) {
 				dir_cover_name = new_dir;
 			}
 			window.NotifyOthers("set_dir_name", dir_cover_name);
-			break;	
+			break;
 		}
 		break;
 	};
 };
 
 // =================================================================== // Objects
-
-oLink = function (){
-	//thix.id = id;
-	this.x = 0;
-	this.y = 0;
-	this.h = p.settings.lineHeight;
-	this.link_hover = 0;
-	var pic = gdi.CreateImage(200, 200);
-		gpic = pic.GetGraphics();
-	this.w1 = gpic.CalcTextWidth("Preferences", g_font);
-	this.x2 = gpic.CalcTextWidth("Preferences  |  ", g_font);
-	this.w2 = gpic.CalcTextWidth("foobx Help", g_font);
-	this.x3 = gpic.CalcTextWidth("Preferences  |  foobx Help  |  ", g_font);
-	this.w3 = gpic.CalcTextWidth("foobar2000 Home", g_font);
-	this.w_sep = gpic.CalcTextWidth("  |  ", g_font);
-	this.w = this.x3 + this.w3;
-	pic.ReleaseGraphics(gpic);
-	
-	this.draw = function(gr, x, y){
-		this.x = x;
-		this.y = y;
-		gr.GdiDrawText("Preferences", (this.link_hover == 1) ? g_font_ud : g_font, g_color_highlight, this.x, this.y, this.w1, this.h, lc_txt);
-		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.w1, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobx Help", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
-		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.x2 + this.w2, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobar2000 Home", (this.link_hover == 3) ? g_font_ud : g_font, g_color_highlight, this.x + this.x3, this.y, this.w3, this.h, lc_txt);
-	}
-	this.repaint = function(){
-		window.RepaintRect(this.x, this.y, this.w, this.h);
-	}
-	this._isHover = function(x, y) {
-		return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
-	};
-	this.ShellExecute = function (arg1, arg2, arg3, arg4, arg5) {
-		try {
-			var shellObj = new ActiveXObject("Shell.Application");
-		} catch (e) {
-			PopMessage("Can not create ActiveX object (Shell.Application), command can't be execute. Please check your system authorities.", 16);
-			return;
-		}
-		shellObj.ShellExecute(arg1, arg2, arg3, arg4, arg5);
-	}
-	this.on_mouse = function(event, x, y) {
-		var link_old = this.link_hover;
-		this.ishover = this._isHover(x, y);
-		switch (event) {
-		case "move":
-			if(this.ishover){
-				if(x < this.x + this.w1) this.link_hover = 1;
-				else if (x > this.x + this.x3) this.link_hover = 3;
-				else if (x > this.x + this.x2 && x < this.x + this.x2 + this.w2) this.link_hover = 2;
-				else this.link_hover = 0;
-				if(this.link_hover) window.SetCursor(IDC_HAND);
-			}
-			else {
-				this.link_hover = 0;
-				window.SetCursor(IDC_ARROW);
-			}
-			break;
-		case "up":
-			if (this.link_hover > 0){
-			switch (this.link_hover) {
-				case 1:
-					fb.RunMainMenuCommand("File/Preferences");
-					break;
-				case 2:
-					this.ShellExecute("https://www.cnblogs.com/foobox/p/15195908.html", "", "", "open", 1);
-					break;
-				case 3:
-					this.ShellExecute("https://www.foobar2000.org", "", "", "open", 1);
-					break;
-			};
-			this.link_hover = 0;
-			}
-			break;
-		case "leave":
-			this.link_hover = 0;
-			window.SetCursor(IDC_ARROW);
-			break;
-		}
-		if(this.link_hover != link_old) this.repaint();
-		return this.ishover;
-	}
-}
 
 oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 	this.objType = "CB";
@@ -1000,7 +1089,7 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		// button
 		if (this.status) {
 			this.button = new button(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
-		}
+		};
 		else {
 			this.button = new button(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
 		};
@@ -1013,7 +1102,7 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 			var button_zoomSize = g_z16;
 			if (this.status) {
 				this.button.update(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
-			}
+			};
 			else {
 				this.button.update(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
 			};
@@ -1024,7 +1113,7 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 			var button_y = this.ly - 1 + Math.ceil((p.settings.lineHeight - this.button.h) / 2);
 			this.button.draw(gr, this.x, button_y, 255);
 			var label_x = this.x + this.button.w + g_z5;
-			gr.GdiDrawText(this.label, p.settings.font, (this.status ? p.settings.color2 : p.settings.color1), label_x, this.ly, p.settings.w, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText(this.label, p.settings.font, (this.status ? p.settings.color2 : p.settings.color1), label_x, this.ly, p.settings.w, p.settings.lineHeight, lc_txt);
 		};
 	};
 	
@@ -1099,7 +1188,7 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		// button
 		if (this.status) {
 			this.button = new button(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
-		}
+		};
 		else {
 			this.button = new button(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
 		};
@@ -1110,7 +1199,7 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		var button_zoomSize = g_z16;
 		if (this.status) {
 			this.button.update(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
-		}
+		};
 		else {
 			this.button.update(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
 		};
@@ -1119,7 +1208,7 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 			var button_y = this.ly - 1 + Math.ceil((p.settings.lineHeight - this.button.h) / 2);
 			this.button.draw(gr, this.x, button_y, 255);
 			var label_x = this.x + this.button.w + g_z5;
-			gr.GdiDrawText(this.label, p.settings.font, (this.status ? p.settings.color2 : p.settings.color1), label_x, this.ly, p.settings.w, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText(this.label, p.settings.font, (this.status ? p.settings.color2 : p.settings.color1), label_x, this.ly, p.settings.w, p.settings.lineHeight, lc_txt);
 		};
 	};
 
@@ -1158,7 +1247,7 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 	this.value = value;
 	var gfunc = func;
 
-	this.inputbox = new oInputbox(this.w, this.h, this.value, "", RGB(0, 0, 0), RGB(240, 240, 240), RGB(180, 180, 180), g_color_selected_bg, gfunc + "(" + this.parentPageId + ", " + this.id + ")", "p.settings.pages[" + this.parentPageId + "].elements[" + this.id + "]", this.id, p.settings.txtHeight, 255);
+	this.inputbox = new oInputbox(this.w, this.h, this.value, "", RGB(0, 0, 0), RGB(240, 240, 240), RGB(180, 180, 180), RGB(135, 135, 135), gfunc + "(" + this.parentPageId + ", " + this.id + ")", "p.settings.pages[" + this.parentPageId + "].elements[" + this.id + "]", this.id, p.settings.txtHeight, 255);
 	this.inputbox.autovalidation = false;
 
 	this.repaint = function() {
@@ -1168,7 +1257,7 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 	this.draw = function(gr) {
 		this.ly = this.y - (p.settings.pages[this.parentPageId].offset * cSettings.rowHeight);
 		if (this.ly + this.h > cSettings.topBarHeight) {
-			gr.GdiDrawText(this.label, g_font_b, p.settings.color1, this.x, this.ly, p.list.w - p.settings.pages[this.parentPageId].scrollbarWidth - 10, this.h, lc_txt);
+			gr.gdiDrawText(this.label, g_font_b, p.settings.color1, this.x, this.ly, p.list.w - p.settings.pages[this.parentPageId].scrollbarWidth - 10, this.h, lc_txt);
 			this.inputbox.draw(gr, this.x, this.ly + this.h);
 		};
 	};
@@ -1231,7 +1320,7 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 					if (next_textbox_id < 0) {
 						next_textbox_id = first_textbox_id;
 					};
-				}
+				};
 				else {
 					// scan elements to find objectType = "TB" / TextBox
 					var first_textbox_id = -1;
@@ -1271,7 +1360,7 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 					if (p.settings.pages[this.parentPageId].offset < 0) p.settings.pages[this.parentPageId].offset = 0;
 					p.settings.pages[this.parentPageId].scrollbar.reSet(p.settings.pages[this.parentPageId].total_rows, cSettings.rowHeight, p.settings.pages[this.parentPageId].offset);
 					full_repaint();
-				}
+				};
 				else if (next_ly > p.settings.pages[this.parentPageId].y + p.settings.pages[this.parentPageId].h - cSettings.rowHeight * 3) {
 					var maxOffset = p.settings.pages[this.parentPageId].total_rows - p.settings.pages[this.parentPageId].totalRowsVis;
 					var d = Math.ceil((next_ly - (p.settings.pages[this.parentPageId].y + p.settings.pages[this.parentPageId].h) + cSettings.rowHeight * 3) / cSettings.rowHeight);
@@ -1290,6 +1379,167 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 
 	this.on_focus = function(is_focused) {
 		this.inputbox.on_focus(is_focused);
+	};
+};
+
+oSlider = function(id, w, h, range, color_mode, value, parentPageId, parentWidgetId) {
+	this.id = id;
+	this.parentPageId = parentPageId;
+	this.parentWidgetId = parentWidgetId;
+	this.w = w;
+	this.h = h;
+	this.range = range;
+	this.value = value;
+	this.colorMode = color_mode;
+	this.cw = 7;
+	this.ch = this.h + 4;
+	//
+	this.ratio = 1;
+	this.Zx = 0;
+	this.Zy = 0;
+	this.Zw = 0;
+	this.Zh = 0;
+	this.Zcx = 0;
+	this.Zcy = 0;
+	this.Zcw = 0;
+	this.Zch = 0;
+	//
+	this.drag = false;
+	this.dragX = 0;
+
+	this.setValue = function(x) {
+		this.ratioValue = (x - this.Zx) / this.Zw;
+		var v = Math.floor(this.range * this.ratioValue);
+		return v;
+	};
+
+	this.setCursorPos = function(v) {
+		this.ratioPos = v / this.range;
+		var Zcx = Math.floor((this.Zw - this.Zcw) * this.ratioPos);
+		return Zcx;
+	};
+
+	this.adjustSize = function() {
+		this.Zw = zoom(this.w, zdpi);
+		this.Zh = zoom(this.h, zdpi);
+		this.Zcw = zoom(this.cw, zdpi);
+		this.Zch = zoom(this.ch, zdpi);
+		this.Zcx = this.setCursorPos(this.value);
+	};
+	this.adjustSize();
+
+	this.draw = function(gr, x, y) {
+		// bar x, y
+		this.Zx = x;
+		this.Zy = y;
+		// cursor Y
+		this.Zcy = this.Zy - Math.floor((this.Zch - this.Zh) / 2);
+		// draw slider bar
+		var widget_x = p.settings.pages[this.parentPageId].elements[this.parentWidgetId].x;
+		this.left_padding = widget_x + g_z10;
+		left_padding = 0;
+		switch (this.colorMode) {
+		case "R":
+			gr.FillSolidRect(left_padding + this.Zx, this.Zy, this.Zw, this.Zh, RGB(255, 0, 0));
+			break;
+		case "G":
+			gr.FillSolidRect(left_padding + this.Zx, this.Zy, this.Zw, this.Zh, RGB(0, 255, 0));
+			break;
+		case "B":
+			gr.FillSolidRect(left_padding + this.Zx, this.Zy, this.Zw, this.Zh, RGB(0, 0, 255));
+			break;
+		};
+		gr.FillGradRect(left_padding + this.Zx - 1, this.Zy, this.Zw, this.Zh, 0, RGB(0, 0, 0), 0, 1.0);
+
+		// draw cursor
+		if (p.settings.pages[this.parentPageId].elements[this.parentWidgetId].colorEnabled) {
+			var cursor_color = (p.settings.colorWidgetFocusedId == this.parentWidgetId ? (p.settings.colorSliderFocusedId == this.id ? RGB(255, 255, 255) : RGB(180, 180, 180)) : RGB(180, 180, 180));
+			gr.FillSolidRect(this.Zx + this.Zcx, this.Zcy, this.Zcw, this.Zch, cursor_color);
+			gr.DrawRect(this.Zx + this.Zcx, this.Zcy, this.Zcw - 1, this.Zch - 1, 1.0, RGB(30, 30, 30));
+		};
+		else {
+			var cursor_color = RGB(180, 180, 180);
+			gr.FillSolidRect(this.Zx + 0, this.Zcy, this.Zcw, this.Zch, cursor_color);
+			gr.DrawRect(this.Zx + 0, this.Zcy, this.Zcw - 1, this.Zch - 1, 1.0, RGB(30, 30, 30));
+		};
+
+	};
+
+	this.isHoverCursor = function(x, y) {
+		var widget_x = p.settings.pages[this.parentPageId].elements[this.parentWidgetId].x;
+		this.left_padding = widget_x + g_z10;
+		var tmp = (x >= this.left_padding + this.Zcx - 1 && x <= this.left_padding + this.Zcx + this.Zcw + 1 && y >= this.Zcy && y <= this.Zcy + this.Zch);
+		return tmp;
+	};
+
+	this.isHoverBar = function(x, y) {
+		return (x >= this.Zx && x <= this.Zx + this.Zw && y >= this.Zy && y <= this.Zy + this.Zh);
+	};
+
+	this.on_mouse = function(event, x, y, delta) {
+		if (p.settings.pages[this.parentPageId].elements[this.parentWidgetId].colorEnabled) {
+			switch (event) {
+			case "down":
+				if (this.isHoverBar(x, y) && !this.isHoverCursor(x, y)) {
+					this.drag = true;
+					this.dragX = x;
+					this.value = this.setValue(x);
+					this.Zcx = this.setCursorPos(this.value);
+					p.settings.pages[this.parentPageId].elements[this.parentWidgetId].repaint();
+				};
+				else if (this.isHoverCursor(x, y)) {
+					this.drag = true;
+					this.dragX = x;
+				};
+				break;
+			case "up":
+				if (this.drag) {
+					p.settings.color_updated = true;
+					p.settings.colorWidgetFocusedId = this.parentWidgetId;
+					p.settings.colorSliderFocusedId = this.id;
+					//
+					this.drag = false;
+					this.dragX = 0;
+					//
+					p.settings.pages[this.parentPageId].elements[this.parentWidgetId].repaint();
+				};
+				break;
+			case "move":
+				if (this.drag) {
+					if (x >= this.Zx && x <= this.Zx + this.Zw) {
+						this.value = this.setValue(x);
+						this.Zcx = this.setCursorPos(this.value);
+						p.settings.pages[this.parentPageId].elements[this.parentWidgetId].repaint();
+					};
+				};
+				break;
+			};
+		};
+	};
+
+	this.on_key = function(event, vkey) {
+		if (!p.timer_onKey) {
+			switch (vkey) {
+			case VK_LEFT:
+				var prev_value = this.value;
+				this.value = this.value > 0 ? this.value - 1 : 0;
+				if (prev_value != this.value) p.settings.color_updated = true;
+				this.Zcx = this.setCursorPos(this.value);
+				p.settings.pages[this.parentPageId].elements[this.parentWidgetId].repaint();
+				break;
+			case VK_RIGHT:
+				var prev_value = this.value;
+				this.value = this.value < this.range ? this.value + 1 : this.range;
+				if (prev_value != this.value) p.settings.color_updated = true;
+				this.Zcx = this.setCursorPos(this.value);
+				p.settings.pages[this.parentPageId].elements[this.parentWidgetId].repaint();
+				break;
+			};
+			p.timer_onKey = window.SetTimeout(function() {
+				p.timer_onKey && window.ClearTimeout(p.timer_onKey);
+				p.timer_onKey = false;
+			}, 150);
+		};
 	};
 };
 
@@ -1314,6 +1564,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 	var gfunc = func;
 	// scrollbar instance
 	this.scrollbar = new oScrollBar(this.id, this.objectName + ".scrollbar", this.x + this.w - cScrollBar.width, this.ly, cScrollBar.width, this.h, this.arr.length, this.rowHeight, this.offset, this.objectName, false, 3, true);
+	this.scrollbar.setCustomColors(RGB(240, 240, 240), RGB(0, 0, 0));
 	this.scrollbarWidth = 0;
 
 	this.repaint = function() {
@@ -1326,7 +1577,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			var max_offset = this.total - this.totalRows;
 			this.offset = rowId > max_offset ? max_offset : rowId;
 			this.scrollbar.updateCursorPos(this.offset);
-		}
+		};
 		else {
 			this.offset = 0;
 		};
@@ -1341,7 +1592,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 		this.scrollbar.reSet(this.total, this.rowHeight, this.offset);
 		if (this.scrollbar.visible) {
 			this.scrollbarWidth = this.scrollbar.w;
-		}
+		};
 		else {
 			this.scrollbarWidth = 0;
 		};
@@ -1364,7 +1615,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 		this.scrollbar.reSize(this.x + this.w - cScrollBar.width, this.ly, cScrollBar.width, this.h, this.arr.length, this.rowHeight, this.offset);
 		if (this.scrollbar.visible) {
 			this.scrollbarWidth = this.scrollbar.w;
-		}
+		};
 		else {
 			this.scrollbarWidth = 0;
 		};
@@ -1379,7 +1630,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 		this.scrollbar.reSet(this.total, this.rowHeight, this.offset);
 		if (this.scrollbar.visible) {
 			this.scrollbarWidth = this.scrollbar.w;
-		}
+		};
 		else {
 			this.scrollbarWidth = 0;
 		};
@@ -1388,7 +1639,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 
 		// listbox bg
 		if (this.label.length > 0) {
-			gr.GdiDrawText(this.label, g_font_b, p.settings.color1, this.x, this.ly - this.rowHeight - g_z2, this.w, this.rowHeight, lc_txt);
+			gr.gdiDrawText(this.label, g_font_b, p.settings.color1, this.x, this.ly - this.rowHeight - g_z2, this.w, this.rowHeight, lc_txt);
 		};
 		gr.FillSolidRect(this.x, this.ly, this.w, this.h + 1, RGB(240, 240, 240));
 		gr.DrawRect(this.x - 1, this.ly - 1, this.w + 1, this.h + 2, 1.0, RGB(180, 180, 180));
@@ -1409,8 +1660,8 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 				isCustom = (p.list.groupby[i].ref.substr(0, 6) == "Custom");
 				break;
 			};
-			if (i == this.selectedId) gr.FillSolidRect(this.x + 1, this.ly + row * this.rowHeight + 1, this.w - this.scrollbarWidth - 2, this.rowHeight - 1, RGB(155, 155, 155));
-			gr.GdiDrawText((isCustom ? "[" : "") + this.arr[i] + (isCustom ? "]" : ""), (i == this.selectedId ? g_font_b : p.settings.font), RGB(0, 0, 0), this.x + text_padding, this.ly + row * this.rowHeight, this.w - this.scrollbarWidth - text_padding * 2, this.rowHeight, lc_txt);
+			if (i == this.selectedId) gr.FillSolidRect(this.x + 1, this.ly + row * this.rowHeight + 1, this.w - this.scrollbarWidth - 2, this.rowHeight - 1, RGB(135, 135, 135));
+			gr.gdiDrawText((isCustom ? "[" : "") + this.arr[i] + (isCustom ? "]" : ""), (i == this.selectedId ? g_font_b : p.settings.font), (i == this.selectedId ? RGB(0, 0, 0) : RGB(0, 0, 0)), this.x + text_padding, this.ly + row * this.rowHeight, this.w - this.scrollbarWidth - text_padding * 2, this.rowHeight, lc_txt);
 			row++;
 		};
 	};
@@ -1543,7 +1794,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			var c5 = p.headerBar.columns[id].enableCustomColor;
 			var c6 = p.headerBar.columns[id].customColor;
 
-			p.headerBar.columns.push(new oColumn("copy of " + c0, c1, c2, 0, "Custom " + num(no_user, 2), c3, c4, c5, c6));
+			p.headerBar.columns.push(new oColumn("copy of "+ c0, c1, c2, 0, "Custom " + num(no_user, 2), c3, c4, c5, c6));
 			p.headerBar.totalColumns++;
 			window.SetProperty("SYSTEM.HeaderBar.TotalColumns", p.headerBar.totalColumns);
 			var arr = [];
@@ -1587,7 +1838,7 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 			full_repaint();
 			break;
 		};
-		//_menu.Dispose();
+		_menu.Dispose();
 		return true;
 	};
 };
@@ -1619,24 +1870,24 @@ oPage = function(id, objectName, label, nbrows) {
 		var txtbox_x = 20;
 		var oTextBox_1 = 600*zdpi;//ww - txtbox_x * 2 - this.scrollbarWidth;
 		var oTextBox_2 = oTextBox_1 - 60;
-		var oTextBox_3 = Math.min(oTextBox_1, 250*zdpi);
+		var oTextBox_3 = Math.min(oTextBox_1, 300*zdpi);
 		var oTextBox_4 = Math.min(oTextBox_2 - 100*zdpi, 450*zdpi);
 		switch (this.id) {
 		case 0:
 			// General
 			var rh = cSettings.rowHeight;
+			// Layout options
+			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "Show header (toggle = CTRL+T)", "cHeaderBar.locked", "settings_checkboxes_action", this.id));
 			// Behaviour options
-			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "Smooth scrolling", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 3.25, "Touch scrolling control (disable drag'n drop)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 4.25, "Smooth scrolling", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 5.25, "Touch scrolling control (disable drag'n drop)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
 
 			// play option
 			var spaceBetween_w = zoom(70, zdpi);
-			this.elements.push(new oRadioButton(2, txtbox_x, cSettings.topBarHeight + rh * 5.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(3, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 5.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(3, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
 
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Append \"Selection\" sub-contextmenu", "properties.selectionmenu", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Play next playlist at the end (for default playback order only, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_2, cHeaderBar.height, "External track editor (optional，called in the contextmenu, e.g. MusicTag, Mp3tag)", track_edit_app, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 9.25, "Play next playlist at the end of current one (for default playback order only, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1649,6 +1900,7 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			var listBoxRowHeight = zoom(21, zdpi);
 			var listBoxRowNum = 6;
+			//var listBoxHeight = Math.floor(wh - (cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight) - 25);
 			var listBoxWidth = zoom(120, zdpi);
 			var listBoxCurrentId = 0;
 			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "Columns", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
@@ -1683,6 +1935,7 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			var listBoxRowHeight = zoom(21, zdpi);
 			var listBoxRowNum = 6;
+			//var listBoxHeight = Math.floor(wh - (cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight) - 25);
 			var listBoxWidth = zoom(175, zdpi);
 			var listBoxCurrentId = cGroup.pattern_idx;
 			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "Group by", arr, listBoxCurrentId, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
@@ -1750,12 +2003,38 @@ oPage = function(id, objectName, label, nbrows) {
 		case 3:
 			//foobox options
 			var rh = cSettings.rowHeight;
-			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(1, zoom(120, zdpi), cSettings.topBarHeight + rh * 2.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Record in file tag also", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Cover/info panel follow cursor, not follow playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Highlight color follow cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.75), oTextBox_3, cHeaderBar.height, "Cover filename for groups by folder", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "Random of the following themes", (ui_mode_set == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 3.25, "White", (ui_mode_set == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(2, zoom(120, zdpi), cSettings.topBarHeight + rh * 3.25, "Light", (ui_mode_set == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(3, zoom(220, zdpi), cSettings.topBarHeight + rh * 3.25, "Dark", (ui_mode_set == 3), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, zoom(320, zdpi), cSettings.topBarHeight + rh * 3.25, "Darker", (ui_mode_set == 4), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, 20, cSettings.topBarHeight + rh * 5.25, "Random", (random_mode == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(6, zoom(120, zdpi), cSettings.topBarHeight + rh * 5.25, "Black and white", (random_mode == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(7, zoom(280, zdpi), cSettings.topBarHeight + rh * 5.25, "Keep current", (random_mode == 2), "settings_radioboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 6.25, "Vary follow cover", "col_by_cover ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 8.25, "Global highlight color", "esl_hcolor_auto ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(10, zoom(170, zdpi), cSettings.topBarHeight + rh * 8.25, "Global font", "esl_font_auto ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(11, zoom(300, zdpi), cSettings.topBarHeight + rh * 8.25, "Bold", "esl_font_bold ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(12, 20, cSettings.topBarHeight + rh * 10.25, "No window border", "ui_noborder ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(13, zoom(150, zdpi), cSettings.topBarHeight + rh * 10.25, "Show full-screen button", "btn_fullscr ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 11.25, "Album cover = disc + front, and disc is preferable", "album_front_disc ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 12.25, "Right panels follow cursor (not recommended)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(16, 20, cSettings.topBarHeight + rh * 13.25, "Switch right panels automatically following main panels", "auto_sw ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(17, 20, cSettings.topBarHeight + rh * 14.25, "Shadow effect for top and bottom bars", "show_shadow ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(18, 20, cSettings.topBarHeight + rh * 16.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(19, zoom(120, zdpi), cSettings.topBarHeight + rh * 16.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
+			if(foo_playcount){
+				this.elements.push(new oRadioButton(20, 20, cSettings.topBarHeight + rh * 18.25, "Recorded by both playcount and file tags", (rating2tag == true), "settings_radioboxes_action", this.id));
+				this.elements.push(new oRadioButton(21, zoom(280, zdpi), cSettings.topBarHeight + rh * 18.25, "Recorded by playcount only", (rating2tag == false), "settings_radioboxes_action", this.id));
+			}
+			break;
+		case 4:
+			//jssb options
+			var rh = cSettings.rowHeight;
+			this.elements.push(new oTextBox(0, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_2, cHeaderBar.height, "Album", album_cover_dir, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(1, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 6.25), oTextBox_2, cHeaderBar.height, "Artist", artist_cover_dir, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(2, txtbox_x + 30, Math.ceil(cSettings.topBarHeight + rh * 8.25), oTextBox_2, cHeaderBar.height, "Genre（don't use %path%）", genre_cover_dir, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(3, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.25), oTextBox_3, cHeaderBar.height, "Filename of folder cover（don't input filename extension）", dir_cover_name, "settings_textboxes_action", this.id));			
 			break;
 		};
 	};
@@ -1771,7 +2050,7 @@ oPage = function(id, objectName, label, nbrows) {
 		this.scrollbar.reSize(p.settings.x + p.settings.w - cScrollBar.width, p.settings.y + cSettings.topBarHeight + cHeaderBar.height, cScrollBar.width, p.settings.h - cSettings.topBarHeight - cHeaderBar.height, this.total_rows, cSettings.rowHeight, this.offset);
 		if (this.scrollbar.visible) {
 			this.scrollbarWidth = this.scrollbar.w;
-		}
+		};
 		else {
 			this.scrollbarWidth = 0;
 		};
@@ -1789,20 +2068,21 @@ oPage = function(id, objectName, label, nbrows) {
 
 		switch (this.id) {
 		case 0:
-			gr.GdiDrawText("Behaviour", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Layout", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Behaviour", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 1:
 			var listBoxWidth = zoom(120, zdpi);
-			gr.GdiDrawText("Status", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.7 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Text Alignment", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 16.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Status", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.7 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Text Alignment", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 16.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			// new column button
 			var nx = 20 + listBoxWidth + g_z30;
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
 			if (p.headerBar.columns.length < properties.max_columns) {
 				p.settings.newbutton.draw(gr, nx, ny, 255);
-			}
+			};
 			else {
 				gr.DrawImage(p.settings.new_no, nx, ny, p.settings.new_no.Width, p.settings.new_no.Height, 0, 0, p.settings.new_no.Width, p.settings.new_no.Height, 0, 255);
 			};
@@ -1814,7 +2094,7 @@ oPage = function(id, objectName, label, nbrows) {
 			var ref = p.headerBar.columns[idx].ref;
 			if (ref.substr(0, 6) == "Custom") {
 				p.settings.delbutton.draw(gr, dx, dy, 255);
-			}
+			};
 			else {
 				gr.DrawImage(p.settings.del_no, dx, dy, p.settings.del_no.Width, p.settings.del_no.Height, 0, 0, p.settings.del_no.Width, p.settings.del_no.Height, 0, 255);
 			};
@@ -1826,7 +2106,7 @@ oPage = function(id, objectName, label, nbrows) {
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
 			if (p.headerBar.columns.length < properties.max_columns) {
 				p.settings.newbuttonPattern.draw(gr, nx, ny, 255);
-			}
+			};
 			else {
 				gr.DrawImage(p.settings.new_no, nx, ny, p.settings.new_no.Width, p.settings.new_no.Height, 0, 0, p.settings.new_no.Width, p.settings.new_no.Height, 0, 255);
 			};
@@ -1838,25 +2118,38 @@ oPage = function(id, objectName, label, nbrows) {
 			var ref = p.list.groupby[idx].ref;
 			if (ref.substr(0, 6) == "Custom") {
 				p.settings.delbuttonPattern.draw(gr, dx, dy, 255);
-			}
+			};
 			else {
 				gr.DrawImage(p.settings.del_no, dx, dy, p.settings.del_no.Width, p.settings.del_no.Height, 0, 0, p.settings.del_no.Width, p.settings.del_no.Height, 0, 255);
 			};
-			gr.GdiDrawText("Collapsed row height", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Expanded row height", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Cover", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 20.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Auto-collapse", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 22.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Default group status", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 24.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			//gr.FillSolidRect(txtbox_x, cSettings.topBarHeight + rh * 12.75 - (this.offset * cSettings.rowHeight), p.settings.w - 20 * 2 - cScrollBar.width, 2, p.settings.color1);
+			gr.gdiDrawText("Collapsed row height", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Expanded row height", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Cover", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 20.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Auto-collapse", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 22.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Default group status", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 24.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 
 			var GHF_delta = 13.0;
-			gr.GdiDrawText("Group header fields", g_font_blank, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * (13.0 + GHF_delta) - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Group header fields", g_font_blank, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * (13.0 + GHF_delta) - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 3:
-			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("其他选项", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("folder cover located in the track directory，jpg or png format", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 10.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 12.25 - (this.offset * cSettings.rowHeight));
+			gr.gdiDrawText("UI theme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Color scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("ESLyric Font", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 7.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 9.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 15.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 17.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			if(!foo_playcount) gr.gdiDrawText("Playcount component not installed, rating will write to file tags", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 18.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			p.settings.opt_fb2k_btn.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 19.5 - (this.offset * cSettings.rowHeight), 255);
+			break;
+		case 4:
+			gr.gdiDrawText("Cover storage path", g_font_b, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("To customize the path, ensure the path is valid (create it if the folder not existing).", p.settings.font, p.settings.color2, txtbox_x + 30, cSettings.topBarHeight + rh * 2.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("To define as same directory with the media tracks, input %path%.", p.settings.font, p.settings.color2, txtbox_x + 30, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("Notes:", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 12.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("1. The settings here are used for download and caching, for the setting of cover reading, go to 'Preference->Display->Album art'", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 13.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("2. Support picture formats: jpg, png", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 14.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.gdiDrawText("3. B drive is the virtual drive mounted for foobar2000 directory.", p.settings.font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 15.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		};
 
@@ -1958,7 +2251,7 @@ oPage = function(id, objectName, label, nbrows) {
 								};
 								p.headerBar.columns[k].w = Math.abs(p.headerBar.w * p.headerBar.columns[k].percent / 100000);
 							};
-						}
+						};
 						else {
 							// it's the last column visible, delete not possile for now !!!
 							return false;
@@ -1986,7 +2279,7 @@ oPage = function(id, objectName, label, nbrows) {
 					var new_idx = (idx == 0 ? 0 : idx - 1);
 					p.settings.pages[1].elements[0].showSelected(new_idx);
 					full_repaint();
-				}
+				};
 				else {
 					// we could not delete a native column!
 					return false;
@@ -2062,18 +2355,31 @@ oPage = function(id, objectName, label, nbrows) {
 					if (idx == cGroup.pattern_idx) {
 						cGroup.pattern_idx = 0;
 						window.SetProperty("SYSTEM.Groups.Pattern Index", cGroup.pattern_idx);
-						window.NotifyOthers("Sorting format change", p.list.groupby[cGroup.pattern_idx].sortOrder);
+						window.NotifyOthers("PLMan to change sorting", p.list.groupby[cGroup.pattern_idx].sortOrder);
 						plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[cGroup.pattern_idx].sortOrder, 1);
 						p.list.updateHandleList(plman.ActivePlaylist, false);
 						p.list.setItems(true);
 						p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 					};
 					full_repaint();
-				}
+				};
 				else {
 					// we could not delete a native "Group By" pattern!
 					return false;
 				};
+			};
+			break;
+		};
+		return state;
+	};
+	
+	this.opt_fb2k_btn_Check = function(event, x, y) {
+		var state = p.settings.opt_fb2k_btn.checkstate(event, x, y);
+		switch (event) {
+		case "up":
+			if (state == ButtonStates.hover) {
+				// action
+				fb.RunMainMenuCommand("File/Preferences");
 			};
 			break;
 		};
@@ -2133,7 +2439,7 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			break;
 		case 3:
-			if(!p.settings.g_link.on_mouse(event, x, y)) {
+			if(this.opt_fb2k_btn_Check(event, x, y) != ButtonStates.hover) {
 				var fin = this.elements.length;
 				for (var i = 0; i < fin; i++) {
 					this.elements[i].on_mouse(event, x, y, delta);
@@ -2161,14 +2467,11 @@ oSettings = function() {
 	this.tabButtons = [];
 	this.page_loaded = [];
 	//font
-	this.setFont = function() {
-		this.font = g_font;
-		this.font_title = GdiFont(g_fname, g_fsize + 4, 1);
-		this.tab_font = GdiFont(g_fname, g_fsize + 2, 1);
-		this.txtHeight = g_fsize;
-		this.lineHeight = this.txtHeight + 10;
-	}
-	this.setFont();
+	this.font = g_font;
+	this.font_title = GdiFont(g_fname, g_fsize + 6, 1);
+	this.tab_font = GdiFont(g_fname, g_fsize + 2, 1);
+	this.txtHeight = g_fsize;
+	this.lineHeight = this.txtHeight + 10;
 	// var for custom color settings (widgets/sliders)
 	this.color_updated = false;
 	this.colorWidgetFocusedId = -1;
@@ -2177,7 +2480,7 @@ oSettings = function() {
 	this.setColors = function() {
 		// colors
 		this.color0 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.2);
-		this.color1 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
+		this.color1 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.55);
 		this.color2 = g_color_normal_txt;
 		this.color3 = g_color_normal_bg;
 		this.color4 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.35);
@@ -2201,7 +2504,7 @@ oSettings = function() {
 		rect_w = gpic.CalcTextWidth("Remove", g_font_b) + g_z30;
 		this.new_off = gdi.CreateImage(rect_w, x32);
 		gb = this.new_off.GetGraphics();
-		gb.SetSmoothingMode(2);
+		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("New", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
@@ -2209,7 +2512,7 @@ oSettings = function() {
 
 		this.new_ov = gdi.CreateImage(rect_w, x32);
 		gb = this.new_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
+		gb.setSmoothingMode(2);
 		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("New", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
@@ -2217,7 +2520,7 @@ oSettings = function() {
 
 		this.new_no = gdi.CreateImage(rect_w, x32);
 		gb = this.new_no.GetGraphics();
-		gb.SetSmoothingMode(2);
+		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color0);
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("New", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
@@ -2226,7 +2529,7 @@ oSettings = function() {
 		
 		this.del_off = gdi.CreateImage(rect_w, x32);
 		gb = this.del_off.GetGraphics();
-		gb.SetSmoothingMode(2);
+		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("Remove", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
@@ -2234,7 +2537,7 @@ oSettings = function() {
 
 		this.del_ov = gdi.CreateImage(rect_w, x32);
 		gb = this.del_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
+		gb.setSmoothingMode(2);
 		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("Remove", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
@@ -2242,7 +2545,7 @@ oSettings = function() {
 
 		this.del_no = gdi.CreateImage(rect_w, x32);
 		gb = this.del_no.GetGraphics();
-		gb.SetSmoothingMode(2);
+		gb.setSmoothingMode(2);
 		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color0);
 		gb.SetTextRenderingHint(4);
 		gb.DrawString("Remove", g_font_b, this.color3, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
@@ -2256,30 +2559,54 @@ oSettings = function() {
 		this.newbuttonPattern = new button(this.new_off, this.new_ov, this.new_ov);
 		// Delete a Custom "Group By" Pattern
 		this.delbuttonPattern = new button(this.del_off, this.del_ov, this.del_ov);
+		
+		// foobar2000 options button
+		rect_w = gpic.CalcTextWidth("foobar2000 Preference", g_font_b) + g_z30;
+		this.fb2k_off = gdi.CreateImage(rect_w, x32);
+		gb = this.fb2k_off.GetGraphics();
+		gb.setSmoothingMode(2);
+		gb.FillRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, this.color4);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("foobar2000 Preference", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		this.fb2k_off.ReleaseGraphics(gb);
+
+		this.fb2k_ov = gdi.CreateImage(rect_w, x32);
+		gb = this.fb2k_ov.GetGraphics();
+		gb.setSmoothingMode(2);
+		gb.DrawRoundRect(1, 1, rect_w - lineWidth * 2, x28, g_z5, g_z5, lineWidth, this.color1);
+		gb.SetTextRenderingHint(4);
+		gb.DrawString("foobar2000 Preference", g_font_b, this.color2, 1, 1, rect_w - lineWidth * 2, x28, cc_stringformat);
+		this.fb2k_ov.ReleaseGraphics(gb);
+
+		this.opt_fb2k_btn = new button(this.fb2k_off, this.fb2k_ov, this.fb2k_ov);
 
 		// Close Settings Button (BACK)
 		this.close_off = gdi.CreateImage(75, 75);
 		gb = this.close_off.GetGraphics();
-		gb.SetSmoothingMode(0);
+		gb.setSmoothingMode(2);
 		gb.DrawEllipse(3, 3, 66, 66, 6, this.color2);
-		gb.SetSmoothingMode(2);
-		gb.FillSolidRect(18, 34, 34, 6, this.color2);
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(18, 38, 33, 21, 6, this.color2);
-		gb.DrawLine(18, 36, 34, 52, 6, this.color2);
-		gb.SetSmoothingMode(0);
+		gb.DrawEllipse(0, 0, 72, 72, 1.0, RGBA(0, 0, 0, 100));
+		gb.DrawEllipse(6, 6, 60, 60, 3, RGBA(0, 0, 0, 50));
+		gb.setSmoothingMode(0);
+		gb.FillSolidRect(18, 36, 36, 6, this.color2);
+		gb.DrawLine(18, 36, 33, 21, 3, this.color2);
+		gb.DrawLine(21, 36, 36, 21, 3, this.color2);
+		gb.DrawLine(18, 39, 33, 54, 3, this.color2);
+		gb.DrawLine(21, 39, 36, 54, 3, this.color2);
 		this.close_off.ReleaseGraphics(gb);
 
 		this.close_ov = gdi.CreateImage(75, 75);
 		gb = this.close_ov.GetGraphics();
-		gb.SetSmoothingMode(0);
+		gb.setSmoothingMode(2);
 		gb.DrawEllipse(3, 3, 66, 66, 6, this.color1);
-		gb.SetSmoothingMode(2);
-		gb.FillSolidRect(18, 34, 34, 6, this.color1);
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(18, 38, 33, 21, 6, this.color1);
-		gb.DrawLine(18, 36, 34, 52, 6, this.color1);
-		gb.SetSmoothingMode(0);
+		gb.DrawEllipse(0, 0, 72, 72, 1.0, RGBA(0, 0, 0, 50));
+		gb.DrawEllipse(6, 6, 60, 60, 3, RGBA(0, 0, 0, 25));
+		gb.setSmoothingMode(0);
+		gb.FillSolidRect(18, 36, 36, 6, this.color1);
+		gb.DrawLine(18, 36, 33, 21, 3, this.color1);
+		gb.DrawLine(21, 36, 36, 21, 3, this.color1);
+		gb.DrawLine(18, 39, 33, 54, 3, this.color1);
+		gb.DrawLine(21, 39, 36, 54, 3, this.color1);
 		this.close_ov.ReleaseGraphics(gb);
 
 		button_zoomSize = Math.ceil(25 * zdpi);
@@ -2301,13 +2628,11 @@ oSettings = function() {
 			this.tabButtons.push(new button(this.tab_img, this.tab_img, this.tab_img));
 		};
 		pic.ReleaseGraphics(gpic);
-		
-		this.g_link = new oLink();
-		//pic.Dispose();
+		pic.Dispose();
 	};
 
 	this.refreshColors = function() {
-		//get_colors();
+		get_colors();
 		this.setColors();
 		this.setButtons();
 
@@ -2326,10 +2651,11 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 11));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 17));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 18));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 38));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 12));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 20));
+			this.pages.push(new oPage(4, "p.settings.pages[4]", "Cover Browsing", 16));
 		};
 		var fin = this.pages.length;
 		for (var i = 0; i < fin; i++) {
@@ -2357,22 +2683,28 @@ oSettings = function() {
 
 		// draw main background
 		gr.FillSolidRect(this.x, this.y, this.w, this.h, g_color_normal_bg);
+		gr.SetSmoothingMode(2);
 
 		// draw current page content
 		this.pages[this.currentPageId].draw(gr);
 
 		gr.FillSolidRect(this.x, this.y + (ty + th), this.w - cScrollBar.width, g_z4, g_color_normal_bg);
+		//gr.FillGradRect(this.x, this.y + (ty + th) + g_z4, this.w - cScrollBar.width, g_z10, 87, g_color_normal_bg, 0, 1.0);
 
 		// draw top background
 		gr.FillSolidRect(this.x, this.y, this.w, (ty + th), blendColors(g_color_normal_bg, g_color_normal_txt, 0.035));
-		gr.FillGradRect(this.x, this.y + (ty + th) - g_z3, this.w, g_z3, 87, 0, RGBA(0, 0, 0, 10), 1.0);
+		gr.FillGradRect(this.x, this.y + (ty + th) - g_z3, this.w, g_z3, 87, 0, RGBA(0, 0, 0, 20), 1.0);
 
 		// draw close button
 		this.closebutton.draw(gr, this.x + 13, this.y + 10, 255);
 		// draw Panel Title
 		var title_x = this.x + this.closebutton.w + 20;
-		gr.GdiDrawText("foobox settings", this.font_title, this.color2, title_x, this.y + 10, this.w - 50, this.closebutton.h, lc_txt);
-		gr.GdiDrawText("Version " + g_script_version, g_font_queue_idx, this.color1, this.x, this.y, this.w - 8, ty + th - 4, rb_txt);
+		gr.SetTextRenderingHint(4);
+		gr.DrawString("foobox settings", this.font_title, this.color2, title_x, this.y + 10, this.w - 50, cSettings.topBarHeight + 10, lt_stringformat);
+		// draw panel version
+		var version_x = this.x;
+		gr.DrawString("Version " + g_script_version, g_font_queue_idx, this.color1, version_x, this.y, this.w - 8, ty + th - 4, rb_stringformat);
+		gr.SetSmoothingMode(0);
 
 		// draw page switcher (tabs!)
 		var fin = this.pages.length;
@@ -2391,11 +2723,11 @@ oSettings = function() {
 
 		// draw tab lineart
 		var lineStrength = 1;//zoom(1.0, zdpi);
-		gr.FillSolidRect(0, ty + th, cx + lineStrength, lineStrength, this.color4);
-		gr.FillSolidRect(cx, ty - g_z3, lineStrength, th + g_z4, this.color4);
-		gr.FillSolidRect(cx, ty - g_z3, cw, lineStrength, this.color4);
-		gr.FillSolidRect(cx + cw, ty - g_z3, lineStrength, th + g_z4, this.color4);
-		gr.FillSolidRect(cx + cw, ty + th, ww - cw - cx, lineStrength, this.color4);
+		gr.FillSolidRect(0, ty + th, cx + lineStrength, lineStrength, this.color1);
+		gr.FillSolidRect(cx, ty - g_z3, lineStrength, th + g_z4, this.color1);
+		gr.FillSolidRect(cx, ty - g_z3, cw, lineStrength, this.color1);
+		gr.FillSolidRect(cx + cw, ty - g_z3, lineStrength, th + g_z4, this.color1);
+		gr.FillSolidRect(cx + cw, ty + th, ww - cw - cx, lineStrength, this.color1);
 		// active tab text
 		gr.SetTextRenderingHint(4);
 		gr.DrawString(this.pages[this.currentPageId].label, this.tab_font, this.color2, cx + tpad, ty - 2, cw + tpad, th, lc_stringformat);
@@ -2415,6 +2747,7 @@ oSettings = function() {
 				resize_panels();
 				properties.collapseGroupsByDefault = (p.list.groupby[cGroup.pattern_idx].collapseGroupsByDefault == 0 ? false : true);
 				update_playlist(properties.collapseGroupsByDefault);
+				window.NotifyOthers("topbar_show_settings", false);
 				full_repaint();
 			};
 			break;

@@ -10,7 +10,7 @@ cInputbox = {
 }
 
 oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bordercolor, backselectioncolor, func, parentObjectName) {
-	this.font = g_font;
+	this.font = GdiFont(g_fname, g_fsize, g_fstyle);
 	this.w = w;
 	this.h = h;
 	this.textcolor = textcolor;
@@ -104,9 +104,9 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 
 		// draw text
 		if (this.text.length > 0) {
-			gr.GdiDrawText(this.text.substr(this.offset), this.font, this.edit ? this.textcolor : blendColors(this.textcolor, (this.backcolor == 0 ? g_color_normal_bg : this.backcolor), 0.35), this.x, this.y, this.w, this.h, DT);
+			gr.GdiDrawText(this.text.substr(this.offset), this.font, this.edit ? this.textcolor : blendColors(this.textcolor, (this.backcolor == 0 ? 0xff000000 : this.backcolor), 0.35), this.x, this.y, this.w, this.h, DT);
 		} else {
-			gr.GdiDrawText(this.empty_text, this.font, blendColors(this.textcolor, (this.backcolor == 0 ? g_color_normal_bg : this.backcolor), 0.35), this.x, this.y, this.w, this.h, DT);
+			gr.GdiDrawText(this.empty_text, this.font, blendColors(this.textcolor, (this.backcolor == 0 ? 0xff000000 : this.backcolor), 0.35), this.x, this.y, this.w, this.h, DT);
 		}
 		// draw cursor
 		if (this.edit && !this.select) this.drawcursor(gr);
@@ -127,15 +127,12 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 	}
 
 	this.repaint = function () {
-		//this.font = g_font;
 		eval(g_parentObjectName + ".repaint()");
-	}
-	
-	this.FontUpdte = function () {
-		this.font = g_font;
 	}
 
 	this.CalcText = function () {
+		var arr = cInputbox.temp_gr.GdiDrawText(this.text.substr(this.offset), this.font, 0, 0, 0, 9999999, 9999999, DT_NOPREFIX | DT_CALCRECT).toArray();
+		this.TLength = arr[4];
 		this.TWidth = cInputbox.temp_gr.CalcTextWidth(this.text.substr(this.offset), this.font);
 	}
 
@@ -317,6 +314,11 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 		_menu.AppendMenuItem(this.select ? MF_STRING : MF_GRAYED | MF_DISABLED, 2, "Cut");
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(cInputbox.clipboard ? MF_STRING : MF_GRAYED | MF_DISABLED, 3, "Paste");
+		/*if (utils.IsKeyPressed(VK_SHIFT)) {
+			_menu.AppendMenuSeparator();
+			_menu.AppendMenuItem(MF_STRING, 20, "属性");
+			_menu.AppendMenuItem(MF_STRING, 21, "配置...");
+		}*/
 		idx = _menu.TrackPopupMenu(x, y);
 		switch (idx) {
 		case 1:
@@ -371,7 +373,14 @@ oInputbox = function (w, h, default_text, empty_text, textcolor, backcolor, bord
 				this.autovalidation && gfunc();
 			};
 			break;
+		/*case 20:
+			window.ShowProperties();
+			break;
+		case 21:
+			window.ShowConfigure();
+			break;*/
 		}
+		_menu.Dispose();
 	}
 
 	this.on_key_down = function (vkey) {

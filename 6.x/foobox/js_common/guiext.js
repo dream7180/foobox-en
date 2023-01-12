@@ -1,9 +1,13 @@
-﻿TOOLTIP_TEXT_PADDING_LEFT = 6;
+﻿TOOLTIP_PADDING_LEFT = 8;
+TOOLTIP_PADDING_TOP = 3;
+TOOLTIP_PADDING_RIGHT = 8;
+TOOLTIP_PADDING_BOTTOM = 3;
+TOOLTIP_TEXT_PADDING_LEFT = 6;
 TOOLTIP_TEXT_PADDING_TOP = 2;
 TOOLTIP_TEXT_PADDING_RIGHT = 6;
 TOOLTIP_TEXT_PADDING_BOTTOM = 2;
 
-function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
+function UISlider(ImgBg, ImgOverlay, ImgKnob, paddingLeft, paddingRight) {
 	this.Enabled = true;
 	this.State = 0; //0-normal 1-mouse hover 2-mouse down
 	this.Value = 0;
@@ -27,14 +31,9 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 			var pos = this.Value / (this.MaxValue - this.MinValue);
 			if (pos > 1) pos = 1;
 			pos = (pos * this.Width) | 0;
-			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, ImgBg);
-			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay);
-			if(ImgDiv) {
-				for (var i = 1; i < 10; i++) {
-					gr.DrawImage(ImgDiv, this.X + this.Width/10*i, this.Y, ImgDiv.Width, this.Height, 0, 0, ImgDiv.Width, ImgDiv.Height);
-				}
-			}
-			gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);
+			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, ImgBg, paddingLeft, 0, paddingRight, 0);
+			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay, paddingLeft, 0, paddingRight, 0);
+			gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height, 0);
 		}
 	}
 
@@ -90,21 +89,26 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 		}
 		return false;
 	}
-	
-	this.MouseLeave = function() {
-		this.State = 0;
-	}
 
 	this.Repaint = function() {
-		try{window.RepaintRect(this.X - (ImgKnob.Width / 2), this.Y, this.Width + ImgKnob.Width, this.Height)}
+		try{window.RepaintRect(this.X - (ImgKnob.Width / 2), this.Y, this.Width + ImgKnob.Width, this.Height)};
 		catch(e){};
 	}
 
 }
 //////////////////////
 
-function DrawThemedBox(gr, x, y, w, h, ImageObj) {
-	gr.DrawImage(ImageObj, x, y, w, h, 0, 0, ImageObj.Width-2, ImageObj.Height);
+function DrawThemedBox(gr, x, y, w, h, ImageObj, paddingLeft, paddingTop, paddingRight, paddingBottom) {
+	var r = x + w;
+	var b = y + h;
+	var imgWidth = ImageObj.Width;
+	var imgHeight = ImageObj.Height;
+	var imgMidWidth = imgWidth - paddingLeft - paddingRight;
+	var imgMidHeight = imgHeight - paddingTop - paddingBottom;
+	var midWidth = w - paddingLeft - paddingRight;
+	var midHeight = h - paddingTop - paddingBottom;
+
+	gr.DrawImage(ImageObj, (x + paddingLeft), (y + paddingTop), midWidth, midHeight, paddingLeft, paddingTop, imgMidWidth, imgMidHeight);
 }
 
 function UITooltip(x, y, txt, FontObj, color, TipBG) {
@@ -114,13 +118,13 @@ function UITooltip(x, y, txt, FontObj, color, TipBG) {
 	this.Width = 0;
 	this.Height = 0
 	this.Text = txt;
-	if(TipBG) var BgImageObj = TipBG;
+	var BgImageObj = TipBG;
 
 	this.Paint = function(gr) {
 		this.Width = gr.CalcTextWidth(this.Text, FontObj) + TOOLTIP_TEXT_PADDING_LEFT + TOOLTIP_TEXT_PADDING_RIGHT;
 		this.Height = gr.CalcTextHeight(this.Text, FontObj) + TOOLTIP_TEXT_PADDING_TOP + TOOLTIP_TEXT_PADDING_BOTTOM;
 		if (this.Visible) {
-			if(TipBG) DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, BgImageObj);
+			DrawThemedBox(gr, this.X, this.Y, this.Width, this.Height, BgImageObj, 0, 0, 0, 0);
 			gr.GdiDrawText(this.Text, FontObj, color, this.X + TOOLTIP_TEXT_PADDING_LEFT, this.Y + TOOLTIP_TEXT_PADDING_TOP, gr.CalcTextWidth(this.Text, FontObj), FontObj.Height, DT_NOPREFIX);
 		}
 	}
@@ -166,75 +170,8 @@ function UITextView(txt, FontObj, color, formatStr) {
 	this.NewTrack = function() {
 		this.ChangeText(TF(this.Text));
 	}
-	
-	
 
 	this.Paint = function(gr) {
-		gr.GdiDrawText(this.Text, FontObj, color, this.X, this.Y, this.Width, this.Height, formatStr);
-	}
-}
-
-//DEFINE CLASS ButtonUI 
-function ButtonUI(img, tooltipText) {
-	this.x = null;
-	this.y = null;
-	this.img = img;
-	this.width = img.Width;
-	this.height = img.Height/3;
-	this.state = 0; //0-normal ;1-hover ;2-down ;3-disable
-	if(tooltipText){
-		this.Tooltip = window.CreateTooltip("",g_fsize);
-		this.Tooltip.Text = tooltipText;
-	} else this.Tooltip = null;
-}
-
-ButtonUI.prototype.SetXY = function(x, y){
-	this.x = x;
-	this.y = y;
-}
-
-ButtonUI.prototype.Paint = function(gr) {
-	gr.DrawImage(this.img, this.x, this.y, this.width, this.height, 0, 0, this.width, this.height, 0);
-	if(this.state > 0) gr.DrawImage(this.img, this.x, this.y, this.width, this.height, 0, this.state * this.height, this.width, this.height, 0);
-}
-
-ButtonUI.prototype.Repaint = function() {
-	window.RepaintRect(this.x, this.y, this.width, this.height);
-}
-
-ButtonUI.prototype.MouseMove = function(x, y) {
-	if (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height) {
-		if (this.state == 0) {
-			this.state = 1;
-			this.Tooltip && this.Tooltip.Activate();
-			this.Repaint();
-		}
-		return true;
-	} else {
-		this.Reset();
-		return false;
-	}
-}
-
-ButtonUI.prototype.MouseDown = function(x, y) {
-	if (this.state == 1) {
-		this.state = 2;
-		this.Repaint();
-		return true;
-	} else return false;
-}
-
-ButtonUI.prototype.MouseUp = function() {
-	if (this.state == 2) {
-		this.Reset();
-		return true;
-	} else return false;
-}
-
-ButtonUI.prototype.Reset = function() {
-	if (this.state != 0) {
-		this.state = 0;
-		this.Tooltip && this.Tooltip.Deactivate();
-		this.Repaint();
+		gr.GdiDrawText(this.Text, FontObj, color, this.X, this.Y, this.Width, this.Height, formatStr | DT_NOPREFIX);
 	}
 }

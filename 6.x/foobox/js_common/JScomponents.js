@@ -8,46 +8,52 @@
 	this.getImages = function() {
 		var gb;
 		var w = Math.round(18 * zdpi);
-		var x5 = 5*zdpi;
-		this.images.magnify = gdi.CreateImage(w, w);
+
+		this.images.magnify = gdi.CreateImage(48, 48);
 		gb = this.images.magnify.GetGraphics();
-		var point_arr = new Array(3*zdpi,3*zdpi,w-6*zdpi,3*zdpi,w/2-1,w/2);
-		gb.DrawLine(w/2-1, w/2 -1, w/2-1, w-x5, 1, g_color_normal_txt);
 		gb.SetSmoothingMode(2);
-		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
+		gb.DrawLine(28, 28, 37, 37, 4.0, g_color_normal_txt & 0x99ffffff);
+		gb.DrawEllipse(6, 6, 24, 24, 4.0, g_color_normal_txt & 0x99ffffff);
 		gb.SetSmoothingMode(0);
 		this.images.magnify.ReleaseGraphics(gb);
 
 		this.images.resetIcon_off = gdi.CreateImage(w, w);
 		gb = this.images.resetIcon_off.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(x5, x5, w - x5, w - x5, 1, g_color_normal_txt);
-		gb.DrawLine(x5, w - x5, w - x5, x5, 1, g_color_normal_txt);
-		gb.SetSmoothingMode(0);
+		gb.setSmoothingMode(2);
+		gb.DrawLine(5, 5, w - 5, w - 5, 2.0, g_color_normal_txt & 0x99ffffff);
+		gb.DrawLine(5, w - 5, w - 5, 5, 2.0, g_color_normal_txt & 0x99ffffff);
+		gb.setSmoothingMode(0);
 		this.images.resetIcon_off.ReleaseGraphics(gb);
 
 		this.images.resetIcon_ov = gdi.CreateImage(w, w);
 		gb = this.images.resetIcon_ov.GetGraphics();
-		gb.SetSmoothingMode(2);
-		gb.DrawLine(x5, x5, w - x5, w - x5, 1, g_color_normal_txt);
-		gb.DrawLine(x5, w - x5, w - x5, x5, 1, g_color_normal_txt);
-		gb.FillEllipse(1, 1, w - 2, w - 2, g_color_bt_overlay);
-		gb.SetSmoothingMode(0);
+		gb.setSmoothingMode(2);
+		gb.DrawLine(5, 5, w - 5, w - 5, 2.0, g_color_normal_txt & 0xbbffffff);
+		gb.DrawLine(5, w - 5, w - 5, 5, 2.0, g_color_normal_txt & 0xbbffffff);
+		gb.setSmoothingMode(0);
 		this.images.resetIcon_ov.ReleaseGraphics(gb);
 
-		this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_ov);
+		this.images.resetIcon_dn = gdi.CreateImage(w, w);
+		gb = this.images.resetIcon_dn.GetGraphics();
+		gb.setSmoothingMode(2);
+		gb.DrawLine(5, 5, w - 5, w - 5, 2.0, g_color_normal_txt);
+		gb.DrawLine(5, w - 5, w - 5, 5, 2.0, g_color_normal_txt);
+		gb.setSmoothingMode(0);
+		this.images.resetIcon_dn.ReleaseGraphics(gb);
+
+		this.reset_bt = new button(this.images.resetIcon_off, this.images.resetIcon_ov, this.images.resetIcon_dn);
 	};
 	this.getImages();
 
 	this.on_init = function() {
-		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter", g_color_normal_txt, 0, 0, g_color_selected_bg, g_sendResponse, "brw");
+		this.inputbox = new oInputbox(cFilterBox.w, cFilterBox.h, "", "Filter", g_color_normal_txt, 0, 0, fbx_set[6] & 0xb9ffffff, g_sendResponse, "brw");
 		this.inputbox.autovalidation = true;
 	};
 	this.on_init();
 
 	this.reset_colors = function() {
 		this.inputbox.textcolor = g_color_normal_txt;
-		this.inputbox.backselectioncolor = g_color_selected_bg;
+		this.inputbox.backselectioncolor = fbx_set[6] & 0xb9ffffff;
 	};
 
 	this.setSize = function(w, h) {
@@ -62,28 +68,27 @@
 		};
 	};
 
-	this.draw = function(gr, x, y, jsspm) {
+	this.draw = function(gr, x, y) {
 		var bx = x;
 		var by = y;
+		var bw = this.inputbox.w + Math.round(44 * zdpi);
 		var bx2 = bx + Math.round(22 * zdpi);
-		if(jsspm){
-			gr.FillSolidRect(0, 0, ww, ppt.SearchBarHeight - 2, g_color_topbar);
-			gr.FillSolidRect(cFilterBox.h + cFilterBox.x, by + this.inputbox.h + 2, cFilterBox.w, 1, g_color_normal_txt & 0x75ffffff);
-		}else{
-			var bx3 = bx2 + cFilterBox.w;
-			var bys = Math.round((ppt.headerBarHeight - 2) / 2);
-			gr.FillSolidRect(0, 0, bx3, ppt.headerBarHeight - 2, g_color_topbar);
-			gr.FillGradRect(bx3 - 1, 0, 1, bys, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-			gr.FillGradRect(bx3 - 1, bys, 1, bys, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
-		}
-		//if (this.inputbox.edit) {
-		//};
+		var bx3 = bx2 + cFilterBox.w;
+		var bys = Math.round((ppt.headerBarHeight - 2) / 2);
+		gr.FillSolidRect(0, 0, bx3, ppt.headerBarHeight - 2, g_color_topbar);
+		gr.FillGradRect(bx3 - 1, 0, 1, bys, 90, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+		gr.FillGradRect(bx3 - 1, bys, 1, bys, 270, RGBA(0, 0, 0, 3), RGBA(0, 0, 0, 35));
+		if (this.inputbox.edit) {
+			//gr.SetSmoothingMode(2);
+			//gr.DrawRect(bx-3, by-1, bw+2, 21, 2.0, RGB(130,140,240));
+			//gr.SetSmoothingMode(0);
+		};
 
 		if (this.inputbox.text.length > 0) {
 			this.reset_bt.draw(gr, bx - 1, by + 1, 255);
-		}
+		};
 		else {
-			gr.DrawImage(this.images.magnify, bx, by + 2, cFilterBox.h - 2, cFilterBox.h - 2, 0, 0, cFilterBox.h - 2, cFilterBox.h - 2, 0, 255);
+			gr.DrawImage(this.images.magnify.Resize(cFilterBox.h - 2, cFilterBox.h - 2, 2), bx, by + 2, cFilterBox.h - 2, cFilterBox.h - 2, 0, 0, cFilterBox.h - 2, cFilterBox.h - 2, 0, 255);
 		};
 
 		this.inputbox.draw(gr, bx2, by, 0, 0);
@@ -101,7 +106,6 @@
 				if (this.reset_bt.checkstate("up", x, y) == ButtonStates.hover) {
 					this.inputbox.text = "";
 					this.inputbox.offset = 0;
-					this.reset_bt.state = ButtonStates.normal;
 					g_sendResponse();
 				};
 			};
@@ -136,7 +140,8 @@
 	};
 };
 
-oScrollbar = function() {
+oScrollbar = function() { //themed) {
+	//this.themed = themed;
 	this.showButtons = window.GetProperty("_DISPLAY: Show Scrollbar Buttons", false);
 	this.buttons = Array(null, null, null);
 	this.buttonType = {
@@ -249,7 +254,7 @@ oScrollbar = function() {
 			this.cursorh = Math.round((brw.h / this.totalh) * this.areah);
 			if (this.cursorh < cScrollBar.minCursorHeight) this.cursorh = cScrollBar.minCursorHeight;
 			if (this.cursorh > cScrollBar.maxCursorHeight) this.cursorh = cScrollBar.maxCursorHeight;
-		}
+		};
 		else {
 			this.cursorh = cScrollBar.minCursorHeight;
 		};
@@ -273,7 +278,7 @@ oScrollbar = function() {
 		if (this.showButtons) {
 			this.areay = this.y + this.buttonh;
 			this.areah = this.h - (this.buttonh * 2);
-		}
+		};
 		else {
 			this.areay = this.y;
 			this.areah = this.h;
@@ -357,7 +362,7 @@ oScrollbar = function() {
 		case "dblclk":
 			if ((this.isHoverCursor || this.cursorDrag) && !this.buttonClick && !this.isHoverEmptyArea) {
 				this.cursorCheck(event, x, y);
-			}
+			};
 			else {
 				// buttons events
 				var bt_state = ButtonStates.normal;
@@ -375,7 +380,7 @@ oScrollbar = function() {
 									if (cScrollBar.timerCounter > 6) {
 										scroll = scroll - scroll_step;
 										scroll = check_scroll(scroll);
-									}
+									};
 									else {
 										cScrollBar.timerCounter++;
 									};
@@ -395,7 +400,7 @@ oScrollbar = function() {
 									if (cScrollBar.timerCounter > 6) {
 										scroll = scroll + scroll_step;
 										scroll = check_scroll(scroll);
-									}
+									};
 									else {
 										cScrollBar.timerCounter++;
 									};
@@ -417,13 +422,13 @@ oScrollbar = function() {
 								if (cScrollBar.timerCounter > 6 && m_y < brw.scrollbar.cursory) {
 									scroll = scroll - scroll_step_page;
 									scroll = check_scroll(scroll);
-								}
+								};
 								else {
 									cScrollBar.timerCounter++;
 								};
 							}, 80);
 						};
-					}
+					};
 					else {
 						// down
 						this.buttonClick = true;
@@ -434,7 +439,7 @@ oScrollbar = function() {
 								if (cScrollBar.timerCounter > 6 && m_y > brw.scrollbar.cursory + brw.scrollbar.cursorh) {
 									scroll = scroll + scroll_step_page;
 									scroll = check_scroll(scroll);
-								}
+								};
 								else {
 									cScrollBar.timerCounter++;
 								};

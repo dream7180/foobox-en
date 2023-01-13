@@ -1854,7 +1854,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case 3:
 			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("其他选项", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Miscellaneous", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("folder cover located in the track directory，jpg or png format", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 10.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 12.25 - (this.offset * cSettings.rowHeight));
 			break;

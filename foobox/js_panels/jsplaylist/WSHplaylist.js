@@ -148,7 +148,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				cx = p.headerBar.columns[j].x + g_z5;
 				cw = (Math.abs(p.headerBar.w * p.headerBar.columns[j].percent / 100000)) - g_z10;
 				switch (p.headerBar.columns[j].ref) {
-				case "状态":
+				case "State":
 					if (p.headerBar.columns[j].tf == "null") {
 						var columnColor = this.text_colour;
 					}
@@ -679,7 +679,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
-					var lg3_left_field = this.obj.count + "首, " + this.obj.total_group_duration_txt;
+					var lg3_left_field = this.obj.count + (this.obj.count > 1 ? " Tracks, " : " Track, ") + this.obj.total_group_duration_txt;
 				}
 				else {
 					var lg3_left_field = "";
@@ -696,7 +696,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.r1, g_font_group1, this.l1_color, line_x, l1_y + vpadding, this.w - cover.w - g_z7, cTrack.height * 1.15, rcs_txt);
 				gr.GdiDrawText(this.r2, g_font_group2, this.l2_color, line_x, l1_y + cTrack.height, this.w - cover.w - g_z7, cTrack.height, rcs_txt);
 				if (this.obj) {
-					var lg3_left_field = this.obj.count + "首, " + this.obj.total_group_duration_txt;
+					var lg3_left_field = this.obj.count + (this.obj.count > 1 ? " Tracks, " : " Track, ") + this.obj.total_group_duration_txt;
 				}
 				else {
 					var lg3_left_field = "";
@@ -1265,8 +1265,8 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				//g_dragndrop_status = true;
 				var items = plman.GetPlaylistSelectedItems(p.list.playlist);
 				if(this.track_index > -1){
-					var line1 = items.Count+" 音轨";
-					var line2 = "拖放中";
+					var line1 = items.Count+(items.Count > 1 ? " Tracks" : " Track");
+					var line2 = "Dragging";
 				}
 				var options = {
 					show_text : false,
@@ -2557,11 +2557,7 @@ oList = function(object_name, playlist) {
 		var o_album = fb.TitleFormat("$ifequal($stricmp(%album%,?),1,,%album%)");
 		var o_genre = fb.TitleFormat("$ifequal($stricmp(%genre%,?),1,,%genre%)");
 
-		//_menu.AppendMenuItem(MF_STRING, 1, "面板设置...");
 		_menu.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
-		/*if(g_track_type == 3) {
-			_menu.AppendMenuItem(MF_STRING, 1013, "下载...");
-		}*/
 		_menu.AppendMenuSeparator();
 		if (plman.GetPlaybackQueueHandles().Count > 0) {
 			if (this.name != "Queue Content") {

@@ -714,17 +714,6 @@ oBrowser = function(name) {
 					};
 					brw.repaint();
 				};
-				/*if (g_handles > 0) {
-					var row_current = this.activeRow;
-					if (this.activeRow > -1 && !plman.IsAutoPlaylist(row_current)) {
-						var insert_index = plman.PlaylistItemCount(row_current);
-						plman.InsertPlaylistItems(row_current, insert_index, plman.GetPlaylistSelectedItems(plman.ActivePlaylist), false);
-					} else {
-						plman.CreatePlaylist(plman.PlaylistCount, "拖入的项目");
-						plman.InsertPlaylistItems(plman.PlaylistCount - 1, 0, plman.GetPlaylistSelectedItems(plman.ActivePlaylist), false);
-					}
-				}
-				g_handles = 0;*/
 			};
 
 			// scrollbar

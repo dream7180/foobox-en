@@ -1723,10 +1723,10 @@ oBrowser = function(name) {
 						if (ppt.showAllItem && i == 0) {// && total > 1) { // aggregate item ( [ALL] )
 							try {
 								if (ppt.tagMode == 1) {
-									gr.GdiDrawText("所有项目", g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+									gr.GdiDrawText("All items", g_font_b, txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
 								}
 								else {
-									gr.GdiDrawText("所有项目", (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
+									gr.GdiDrawText("All items", (i == this.selectedIndex ? g_font_b : g_font), txt_color, ax + Math.round((aw - coverWidth) / 2), (coverTop + 5 + coverWidth), coverWidth, ppt.botTextRowHeight, lt_txt);
 								};
 							} catch (e) {}
 						}

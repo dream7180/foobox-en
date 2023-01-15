@@ -1940,8 +1940,10 @@ function Controller(imgArray, imgDisplay, prop) {
 			currentPathItem = null;
 			currentImage = null;
 			imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
-			if(get_imgCol) window.NotifyOthers("color_scheme_updated", null);
-			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			if(get_imgCol) {
+				window.NotifyOthers("color_scheme_updated", null);
+				if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			}
 		}
 		SetMenuButtonCaption();
 	}
@@ -2266,7 +2268,7 @@ function on_playlist_switch() {
 }
 
 function on_playback_new_track(metadb) {
-	if (!this.Properties.FollowCursor && color_bycover) get_imgCol = true;
+	if (!MainController.Properties.FollowCursor && color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
 	OnMetadbChanged();
 }
@@ -2410,6 +2412,17 @@ function on_notify_data(name, info) {
 	case "foobox_color_bycover":
 		color_bycover = info;
 		window.SetProperty("foobox.color.by.cover", color_bycover);
+		if(color_bycover){
+			if (!MainController.Properties.FollowCursor) {
+				get_imgCol = true;
+				getColorSchemeFromImage();
+			}
+		} else{
+			get_imgCol = false;
+			window.NotifyOthers("color_scheme_updated", null);
+			if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
+			on_colorscheme_update(false);
+		}
 		break;
 	}
 }

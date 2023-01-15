@@ -437,7 +437,7 @@ oSwitchbar = function() {
 	};
 	
 	this.draw = function(gr){
-		var sw_img_y = Math.round((ppt.headerBarHeight - images.album.Height)/2);
+		var sw_img_y = Math.ceil((ppt.headerBarHeight - images.album.Height)/2);
 		gr.DrawImage(images.album, Math.round(10*zdpi), sw_img_y, images.album.Width, images.album.Height, 0, 0, images.album.Width, images.album.Height,0,255);
 		gr.DrawImage(images.artist, Math.round(80*zdpi), sw_img_y, images.artist.Width, images.artist.Height, 0, 0, images.artist.Width, images.artist.Height,0,255);
 		gr.DrawImage(images.genre, Math.round(150*zdpi), sw_img_y, images.genre.Width, images.genre.Height, 0, 0, images.genre.Width, images.genre.Height,0,255);
@@ -2106,13 +2106,6 @@ oBrowser = function(name) {
 		};
 
 		scroll_prev = scroll;
-
-		// tweak to fix bug in timer/memory/repaint handle in WSH Panel Mod with timers
-		g_counter_repaint++;
-		if (g_counter_repaint > 100) {
-			g_counter_repaint = 0;
-		};
-
 	}, ppt.refreshRate);
 
 	this.item_context_menu = function(x, y, albumIndex) {
@@ -2131,7 +2124,7 @@ oBrowser = function(name) {
 		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 2, -1);
 		_menu.AppendMenuItem(MF_STRING, 1010, "Reset cache of selected");
-		_child01.AppendTo(_menu, MF_STRING, "Selected send to...");
+		_child01.AppendTo(_menu, MF_STRING, "Selected add to...");
 		_child01.AppendMenuItem(MF_STRING, 2000, "New playlist");
 
 		var pl_count = plman.PlaylistCount;
@@ -2427,9 +2420,6 @@ var isScrolling = false;
 var g_switchbar = null;
 var g_filterbox = null;
 var filter_text = "";
-
-var g_instancetype = window.InstanceType;
-var g_counter_repaint = 0;
 
 // fonts
 var g_font = null, g_font_b = null, g_font_s = null, g_font_bb = null;
@@ -2818,16 +2808,16 @@ function get_metrics() {
 	cScrollBar.minCursorHeight = 25*zdpi;
 	cScrollBar.maxCursorHeight = sys_scrollbar ? 125*zdpi : 110*zdpi;
 	ppt.headerBarHeight = Math.ceil(26 * zdpi) + 2;
-	g_switchbar.x = 5*zdpi;
-	g_switchbar.y = 5*zdpi;
-	g_switchbar.w = 210*zdpi;
+	g_switchbar.x = z(5);
+	g_switchbar.y = z(5);
+	g_switchbar.w = z(205);
 	g_switchbar.h = ppt.headerBarHeight;
 	cFilterBox.x = g_switchbar.x * 2 + g_switchbar.w;
 	cFilterBox.w = 120*zdpi;
 	cFilterBox.h = 20*zdpi;
-	cFilterBox.y = (ppt.headerBarHeight - cFilterBox.h)/2;
+	cFilterBox.y = Math.ceil((ppt.headerBarHeight - cFilterBox.h)/2);
 	cSwitchBtn.h = 12 * zdpi + 12;
-	cSwitchBtn.y = (ppt.headerBarHeight - cSwitchBtn.h) / 2;
+	cSwitchBtn.y = Math.ceil((ppt.headerBarHeight - cSwitchBtn.h) / 2);
 	cSwitchBtn.w = 24 * zdpi;
 	if (brw) {
 		//if (cScrollBar.enabled) {
@@ -2842,7 +2832,7 @@ function get_metrics() {
 function get_images() {
 	var gb;
 	var txt = "";
-	var x5 = 5 * zdpi, _x10 = 10*zdpi;
+	var x5 = 5*zdpi, _x10 = 10*zdpi;
 	images.all = gdi.CreateImage(150, 150);
 	gb = images.all.GetGraphics();
 	gb.FillSolidRect(0, 0, 150, 150, g_color_normal_txt & 0x10ffffff);
@@ -2899,7 +2889,9 @@ function get_images() {
 	gb.FillRoundRect(_x10+2,x5+2, _x10-4,_x10-4, x5-2,x5-2, RGBA(255, 255, 255, 180));
 	images.sw_btn_n1.ReleaseGraphics(gb);
 	
-	images.album = gdi.CreateImage(16*zdpi, 16*zdpi);
+	nw = Math.round(16*zdpi);
+	nh = Math.round(15*zdpi);
+	images.album = gdi.CreateImage(nw, nw);
 	gb = images.album.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(zdpi,zdpi, 14*zdpi,14*zdpi, 1, g_color_normal_txt);
@@ -2907,7 +2899,7 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	images.album.ReleaseGraphics(gb);
 	
-	images.artist = gdi.CreateImage(16*zdpi, 15*zdpi);
+	images.artist = gdi.CreateImage(nw, nh);
 	gb = images.artist.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(4*zdpi,zdpi, 8*zdpi,8*zdpi, 1, g_color_normal_txt);
@@ -2915,7 +2907,7 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	images.artist.ReleaseGraphics(gb);
 	
-	images.genre = gdi.CreateImage(16*zdpi, 15*zdpi);
+	images.genre = gdi.CreateImage(nw, nh);
 	gb = images.genre.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(zdpi,_x10, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
@@ -2924,7 +2916,7 @@ function get_images() {
 	gb.DrawLine(x5,12*zdpi, x5,2*zdpi, 1, g_color_normal_txt);
 	gb.DrawLine(14*zdpi,12*zdpi, 14*zdpi,2*zdpi, 1, g_color_normal_txt);
 	gb.DrawLine(x5,2*zdpi, 14*zdpi,2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(x5,x5, 14*zdpi,5*zdpi, 1, g_color_normal_txt);
+	gb.DrawLine(x5,x5, 14*zdpi,x5, 1, g_color_normal_txt);
 	images.genre.ReleaseGraphics(gb);
 };
 

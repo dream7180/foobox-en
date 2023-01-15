@@ -108,7 +108,7 @@ properties = {
 	//showscrollbar: window.GetProperty("CUSTOM Show Scrollbar", true),
 	settingspanel: false,
 	smoothscrolling: window.GetProperty("CUSTOM Enable Smooth Scrolling", true),
-	selectionmenu: window.GetProperty("CUSTOM Enable Selection Menu", false),
+	selectionmenu: window.GetProperty("CUSTOM Enable Selection Menu", true),
 	cursor_min: 25,
 	cursor_max: 110,
 	repaint_rate1: 20,
@@ -657,14 +657,14 @@ on_init();
 
 function on_size() {
 	if (!window.Width || !window.Height) return;
-	if (g_instancetype == 0) { // CUI
-		window.MinWidth = 360;
-		window.MinHeight = 200;
-	}
-	else if (g_instancetype == 1) { // DUI
+	//if (g_instancetype == 0) { // CUI
+	//	window.MinWidth = 360;
+	//	window.MinHeight = 200;
+	//}
+	//else if (g_instancetype == 1) { // DUI
 		window.MinWidth = zoom(360, zdpi);
 		window.MinHeight = zoom(200, zdpi);
-	};
+	//};
 
 	ww = window.Width;
 	wh = window.Height;

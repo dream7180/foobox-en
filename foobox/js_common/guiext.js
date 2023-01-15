@@ -31,7 +31,7 @@ function UISlider(ImgBg, ImgOverlay, ImgKnob, ImgDiv) {
 			DrawThemedBox(gr, this.X, this.Y, pos, this.Height, ImgOverlay);
 			if(ImgDiv) {
 				for (var i = 1; i < 10; i++) {
-					gr.DrawImage(ImgDiv, this.X + this.Width/10*i, this.Y, ImgDiv.Width, this.Height, 0, 0, ImgDiv.Width, ImgDiv.Height);
+					gr.DrawImage(ImgDiv, Math.ceil(this.X + this.Width/10*i), this.Y, ImgDiv.Width, this.Height, 0, 0, ImgDiv.Width, ImgDiv.Height);
 				}
 			}
 			gr.DrawImage(ImgKnob, Math.floor(this.X + pos - (ImgKnob.Width / 2)), this.Y, ImgKnob.Width, ImgKnob.Height, 0, 0, ImgKnob.Width, ImgKnob.Height);

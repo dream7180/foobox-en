@@ -8,11 +8,11 @@
 	this.getImages = function() {
 		var gb;
 		var w = Math.round(18 * zdpi);
-		var x5 = 5*zdpi;
+		var x5 = 5*zdpi, x_c = (w-3*zdpi)/2;
 		this.images.magnify = gdi.CreateImage(w, w);
 		gb = this.images.magnify.GetGraphics();
-		var point_arr = new Array(3*zdpi,3*zdpi,w-6*zdpi,3*zdpi,w/2-1,w/2);
-		gb.DrawLine(w/2-1, w/2 -1, w/2-1, w-x5, 1, g_color_normal_txt);
+		var point_arr = new Array(3*zdpi,3*zdpi,w-6*zdpi,3*zdpi,x_c,w/2);
+		gb.DrawLine(x_c, w/2 -1, x_c, w-x5, 2, g_color_normal_txt);
 		gb.SetSmoothingMode(2);
 		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
 		gb.SetSmoothingMode(0);

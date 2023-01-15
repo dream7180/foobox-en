@@ -5,7 +5,6 @@
 
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var zdpi = 1, dark_mode = 0;
-//var g_handles = 0;
 var default_sort =  window.GetProperty("_PROPERTY: New playlist sortorder", "%album% | %discnumber% | %tracknumber% | %title%");
 var DefaultPlaylistIdx = -1;
 var g_font, g_font_b, g_font_track;
@@ -21,9 +20,6 @@ var isScrolling = false;
 var g_filterbox = null;
 var g_searchbox = null;
 var filter_text = "";
-
-var g_instancetype = window.InstanceType;
-var g_counter_repaint = 0;
 
 // drag'n drop from windows system
 var g_dragndrop_status = false;
@@ -847,15 +843,7 @@ oBrowser = function(name) {
 			repaint_main = true;
 			window.Repaint();
 		};
-
 		scroll_prev = scroll;
-
-		// tweak to fix bug in timer/memory/repaint handle in WSH Panel Mod with timers
-		g_counter_repaint++;
-		if (g_counter_repaint > 100) {
-			g_counter_repaint = 0;
-		};
-
 	}, ppt.refreshRate);
 
 	this.context_menu = function(x, y, id, setting_mode) {
@@ -1419,15 +1407,15 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 function get_images() {
 	var gb;
 	var imgw = Math.floor(27*zdpi), imgh = Math.floor(25*zdpi);
-	var x3 = Math.ceil(3*zdpi), _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
+	var x2 = Math.floor(2*zdpi), x3 = Math.ceil(3*zdpi), _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
 			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
-	
-	images.add_menu = gdi.CreateImage(_x14, _x14);
+	var add_h = Math.ceil(4*zdpi);
+	images.add_menu = gdi.CreateImage(Math.ceil(_x14), add_h*3+3);
 		gb = this.images.add_menu.GetGraphics();
 		gb.SetSmoothingMode(0);
-		gb.DrawLine(2*zdpi, 3*zdpi, _x12, 3*zdpi, 1, g_color_normal_txt);
-		gb.DrawLine(2*zdpi, _x7, _x12, _x7, 1, g_color_normal_txt);
-		gb.DrawLine(2*zdpi, _x11, _x12, _x11, 1, g_color_normal_txt);	
+		gb.DrawLine(Math.ceil(2*zdpi), x2+1, Math.ceil(_x12), x2+1, 1, g_color_normal_txt);
+		gb.DrawLine(Math.ceil(2*zdpi), x2+add_h+1, Math.ceil(_x12), x2+add_h+1, 1, g_color_normal_txt);
+		gb.DrawLine(Math.ceil(2*zdpi), x2+add_h*2+1, Math.ceil(_x12), x2+add_h*2+1, 1, g_color_normal_txt);	
 	images.add_menu.ReleaseGraphics(gb);
 		
 	images.icon_normal_pl = gdi.CreateImage(imgw, imgh);
@@ -2070,10 +2058,6 @@ function on_notify_data(name, info) {
 			brw.repaint();
 		}
 		break;
-	//case "WSH_playlist_drag_drop":
-		// send from a WSH playlist panel to simulate a drag and drop feature
-		//g_handles = info;
-		//break;
 	case "lock_lib_playlist":
 		if (ppt.lockReservedPlaylist == info) break;
 		ppt.lockReservedPlaylist = info;

@@ -527,7 +527,7 @@ function get_images() {
 	gb.DrawEllipse(_x5, _x6, _x14, _x14, 2, c_normal);
 	gb.DrawEllipse(_x10, 11*zdpi, _x4, _x4, 2, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x14, _x3, _x14, 15*zdpi, 2, c_normal);
+	gb.DrawLine(_x14, _x3, _x14, _x14, 2, c_normal);
 	gb.DrawLine(_x14-1, _x3, _x18, _x3, 2, c_normal);
 	gb = img_pbo[5].ReleaseGraphics(gb);
 
@@ -537,7 +537,7 @@ function get_images() {
 	gb.DrawRoundRect(_x5, _x7, _x14, _x12, 3, 3, 2, c_normal);
 	gb.DrawEllipse(_x10, 11*zdpi, _x4, _x4, 2, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x14, _x3, _x14, 15*zdpi, 2, c_normal);
+	gb.DrawLine(_x14, _x3, _x14, _x14, 2, c_normal);
 	gb.DrawLine(_x14-1, _x3, _x18, _x3, 2, c_normal);
 	img_pbo[6].ReleaseGraphics(gb);
 

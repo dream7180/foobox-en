@@ -56,7 +56,8 @@ var g_font_queue_idx;
 var g_font_ud = null;
 // color vars
 var g_color_normal_bg = 0;
-var g_color_bt_overlay = 0;
+var g_color_star = 0;
+var g_color_star_h = 0;
 var g_color_selected_bg = 0;
 var g_color_normal_txt = 0;
 var g_color_selected_txt = 0;
@@ -715,10 +716,6 @@ function on_paint(gr) {
 				};
 				// draw flashing beam if scroll max reached on mouse wheel! (android like effect)
 				if (p.list.beam > 0) {
-					var r = getRed(g_color_highlight);
-					var g = getGreen(g_color_highlight);
-					var b = getBlue(g_color_highlight);
-					var a = Math.floor((p.list.beam_alpha <= 250 ? p.list.beam_alpha : 250) / 12);
 					var beam_h = Math.floor(cTrack.height * 7 / 4);
 					var alpha = (p.list.beam_alpha <= 255 ? p.list.beam_alpha : 255);
 					switch (p.list.beam) {
@@ -2147,7 +2144,14 @@ function on_notify_data(name, info) {
 		var c_ol_tmp = g_color_highlight;
 		if(info) g_color_highlight = RGB(info[0], info[1], info[2]);
 		else g_color_highlight = c_default_hl;
+		g_color_star_h = g_color_highlight;
 		if(g_color_highlight != c_ol_tmp){
+			if(info && dark_mode){
+				var r = getRed(g_color_normal_bg) + 27;
+				var g = getGreen(g_color_normal_bg) + 27;
+				var b = getBlue(g_color_normal_bg) + 27;
+				if(Math.abs(info[0]-r)<25 && Math.abs(info[0]-g)<25 && Math.abs(info[0]-b)<25) g_color_star_h = g_color_normal_txt;
+			}
 			get_images_color();
 			full_repaint();
 		}
@@ -2205,7 +2209,8 @@ function get_colors() {
 	g_color_topbar = g_color_normal_txt & 0x09ffffff;
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	g_color_highlight = c_default_hl;
-	g_color_bt_overlay = g_color_normal_txt & 0x35ffffff;
+	g_color_star = g_color_normal_txt & 0x2dffffff;
+	g_color_star_h = g_color_highlight;
 	if (isDarkMode(g_color_normal_bg)) dark_mode = 1;
 	else dark_mode = 0;
 };
@@ -2261,14 +2266,14 @@ function get_images_color() {
 	images.star = gdi.CreateImage(imgh, imgh);
 	gb = images.star.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(g_color_bt_overlay, 0, star_arr);
+	gb.FillPolygon(g_color_star, 0, star_arr);
 	gb.SetSmoothingMode(0);
 	images.star.ReleaseGraphics(gb);
 
 	images.star_h = gdi.CreateImage(imgh, imgh);
 	gb = images.star_h.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(g_color_highlight, 0, star_arr);
+	gb.FillPolygon(g_color_star_h, 0, star_arr);
 	gb.SetSmoothingMode(0);
 	images.star_h.ReleaseGraphics(gb);
 
@@ -2289,9 +2294,9 @@ function get_images_color() {
 	images.mood_ico = gdi.CreateImage(imgw, imgh*4);
 	gb = images.mood_ico.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(g_color_highlight, 2, points_arr);
-	gb.DrawPolygon(g_color_bt_overlay, 2, points_arr_2);
-	gb.DrawPolygon(g_color_bt_overlay, 2, points_arr_3);
+	gb.DrawPolygon(g_color_star_h, 2, points_arr);
+	gb.DrawPolygon(g_color_star, 2, points_arr_2);
+	gb.DrawPolygon(g_color_star, 2, points_arr_3);
 	gb.DrawPolygon(RGBA(255,255,255,255), 2, points_arr_4);
 	gb.SetSmoothingMode(0);
 	images.mood_ico.ReleaseGraphics(gb);

@@ -66,7 +66,7 @@ var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 1
 if (time_circle < 3000) time_circle = 3000;
 if (time_circle > 60000) time_circle = 60000;
 var rbutton = Array();
-var c_background, c_highlight, fontcolor, fontcolor2, icocolor, c_default_hl;
+var c_background, c_highlight, fontcolor, fontcolor2, icocolor, c_default_hl, c_rating_h;
 var tracktype;
 var img_rating_on, img_rating_off, mood_img, btn_mood, TextBtn_info;
 
@@ -136,7 +136,8 @@ function get_colors() {
 	fontcolor = window.GetColourDUI(ColorTypeDUI.text);
 	c_default_hl = window.GetColourDUI(ColorTypeDUI.highlight);
 	c_highlight = c_default_hl;
-	icocolor = fontcolor & 0x35ffffff;
+	c_rating_h = c_highlight;
+	icocolor = fontcolor & 0x2dffffff;
 	fontcolor2 = blendColors(c_background, fontcolor, 0.75);
 	dark_mode = isDarkMode(c_background);
 }
@@ -154,7 +155,7 @@ function get_imgs() {
 	img_rating_on = gdi.CreateImage(imgw, imgh);
 	gb = img_rating_on.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillPolygon(c_highlight, 0, pointArr.p1);
+	gb.FillPolygon(c_rating_h, 0, pointArr.p1);
 	gb.SetSmoothingMode(0);
 	img_rating_on.ReleaseGraphics(gb);
 
@@ -168,7 +169,7 @@ function get_imgs() {
 	mood_img = gdi.CreateImage(imgw, mood_h*2);
 	gb = mood_img.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawPolygon(c_highlight, 2, pointArr.p2);
+	gb.DrawPolygon(c_rating_h, 2, pointArr.p2);
 	gb.DrawPolygon(icocolor, 2, pointArr.p3);
 	gb.SetSmoothingMode(0);
 	mood_img.ReleaseGraphics(gb);
@@ -1941,6 +1942,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			currentImage = null;
 			imgDisplay.ChangeImage(1, currentImage, isNewgroup ? 2 : 1);
 			if(get_imgCol) {
+				getColorSchemeFromImage();
 				window.NotifyOthers("color_scheme_updated", null);
 				if(eslPanels) eslPanels.SetTextHighlightColor(c_default_hl);
 			}
@@ -1964,19 +1966,16 @@ function Controller(imgArray, imgDisplay, prop) {
 		}else{
 			var imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
 			imgColor = toRGB(imgColorData[0].col);
-			//if (Math.abs(imgColor[0]-imgColor[1])<15 && Math.abs(imgColor[0]-imgColor[2])<15 && Math.abs(imgColor[1]-imgColor[2])<15) {
-			//	window.NotifyOthers("color_scheme_updated", null);
-			//	get_imgCol = false;
-			//	on_colorscheme_update(null);
-			//	return;
-			//}
 			if(imgColor[0]>160 && imgColor[1]>160 && imgColor[2]>160){
-				var reduction = Math.round((imgColor[0]+imgColor[1]+imgColor[2] - 480) / 3);
-				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
+				if(!dark_mode && imgColor[0]>240 && imgColor[1]>240 && imgColor[2]>240) imgColor = false;
+				else{
+					var reduction = Math.round((imgColor[0]+imgColor[1]+imgColor[2] - 480) / 3);
+					imgColor[0] = Math.max(imgColor[0]-reduction, 0);
+					imgColor[1] = Math.max(imgColor[1]-reduction, 0);
+					imgColor[2] = Math.max(imgColor[2]-reduction, 0);
+				}
 			}
-			if(dark_mode && imgColor[0]<75 && imgColor[1]<75 && imgColor[2]<75){
+			else if(dark_mode && imgColor[0]<75 && imgColor[1]<75 && imgColor[2]<75){
 				var reduction = Math.round((225-imgColor[0]-imgColor[1]-imgColor[2]) / 3);
 				imgColor[0] = Math.min(imgColor[0]+reduction, 255);
 				imgColor[1] = Math.min(imgColor[1]+reduction, 255);
@@ -1992,7 +1991,14 @@ function Controller(imgArray, imgDisplay, prop) {
 		var c_hl_tmp = c_highlight;
 		if(imgColor) c_highlight = RGB(imgColor[0], imgColor[1], imgColor[2]);
 		else c_highlight = c_default_hl;
+		c_rating_h = c_highlight;
 		if(c_highlight != c_hl_tmp){
+			if(imgColor && dark_mode){
+				var r = getRed(c_background) + 27;
+				var g = getGreen(c_background) + 27;
+				var b = getBlue(c_background) + 27;
+				if(Math.abs(imgColor[0]-r)<25 && Math.abs(imgColor[1]-g)<25 && Math.abs(imgColor[2]-b)<25) c_rating_h = fontcolor;
+			}
 			get_imgs();
 			if (is_mood && show_infobar) btn_mood.resetImg();
 			if(eslPanels) eslPanels.SetTextHighlightColor(c_highlight);

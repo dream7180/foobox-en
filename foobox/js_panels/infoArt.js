@@ -2148,8 +2148,8 @@ var Properties = new function() {
 		this.Display = {
 			Animation: {
 				Enable: window.GetProperty("Cycle.Animation.Enable", true),
-				RefreshInterval: window.GetProperty("Cycle.Animation.RefreshInterval", 75),
-				Duration: window.GetProperty("Cycle.Animation.Duration", 450)
+				RefreshInterval: window.GetProperty("Cycle.Animation.RefreshInterval", 60),
+				Duration: window.GetProperty("Cycle.Animation.Duration", 480)
 			}
 		}
 

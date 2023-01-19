@@ -85,7 +85,7 @@ ppt = {
 	rowScrollStep: window.GetProperty("_PROPERTY: Scroll Step", 6),
 	scrollSmoothness: 3.0,
 	refreshRate: 20,
-	showFilter: window.GetProperty("_DISPLAY: Show Filter", true),
+	showFilter: window.GetProperty("_DISPLAY: Show Filter", false),
 	lockReservedPlaylist: window.GetProperty("_PROPERTY: Lock Reserved Playlist", false),
 	SearchBarHeight: 28,
 	headerBarHeight: 28,

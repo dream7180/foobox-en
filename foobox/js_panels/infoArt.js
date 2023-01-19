@@ -1014,7 +1014,7 @@ function Display(x, y, w, h, prop) {
 
 	//-----------------------------------------------
 	var animation = new function(prop) {
-			this.enable = prop.Animation.Enable;
+			//this.enable = prop.Animation.Enable;
 			this.duration = prop.Animation.Duration;
 			this.refreshInterval = prop.Animation.RefreshInterval;
 			this.totalFrames = Math.floor(this.duration / this.refreshInterval);
@@ -1221,7 +1221,7 @@ function Display(x, y, w, h, prop) {
 	this.ChangeImage = function(type, img, aniNo) { // type: 0: to empty, 1: to image or default image.
 		if (!covers.length && aniNo == 1) aniNo = 2;
 
-		if (aniNo == 0 || !animation.enable) this.SetImage(type, img);
+		if (aniNo == 0 || !prop.Animation.Enable) this.Refresh(type, img);
 		else if (aniNo == 1) covers[covers.length - 1].ChangeImage(type, img);
 		else if (aniNo == 2) {
 			var newcover = new FadingCovers(type, img);
@@ -1576,7 +1576,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			funcs[id] = [_this.OpenContainingFolder, null];
 			baseMenu.AppendMenuItem(currentPathItem ? MF_STRING : MF_DISABLED, id++, "Open file directory");
 			funcs[id] = [_this.Refresh, true];
-			baseMenu.AppendMenuItem(MF_STRING, id++, "Refresh");
+			baseMenu.AppendMenuItem(MF_STRING, id++, "Refresh (F5)");
 
 			baseMenu.AppendMenuSeparator();
 			if (currentMetadb) {
@@ -1624,6 +1624,8 @@ function Controller(imgArray, imgDisplay, prop) {
 
 			funcs[id] = [_this.SetGenreBackup, null];
 			baseMenu.AppendMenuItem(imgArray.Properties.TreatGenrePathAsBackup ? MF_CHECKED : MF_STRING, id++, "Genre cover as backup only");
+			funcs[id] = [_this.SetAnimation, null];
+			baseMenu.AppendMenuItem(Properties.Display.Animation.Enable ? MF_CHECKED : MF_STRING, id++, "Fade in / fade out effect");
 			funcs[id] = [_this.ClearCache, null];
 			baseMenu.AppendMenuItem(MF_STRING, id++, "Clear caches");
 			baseMenu.AppendMenuSeparator();
@@ -1859,6 +1861,11 @@ function Controller(imgArray, imgDisplay, prop) {
 	this.SetGenreBackup = function() {
 		imgArray.Properties.TreatGenrePathAsBackup = !imgArray.Properties.TreatGenrePathAsBackup;
 		window.SetProperty("Image.Genre.Image.TreatAsBackup", imgArray.Properties.TreatGenrePathAsBackup);
+	}
+	
+	this.SetAnimation = function() {
+		Properties.Display.Animation.Enable = !Properties.Display.Animation.Enable;
+		window.SetProperty("Cycle.Animation.Enable", Properties.Display.Animation.Enable);
 	}
 	
 	this.CloseInfo = function() {
@@ -2141,8 +2148,8 @@ var Properties = new function() {
 		this.Display = {
 			Animation: {
 				Enable: window.GetProperty("Cycle.Animation.Enable", true),
-				RefreshInterval: window.GetProperty("Cycle.Animation.RefreshInterval", 50),
-				Duration: window.GetProperty("Cycle.Animation.Duration", 500)
+				RefreshInterval: window.GetProperty("Cycle.Animation.RefreshInterval", 75),
+				Duration: window.GetProperty("Cycle.Animation.Duration", 450)
 			}
 		}
 
@@ -2151,7 +2158,7 @@ var Properties = new function() {
 		window.SetProperty("Cycle.Animation.RefreshInterval", this.Display.Animation.RefreshInterval);
 
 		if (typeof(this.Display.Animation.Duration) != "number") this.Display.Animation.Duration = 300;
-		else if (this.Display.Animation.Duration < 10) this.Display.Animation.Duration = 10;
+		else if (this.Display.Animation.Duration < this.Display.Animation.RefreshInterval) this.Display.Animation.Duration = this.Display.Animation.RefreshInterval;
 		window.SetProperty("Cycle.Animation.Duration", this.Display.Animation.Duration);
 
 		//------------------------------------------------------
@@ -2192,8 +2199,7 @@ var Properties = new function() {
 		if (typeof(this.Image.PathsCacheCapacity) != "number") this.Image.PathsCacheCapacity = 10;
 		else if (this.Image.PathsCacheCapacity < 0) this.Image.PathsCacheCapacity = 0;
 		window.SetProperty("Image.CacheCapacity.Paths", this.Image.PathsCacheCapacity);
-
-	}();
+}();
 
 
 //===================================================
@@ -2530,6 +2536,13 @@ function on_key_down(vkey) {
 			break;
 		case 13://Alt+Enter
 			fb.RunMainMenuCommand("Properties");
+			break;
+		};
+		break;
+	case KMask.none:
+		switch (vkey) {
+		case 116:// F5
+			MainController.Refresh(true, currentMetadb);
 			break;
 		};
 		break;

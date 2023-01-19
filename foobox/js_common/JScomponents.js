@@ -67,7 +67,6 @@
 		var by = y;
 		var bx2 = bx + Math.round(22 * zdpi);
 		if(jsspm){
-			gr.FillSolidRect(0, 0, ww, ppt.SearchBarHeight - 2, g_color_topbar);
 			gr.FillSolidRect(cFilterBox.h + cFilterBox.x, by + this.inputbox.h + 2, cFilterBox.w, 1, g_color_normal_txt & 0x75ffffff);
 		}else{
 			var bx3 = bx2 + cFilterBox.w;

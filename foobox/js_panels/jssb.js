@@ -1878,7 +1878,7 @@ oBrowser = function(name) {
 			var nb_groups = (ppt.showAllItem/* && total > 1*/ ? total - 1 : total);
 			var _idx1 = (ppt.tagMode == 2 && ppt.artistMode);
 			var _idx2 = (ppt.tagMode == 3 ? (ppt.genre_dir ? 2 : 1) : 0);
-			var boxText = nb_groups + " " +  item_txt[ppt.tagMode+_idx1+_idx2] + "  ";
+			var boxText = nb_groups + " " +  item_txt[ppt.tagMode+_idx1+_idx2] + (nb_groups > 1 ? "s  " : "  ");
 			try{boxText_len = gr.CalcTextWidth(boxText, g_font_b)}
 			catch (e) {boxText_len = 0;}
 			if (ppt.sourceMode == 0) {
@@ -2223,7 +2223,7 @@ oBrowser = function(name) {
 		_menu2.AppendMenuSeparator();
 		_menu2.AppendMenuItem(MF_STRING, 912, "Reset disk cache");
 		_menu2.AppendTo(_menu, MF_STRING, "Display");
-		_menu.AppendMenuItem(MF_STRING, 200, "Refresh");
+		_menu.AppendMenuItem(MF_STRING, 200, "Refresh (F5)");
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 201, "Loading animation");
 		_menu.CheckMenuItem(201, ppt.showloading);

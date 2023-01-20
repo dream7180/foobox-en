@@ -569,16 +569,16 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	pbo_btn_img.ReleaseGraphics(gb);
 	
+	let floor_x6 = Math.floor(_x6);
+	point_arr = new Array(zdpi, _x2, zdpi, floor_x6*2-1,  _x7, (floor_x6*2+_x2-1)/2);
 	img_list = gdi.CreateImage(z(28), z(16));
 	gb = img_list.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(zdpi, _x2, _x8, Math.floor(_x7), 2, c_normal);
-	gb.DrawLine(zdpi, _x5+Math.floor(_x7), _x8, _x7-1, 2, c_normal);
+	gb.DrawPolygon(c_normal,2,point_arr);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(zdpi, _x2, zdpi, _x12 + 1, 2, c_normal);
 	gb.DrawLine(_x6, zdpi, 19*zdpi,  zdpi, 2, c_normal);
-	gb.DrawLine(9.5*zdpi, zdpi+Math.floor(_x6), 19*zdpi,  zdpi+Math.floor(_x6), 2, c_normal);
-	gb.DrawLine(_x6, zdpi+Math.floor(_x6)*2, 19*zdpi,  zdpi+Math.floor(_x6)*2, 2, c_normal);
+	gb.DrawLine(9.5*zdpi, zdpi+floor_x6, 19*zdpi,  zdpi+floor_x6, 2, c_normal);
+	gb.DrawLine(_x6, zdpi+floor_x6*2, 19*zdpi,  zdpi+floor_x6*2, 2, c_normal);
 	img_list.ReleaseGraphics(gb);
 	
 	point_arr = new Array(_x2, _x12-1, _x10, _x12-1, _x6, _x5);

@@ -372,7 +372,7 @@ oHeaderBar = function() {
 					fields.push(new Array("null", "null", "null", "$if2(%play_count%,0)", "$if2(%album artist%,'Unknown artist')", "null", "null", "null", "$if2(%genre%,'Other')", "null", "null", "null", "null", "null", "null", "$if(%__bitrate_dynamic%, $if(%isplaying%,$select($add($mod(%_time_elapsed_seconds%,2),1),%__bitrate_dynamic%,%__bitrate_dynamic%)'K',$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K')),$if($stricmp($left(%codec_profile%,3),'VBR'),%codec_profile%,%__bitrate%'K'))"));
 					break;
 				case 3:
-					fields.push(new Array("8000", "5000", "0", "5000", "38000", "0", "27000", "0", "0", "0", "0", "10000", "0", "0", "0", "7000"));
+					fields.push(new Array("10000", "5000", "0", "5000", "37000", "0", "26000", "0", "0", "0", "0", "10000", "0", "0", "0", "7000"));
 					break;
 				case 4:
 					fields.push(new Array("Cover", "State", "Index", "Tracknumber", "Title", "Date", "Artist", "Album Artist", "Album", "Genre", "Mood", "Rating", "Plays", "Bitrate", "Codec", "Duration"));

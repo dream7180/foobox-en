@@ -637,7 +637,7 @@ function QTFMRadiolist(id, listname){
 			filedata = filedata + '<entry>\r\n'
 			 + '<title>' + id[i].split(":")[0] + '</title>\r\n'
 			 + '<author>' + listname + '</author>\r\n'
-			 + '<ref href="' + "https://lhttp.qingting.fm/live/" + id[i].split(":")[1] + "/64k.mp3" + '"/>\r\n'
+			 + '<ref href="' + "http://lhttp.qingting.fm/live/" + id[i].split(":")[1] + "/64k.mp3" + '"/>\r\n'
 			 + '</entry>\r\n\r\n';
 		}
 		filedata = filedata + "</asx>";

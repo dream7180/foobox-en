@@ -407,7 +407,7 @@ oBrowser = function(name) {
 					ay = Math.floor(this.y + (i * ah) - scroll_);
 					this.rows[i].x = ax;
 					this.rows[i].y = ay;
-					if (ay > this.y - ppt.headerBarHeight - ah && ay < this.y + this.h) {
+					if (ay > ppt.headerBarHeight && ay < this.y + this.h) {
 						// row bg
 						var track_color_txt = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
 						if(ppt.showGrid) gr.DrawLine(ax, ay + ah, aw, ay + ah, 1, g_color_line);
@@ -481,6 +481,7 @@ oBrowser = function(name) {
 				};
 			}
 			gr.FillSolidRect(0, 0, ww, ppt.SearchBarHeight - 2, g_color_topbar);
+			gr.FillSolidRect(0, ppt.headerBarHeight-2, ww, ppt.rowHeight+2, g_color_normal_bg);
 			if(ppt.showFilter){
 				var boxText = this.rows.length.toString();
 				var tw = gr.CalcTextWidth(boxText, g_font_track);

@@ -2604,7 +2604,7 @@ oList = function(object_name, playlist) {
 		else if (ret < 3) {
 			switch (ret) {
 			case 2:
-				plman.ActivePlaylist = isQueuePlaylistPresent();
+				CheckPlaylistQueue();
 				break;
 			};
 		}

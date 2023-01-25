@@ -2491,7 +2491,7 @@ function SetPlaylistQueue() {
 	plman.InsertPlaylistItems(queue_pl_idx, j, q_handlelist, false);
 };
 
-function ShowPlaylistQueue(focus_id) {
+function ShowPlaylistQueue() {
 	var total_pl = plman.PlaylistCount;
 	var queue_pl_idx = isQueuePlaylistPresent();
 	if (queue_pl_idx < 0) {
@@ -2510,7 +2510,6 @@ function ShowPlaylistQueue(focus_id) {
 		q_handlelist.Add(vbarr[i].Handle);
 	};
 	plman.InsertPlaylistItems(queue_pl_idx, i, q_handlelist, false);
-	plman.SetPlaylistFocusItem(queue_pl_idx, 0);
 };
 
 function ClearQueuePlaylist() {
@@ -2526,25 +2525,20 @@ function ClearQueuePlaylist() {
 };
 
 function CheckPlaylistQueue() {
-	var current = plman.ActivePlaylist;
 	var total_pl = plman.PlaylistCount;
 	var queue_pl_idx = isQueuePlaylistPresent();
 	if (queue_pl_idx < 0) {
 		plman.CreatePlaylist(total_pl, "Queue Content");
 		queue_pl_idx = total_pl;
+		var vbarr = plman.GetPlaybackQueueContents();
+		var queue_total = vbarr.length;
+		var q_handlelist = plman.GetPlaylistSelectedItems(-1);
+		for (var i = 0; i < queue_total; i++) {
+			q_handlelist.Add(vbarr[i].Handle);
+		};
+		plman.InsertPlaylistItems(queue_pl_idx, i, q_handlelist, false);
 	}
-	else {
-		plman.RemovePlaylist(queue_pl_idx);
-		plman.CreatePlaylist(queue_pl_idx, "Queue Content");
-	};
-	var vbarr = plman.GetPlaybackQueueContents();
-	var queue_total = vbarr.length;
-	var q_handlelist = plman.GetPlaylistSelectedItems(-1);
-	for (var i = 0; i < queue_total; i++) {
-		q_handlelist.Add(vbarr[i].Handle);
-	};
-	plman.InsertPlaylistItems(queue_pl_idx, i, q_handlelist, false);
-	plman.SetPlaylistFocusItem(queue_pl_idx, 0);
+	plman.ActivePlaylist = queue_pl_idx;
 };
 
 function on_playback_queue_changed(origin) {
@@ -2655,12 +2649,11 @@ function on_playback_queue_changed(origin) {
 		};
 
 		if (isQueuePlaylistActive()) {
-			ShowPlaylistQueue(0);
+			ShowPlaylistQueue();
 			full_repaint();
 		}
 		else {
 			SetPlaylistQueue();
-			//CheckPlaylistQueue();
 		};
 
 		g_avoid_on_playlists_changed = false;

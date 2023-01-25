@@ -123,9 +123,9 @@ function get_var() {
 	mood_h = Math.floor(20*zdpi);
 	infobar_h = show_infobar ? Math.floor(80*zdpi) : 0;
 	pointArr = {
-		p1: Array(9*zdpi, 1*zdpi, 6.4*zdpi, 5.6*zdpi, 1*zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi),
-		p2: Array(2*zdpi,1*zdpi,2*zdpi,16*zdpi,8*zdpi,12*zdpi,14*zdpi,16*zdpi,14*zdpi,1*zdpi),
-		p3: Array(2*zdpi,1*zdpi+mood_h,2*zdpi,16*zdpi+mood_h,8*zdpi,12*zdpi+mood_h,14*zdpi,16*zdpi+mood_h,14*zdpi,1*zdpi+mood_h)
+		p1: Array(9*zdpi, zdpi, 6.4*zdpi, 5.6*zdpi, zdpi, 6.6*zdpi, 4.6*zdpi, 10.6*zdpi, 4*zdpi, 16*zdpi, 9*zdpi, 13.6*zdpi, 14*zdpi, 16*zdpi, 13.4*zdpi, 10.6*zdpi, 17*zdpi, 6.6*zdpi, 11.6*zdpi, 5.6*zdpi),
+		p2: Array(2*zdpi,zdpi,2*zdpi,16*zdpi,8*zdpi,12*zdpi,14*zdpi,16*zdpi,14*zdpi,zdpi),
+		p3: Array(2*zdpi,zdpi+mood_h,2*zdpi,16*zdpi+mood_h,8*zdpi,12*zdpi+mood_h,14*zdpi,16*zdpi+mood_h,14*zdpi,zdpi+mood_h)
 	}
 }
 

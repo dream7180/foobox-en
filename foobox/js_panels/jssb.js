@@ -2832,7 +2832,7 @@ function get_metrics() {
 function get_images() {
 	var gb;
 	var txt = "";
-	var x5 = 5*zdpi, _x10 = 10*zdpi;
+	var x5 = 5*zdpi, _x10 = 10*zdpi, _x14 = 14*zdpi;
 	images.all = gdi.CreateImage(150, 150);
 	gb = images.all.GetGraphics();
 	gb.FillSolidRect(0, 0, 150, 150, g_color_normal_txt & 0x10ffffff);
@@ -2894,7 +2894,7 @@ function get_images() {
 	images.album = gdi.CreateImage(nw, nw);
 	gb = images.album.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawEllipse(zdpi,zdpi, 14*zdpi,14*zdpi, 1, g_color_normal_txt);
+	gb.DrawEllipse(zdpi,zdpi, _x14,_x14, 1, g_color_normal_txt);
 	gb.DrawEllipse(6*zdpi,6*zdpi, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.album.ReleaseGraphics(gb);
@@ -2903,7 +2903,7 @@ function get_images() {
 	gb = images.artist.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(4*zdpi,zdpi, 8*zdpi,8*zdpi, 1, g_color_normal_txt);
-	gb.DrawEllipse(zdpi,9*zdpi, 14*zdpi,14*zdpi, 1, g_color_normal_txt);
+	gb.DrawEllipse(zdpi,9*zdpi, _x14,_x14, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.artist.ReleaseGraphics(gb);
 	
@@ -2913,10 +2913,10 @@ function get_images() {
 	gb.DrawEllipse(zdpi,_x10, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
 	gb.DrawEllipse(_x10,_x10, 4*zdpi,4*zdpi, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(x5,12*zdpi, x5,2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(14*zdpi,12*zdpi, 14*zdpi,2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(x5,2*zdpi, 14*zdpi,2*zdpi, 1, g_color_normal_txt);
-	gb.DrawLine(x5,x5, 14*zdpi,x5, 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(x5),12*zdpi, Math.round(x5),2*zdpi, 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(_x14),12*zdpi, Math.round(_x14),2*zdpi, 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(x5),2*zdpi, Math.round(_x14),2*zdpi, 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(x5),x5, Math.round(_x14),x5, 1, g_color_normal_txt);
 	images.genre.ReleaseGraphics(gb);
 };
 

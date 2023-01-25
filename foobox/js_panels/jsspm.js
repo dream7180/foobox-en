@@ -1417,7 +1417,7 @@ function get_images() {
 	var gb;
 	var imgw = Math.floor(27*zdpi), imgh = Math.floor(25*zdpi);
 	var x2 = Math.floor(2*zdpi), x3 = Math.ceil(3*zdpi), _x7 = 7*zdpi, _x8 = 8*zdpi, _x9 = 9*zdpi, _x10 = 10*zdpi, _x11 = 11*zdpi, _x12 = 12*zdpi, 
-			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
+			_x13 = 13*zdpi, _x14 = 14*zdpi, _x15 = 15*zdpi, _x16 = 16*zdpi, _x17 = 17*zdpi, _x18 = 18*zdpi, _x19 = 19*zdpi;
 	var add_h = Math.ceil(4*zdpi);
 	images.add_menu = gdi.CreateImage(Math.ceil(_x14), add_h*3+3);
 		gb = this.images.add_menu.GetGraphics();
@@ -1446,7 +1446,7 @@ function get_images() {
 
 	images.icon_auto_pl = gdi.CreateImage(imgw, imgh);
 	gb = images.icon_auto_pl.GetGraphics();
-	gb.DrawLine(_x8, _x8, 16*zdpi, _x8, 1, g_color_normal_txt);
+	gb.DrawLine(_x8, _x8, _x16, _x8, 1, g_color_normal_txt);
 	gb.DrawLine(_x8, _x8+x3, _x15, _x8+x3, 1, g_color_normal_txt);
 	gb.DrawLine(_x8, _x8+x3*2, _x12, _x8+x3*2, 1, g_color_normal_txt);
 	gb.DrawLine(_x8, _x8+x3*3, _x12, _x8+x3*3, 1, g_color_normal_txt);
@@ -1458,22 +1458,20 @@ function get_images() {
 
 	images.history_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.history_icon.GetGraphics();
-	gb.DrawRect(_x7, _x7, _x12, _x10, 1, g_color_normal_txt);
-	gb.DrawLine(_x10, 5*zdpi, _x10, _x10, 1, g_color_normal_txt);
-	gb.DrawLine(16*zdpi, 5*zdpi, 16*zdpi, _x10, 1, g_color_normal_txt);
+	gb.DrawRect(Math.round(_x7), Math.round(_x7), Math.round(_x12), Math.round(_x10), 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(_x10), Math.ceil(5*zdpi), Math.round(_x10), Math.floor(_x9), 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(_x7)+Math.round(_x9), Math.ceil(5*zdpi),Math.round(_x7)+Math.round(_x9), Math.floor(_x9), 1, g_color_normal_txt);
+	gb.DrawLine(Math.round(_x7), Math.ceil(_x11), Math.round(_x7)+Math.round(_x12), Math.ceil(_x11), 1, g_color_normal_txt);
 	images.history_icon.ReleaseGraphics(gb);
 	
 	images.library_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.library_icon.GetGraphics();
-	gb.DrawRect(_x8, _x7, _x11, _x11, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x10, _x9, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x17, _x9, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x10, _x11, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x17, _x11, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x10, _x13, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x17, _x13, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x10, _x15, 1, 1, g_color_normal_txt);
-	gb.FillSolidRect(_x17, _x15, 1, 1, g_color_normal_txt);
+	gb.DrawRect(_x8, _x7, Math.floor(_x11), x2*6, 1, g_color_normal_txt);
+	gb.DrawLine(_x8+x2, _x7+x2, _x14, _x7+x2, 1, g_color_normal_txt);gb.DrawLine(_x16, _x7+x2, _x16+1, _x7+x2, 1, g_color_normal_txt);
+	gb.DrawLine(_x8, _x7+x2*2, _x19, _x7+x2*2, 1, g_color_normal_txt);
+	gb.DrawLine(_x8+x2, _x7+x2*3, _x14, _x7+x2*3, 1, g_color_normal_txt);gb.DrawLine(_x16, _x7+x2*3, _x16+1, _x7+x2*3, 1, g_color_normal_txt);
+	gb.DrawLine(_x8, _x7+x2*4, _x19, _x7+x2*4, 1, g_color_normal_txt);
+	gb.DrawLine(_x8+x2, _x7+x2*5, _x14, _x7+x2*5, 1, g_color_normal_txt);gb.DrawLine(_x16, _x7+x2*5, _x16+1, _x7+x2*5, 1, g_color_normal_txt);
 	images.library_icon.ReleaseGraphics(gb);
 
 	images.newly_added_icon = gdi.CreateImage(imgw, imgh);
@@ -1486,46 +1484,31 @@ function get_images() {
 	gb.DrawLine(_x15, _x15, 20*zdpi, _x15, 1, g_color_normal_txt);
 	images.newly_added_icon.ReleaseGraphics(gb);
 
+	var point_arr2 = new Array(Math.round(_x7), Math.round(_x11), (Math.round(_x7)+Math.round(_x18))/2, 6*zdpi, Math.round(_x18), Math.round(_x11), Math.round(_x15), Math.round(_x11), Math.round(_x15), Math.floor(_x18), Math.round(_x10), Math.floor(_x18), Math.round(_x10), Math.round(_x11));
 	images.most_played_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.most_played_icon.GetGraphics();
-	gb.DrawLine(_x7, _x18, _x18, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x10, _x12, _x10, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x15, _x12, _x15, _x18, 1, g_color_normal_txt);
-	gb.DrawLine(_x7, _x11, _x10, _x11, 1, g_color_normal_txt);
-	gb.DrawLine(_x15, _x11, _x18, _x11, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(2)
-	gb.DrawLine(_x12, 6*zdpi, _x7, _x11, 1, g_color_normal_txt);
-	gb.DrawLine(_x13, 6*zdpi, _x18, _x11, 1, g_color_normal_txt);
-	gb.SetSmoothingMode(0)
+	gb.SetSmoothingMode(2);
+	gb.DrawPolygon(g_color_normal_txt,1,point_arr2);
+	gb.SetSmoothingMode(0);
+	gb.DrawLine(Math.round(_x7), Math.floor(_x18), Math.round(_x18), Math.floor(_x18), 1, g_color_normal_txt);
 	images.most_played_icon.ReleaseGraphics(gb);
 	
 	images.radios_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.radios_icon.GetGraphics();
-	gb.DrawLine(_x12, _x12, _x12, _x19, 1, g_color_normal_txt);
+	gb.DrawLine(_x12, _x12, _x12, Math.floor(_x19), 1, g_color_normal_txt);
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(_x10, _x8, 4*zdpi, 4*zdpi, 1, g_color_normal_txt);
 	gb.DrawEllipse(_x7, 5*zdpi, _x10, _x10, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.radios_icon.ReleaseGraphics(gb);
 	
-	var point_arr = new Array(_x8,_x8,_x18,_x8,_x18,_x19,_x13,_x15,_x8,_x19);
+	var point_arr = new Array(_x8,_x8,Math.round(_x18),_x8,Math.round(_x18),_x19,(_x8+Math.round(_x18))/2,_x15,_x8,_x19);
 	images.mood_icon = gdi.CreateImage(imgw, imgh);
 	gb = images.mood_icon.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.DrawPolygon(g_color_normal_txt,1,point_arr);
 	gb.SetSmoothingMode(0);
 	images.mood_icon.ReleaseGraphics(gb);
-	
-	var point_arr2 = new Array(_x18,_x10,_x15,_x11,_x18,_x13);
-	images.board_icon = gdi.CreateImage(imgw, imgh);
-	gb = images.board_icon.GetGraphics();
-	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x7, _x18, _x11, _x12, 1, g_color_normal_txt);
-	gb.DrawLine(_x12-1, _x12, _x13, _x17, 1, g_color_normal_txt);
-	gb.DrawLine(_x13, _x17, _x18, _x10, 1, g_color_normal_txt);
-	gb.FillPolygon(g_color_normal_txt, 0, point_arr2);
-	gb.SetSmoothingMode(0);
-	images.board_icon.ReleaseGraphics(gb);
 
 	if (dark_mode) return;
 
@@ -1539,7 +1522,7 @@ function get_images() {
 
 	images.icon_auto_pl_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.icon_auto_pl_hl.GetGraphics();
-	gb.DrawLine(_x8, _x8, 16*zdpi, _x8, 1, g_color_playing_txt);
+	gb.DrawLine(_x8, _x8, _x16, _x8, 1, g_color_playing_txt);
 	gb.DrawLine(_x8, _x8+x3, _x15, _x8+x3, 1, g_color_playing_txt);
 	gb.DrawLine(_x8, _x8+x3*2, _x12, _x8+x3*2, 1, g_color_playing_txt);
 	gb.DrawLine(_x8, _x8+x3*3, _x12, _x8+x3*3, 1, g_color_playing_txt);
@@ -1551,22 +1534,20 @@ function get_images() {
 	
 	images.history_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.history_icon_hl.GetGraphics();
-	gb.DrawRect(_x7, _x7, _x12, _x10, 1, g_color_playing_txt);
-	gb.DrawLine(_x10, 5*zdpi, _x10, _x10, 1, g_color_playing_txt);
-	gb.DrawLine(16*zdpi, 5*zdpi, 16*zdpi, _x10, 1, g_color_playing_txt);
+	gb.DrawRect(Math.round(_x7), Math.round(_x7), Math.round(_x12), Math.round(_x10), 1, g_color_playing_txt);
+	gb.DrawLine(Math.round(_x10), Math.ceil(5*zdpi), Math.round(_x10), Math.floor(_x9), 1, g_color_playing_txt);
+	gb.DrawLine(Math.round(_x7)+Math.round(_x9), Math.ceil(5*zdpi),Math.round(_x7)+Math.round(_x9), Math.floor(_x9), 1, g_color_playing_txt);
+	gb.DrawLine(Math.round(_x7), Math.ceil(_x11), Math.round(_x7)+Math.round(_x12), Math.ceil(_x11), 1, g_color_playing_txt);
 	images.history_icon_hl.ReleaseGraphics(gb);
 
 	images.library_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.library_icon_hl.GetGraphics();
-	gb.DrawRect(_x8, _x7, _x11, _x11, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x10, _x9, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x17, _x9, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x10, _x11, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x17, _x11, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x10, _x13, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x17, _x13, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x10, _x15, 1, 1, g_color_playing_txt);
-	gb.FillSolidRect(_x17, _x15, 1, 1, g_color_playing_txt);
+	gb.DrawRect(_x8, _x7, Math.floor(_x11), x2*6, 1, g_color_playing_txt);
+	gb.DrawLine(_x8+x2, _x7+x2, _x14, _x7+x2, 1, g_color_playing_txt);gb.DrawLine(_x16, _x7+x2, _x16+1, _x7+x2, 1, g_color_playing_txt);
+	gb.DrawLine(_x8, _x7+x2*2, _x19, _x7+x2*2, 1, g_color_playing_txt);
+	gb.DrawLine(_x8+x2, _x7+x2*3, _x14, _x7+x2*3, 1, g_color_playing_txt);gb.DrawLine(_x16, _x7+x2*3, _x16+1, _x7+x2*3, 1, g_color_playing_txt);
+	gb.DrawLine(_x8, _x7+x2*4, _x19, _x7+x2*4, 1, g_color_playing_txt);
+	gb.DrawLine(_x8+x2, _x7+x2*5, _x14, _x7+x2*5, 1, g_color_playing_txt);gb.DrawLine(_x16, _x7+x2*5, _x16+1, _x7+x2*5, 1, g_color_playing_txt);
 	images.library_icon_hl.ReleaseGraphics(gb);
 	
 	images.newly_added_icon_hl = gdi.CreateImage(imgw, imgh);
@@ -1581,20 +1562,15 @@ function get_images() {
 
 	images.most_played_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.most_played_icon_hl.GetGraphics();
-	gb.DrawLine(_x7, _x18, _x18, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x10, _x12, _x10, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x15, _x12, _x15, _x18, 1, g_color_playing_txt);
-	gb.DrawLine(_x7, _x11, _x10, _x11, 1, g_color_playing_txt);
-	gb.DrawLine(_x15, _x11, _x18, _x11, 1, g_color_playing_txt);
-	gb.SetSmoothingMode(2)
-	gb.DrawLine(_x12, 6*zdpi, _x7, _x11, 1, g_color_playing_txt);
-	gb.DrawLine(_x13, 6*zdpi, _x18, _x11, 1, g_color_playing_txt);
-	gb.SetSmoothingMode(0)
+	gb.SetSmoothingMode(2);
+	gb.DrawPolygon(g_color_playing_txt,1,point_arr2);
+	gb.SetSmoothingMode(0);
+	gb.DrawLine(Math.round(_x7), Math.floor(_x18), Math.round(_x18), Math.floor(_x18), 1, g_color_playing_txt);
 	images.most_played_icon_hl.ReleaseGraphics(gb);
 	
 	images.radios_icon_hl = gdi.CreateImage(imgw, imgh);
 	gb = images.radios_icon_hl.GetGraphics();
-	gb.DrawLine(_x12, _x12, _x12, _x19, 1, g_color_playing_txt);
+	gb.DrawLine(_x12, _x12, _x12, Math.floor(_x19), 1, g_color_playing_txt);
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(_x10, _x8, 4*zdpi, 4*zdpi, 1, g_color_playing_txt);
 	gb.DrawEllipse(_x7, 5*zdpi, _x10, _x10, 1, g_color_playing_txt);

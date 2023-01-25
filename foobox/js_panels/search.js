@@ -110,7 +110,7 @@ searchbox = function() {
 		
 		this.images.ico_menu = gdi.CreateImage(x14, x14);
 		gb = this.images.ico_menu.GetGraphics();
-		var point_arr = new Array(3*zdpi,5*zdpi,11*zdpi,5*zdpi,7*zdpi,10*zdpi);
+		var point_arr = new Array(3*zdpi,Math.floor(5*zdpi),11*zdpi,Math.floor(5*zdpi),7*zdpi,10*zdpi);
 		gb.SetSmoothingMode(2);
 		gb.DrawPolygon(g_color_normal_txt,1,point_arr);
 		gb.SetSmoothingMode(0);

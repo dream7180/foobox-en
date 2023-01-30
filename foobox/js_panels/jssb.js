@@ -215,7 +215,7 @@ function on_get_album_art_done(metadb, art_id, image, image_path) {
 					if(path_img(image_path))
 						brw.groups[i].cover_img = g_image_cache.getit(metadb, i, image, image_path);
 					else
-						brw.groups[i].cover_img = g_image_cache.getit(metadb, i, image, false);
+						brw.groups[i].cover_img = g_image_cache.getit(metadb, i, image, 1);
 					//if(!isScrolling && !cScrollBar.timerID) {
 					if (i < brw.groups.length && i >= g_start_ && i <= g_end_) {
 						if (!timers.coverDone) {
@@ -290,7 +290,7 @@ image_cache = function() {
 							this.albumArtId = ppt.albumArtId;
 							try {
 								brw.groups[albumIndex].load_requested = 1;
-								utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, true, false, false);
+								utils.GetAlbumArtAsync(window.ID, metadb, this.albumArtId, false, false, false);
 							}
 							catch(e) {}
 						};
@@ -342,11 +342,16 @@ image_cache = function() {
 			this._cachelist[brw.groups[albumId].cachekey] = img;
 
 			// save img to cache
-			if (/*ppt.enableDiskCache && */image_path) {
+			if (image_path) {
 				if (cover_type == 1 && !brw.groups[albumId].save_requested) {
 					if (!timers.saveCover) {
 						brw.groups[albumId].save_requested = true;
-						save_image_to_cache(metadb, albumId, image_path);
+						let crc = brw.groups[albumId].cachekey;
+						let s = Math.min(200 / img.Width, 200 / img.Height);
+						let w = Math.floor(img.Width * s);
+						let h = Math.floor(img.Height * s);
+						img = img.Resize(w, h, 2);
+						img.SaveAs(CACHE_FOLDER + crc, "image/jpeg");
 						timers.saveCover = window.SetTimeout(function() {
 							window.ClearTimeout(timers.saveCover);
 							timers.saveCover = false;
@@ -3458,28 +3463,6 @@ function load_image_from_cache(crc) {
 		return -1;
 	};
 };
-
-function save_image_to_cache(metadb, albumIndex, image_path) {
-	if (image_path) {
-		var crc = brw.groups[albumIndex].cachekey;
-	}
-	else {
-		return false;
-	};
-	resize(image_path, crc);
-};
-
-function resize(source, crc) {
-	var img = gdi.Image(source);
-	if (!img) {
-		return;
-	}
-	var s = Math.min(200 / img.Width, 200 / img.Height);
-	var w = Math.floor(img.Width * s);
-	var h = Math.floor(img.Height * s);
-	img = img.Resize(w, h, 2);
-	img.SaveAs(CACHE_FOLDER + crc, "image/jpeg");
-}
 
 function process_cachekey(str) {
 	var str_return = "";

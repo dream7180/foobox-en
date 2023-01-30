@@ -129,8 +129,8 @@ oSwitchbar = function() {
 		}
 		gr.SetSmoothingMode(0);
 		gr.DrawImage(img_list, this.x + z(5), ico_y, img_list.Width, img_list.Height, 0, 0, img_list.Width, img_list.Height,0,255);
-		gr.DrawImage(img_cover, this.x + this.h_space + z(5), ico_y-1, img_list.Width, img_list.Height, 0, 0, img_list.Width, img_list.Height,0,255);
-		gr.DrawImage(img_lib,  this.x + this.h_space*2 + z(5), ico_y, img_lib.Width, img_lib.Height, 0, 0, img_lib.Width, img_lib.Height,0,255);
+		gr.DrawImage(img_cover, this.x + this.h_space + z(5), ico_y, img_list.Width, img_list.Height, 0, 0, img_list.Width, img_list.Height,0,255);
+		gr.DrawImage(img_lib,  this.x + this.h_space*2 + z(5), ico_y-1, img_lib.Width, img_lib.Height, 0, 0, img_lib.Width, img_lib.Height,0,255);
 	}
 	this.repaint = function () {
 		window.RepaintRect(this.x, this.y, this.w, this.h);
@@ -314,7 +314,7 @@ function init_obj() {
 	var btn_space = z(12) + 3;
 	var imgh = img_stop.Width, imgh_b = img_play.Width;
 	btn_y = win_y + z(24);//Math.round(Math.max(z(4), (wh+seek_h-imgh)/2-zdpi));
-	var btn_y2 = Math.round(btn_y - z(4));
+	var btn_y2 = Math.round(btn_y - z(3));
 	var btn_x = Math.round((ww-imgh*4-imgh_b-btn_space*4)/2);
 	PBOpen.SetXY(btn_x, btn_y);
 	PBPrevious.SetXY(btn_x+imgh+btn_space, btn_y);
@@ -329,8 +329,8 @@ function init_obj() {
 	PlaybackTimeText.SetSize(btn_space*2, win_y, time_length, seek_h);
 	PlaybackLengthText.SetSize(seek_len + seek_start + btn_space, win_y, time_length, seek_h);
 	TimeTip = new UITooltip(seek_start + z(12), win_y, "", g_font, c_font, tip_bg);
-	VolumeTip = new UITooltip(ww - seek_start + z(5), btn_y + z(2), "", g_font, c_font, false);
-	MuteBtn.SetXY(volbtn_x, Math.round(btn_y + 2*zdpi));
+	VolumeTip = new UITooltip(ww - seek_start + z(5) - 1, btn_y + z(2), "", g_font, c_font, false);
+	MuteBtn.SetXY(volbtn_x, btn_y + Math.round(zdpi));
 	pbo_start = volbtn_x - pbo_btn_img.Width - btn_space;
 	PBOBtn.SetXY(pbo_start, btn_y);
 	g_switchbar.setSize(seek_start -z(5), btn_y, g_switchbar.w, g_switchbar.h);
@@ -339,7 +339,7 @@ function init_obj() {
 function setSize(){
 	seekbar.setSize(seek_start, win_y, seek_len, seek_h);
 	seekbar.MaxValue = Math.max(0, fb.PlaybackLength);
-	VolumeBar.setSize(vol_start, btn_y + z(5), vol_len, z(18));
+	VolumeBar.setSize(vol_start, btn_y + z(5) - 1, vol_len, z(18));
 	VolumeBar.Value = vol2pos(fb.Volume) | 0;
 }
 
@@ -437,17 +437,17 @@ function get_images() {
 	img_vol = gdi.CreateImage(imgh, imgh * 3);
 	gb = img_vol.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x2, _x9-1, _x6, _x9-1, 2, c_normal);
-	gb.DrawLine(_x12, _x4, _x12, _x18, 2, c_normal);
-	gb.DrawLine(_x2, _x9-2, _x2, _x16, 2, c_normal);
-	gb.DrawLine(_x2, _x16-1, _x6+1, _x16-1, 2, c_normal);
-	gb.DrawLine(_x16, _x10, _x16, _x14, 2, c_normal);
-	gb.DrawLine(_x20, _x8, _x20, _x16, 2, c_normal);
+	gb.DrawLine(_x3, z(8)+1, _x6+1, z(8)+1, 2, c_normal);
+	gb.DrawLine(_x13, z(5), _x13, z(19)+1, 2, c_normal);
+	gb.DrawLine(_x3, z(8), _x3, z(16)+1, 2, c_normal);
+	gb.DrawLine(_x3, z(16), _x6+1, z(16), 2, c_normal);
+	gb.DrawLine(_x17, _x10, _x17, _x14, 2, c_normal);
+	gb.DrawLine(_x21, _x8, _x21, _x16, 2, c_normal);
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x6-1, _x8, _x12, _x4, 2, c_normal);
-	gb.DrawLine(_x6, 15*zdpi, _x12, _x18, 2, c_normal);
-	gb.FillEllipse(0, imgh, imgh, imgh, c_shadow_h);
-	gb.FillEllipse(0, imgh2, imgh, imgh, c_shadow);
+	gb.DrawLine(_x6, z(8)+1, _x13, z(5), 2, c_normal);
+	gb.DrawLine(_x6, z(16)-1, _x13, z(19), 2, c_normal);
+	gb.FillRoundRect(1, imgh+1, imgh-2, imgh-2, 6, 6, c_shadow_h);
+	gb.FillRoundRect(1, imgh2+1, imgh-2, imgh-2, 6, 6, c_shadow);
 	gb.SetSmoothingMode(0);
 	img_vol.ReleaseGraphics(gb);
 
@@ -576,9 +576,9 @@ function get_images() {
 	gb.SetSmoothingMode(2);
 	gb.DrawPolygon(c_normal,2,point_arr);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x6, zdpi, 19*zdpi,  zdpi, 2, c_normal);
-	gb.DrawLine(9.5*zdpi, zdpi+floor_x6, 19*zdpi,  zdpi+floor_x6, 2, c_normal);
-	gb.DrawLine(_x6, zdpi+floor_x6*2, 19*zdpi,  zdpi+floor_x6*2, 2, c_normal);
+	gb.DrawLine(_x6, zdpi, Math.floor(19*zdpi),  zdpi, 2, c_normal);
+	gb.DrawLine(9.5*zdpi, zdpi+floor_x6, Math.floor(19*zdpi),  zdpi+floor_x6, 2, c_normal);
+	gb.DrawLine(_x6, zdpi+floor_x6*2, Math.floor(19*zdpi),  zdpi+floor_x6*2, 2, c_normal);
 	img_list.ReleaseGraphics(gb);
 	
 	point_arr = new Array(_x2, _x12-1, _x10, _x12-1, _x6, _x5);
@@ -597,17 +597,17 @@ function get_images() {
 	gb = img_lib.GetGraphics();
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(zdpi, zdpi, _x4, _x4, c_normal);
-	gb.FillEllipse(zdpi, _x9, _x4, _x4, c_normal);
+	gb.FillEllipse(zdpi, _x10, _x4, _x4, c_normal);
 	gb.FillEllipse(7.5*zdpi, zdpi, _x4, _x4, c_normal);
-	gb.FillEllipse(7.5*zdpi, _x9, _x4, _x4, c_normal);
+	gb.FillEllipse(7.5*zdpi, _x10, _x4, _x4, c_normal);
 	gb.FillEllipse(_x14, zdpi, _x4, _x4, c_normal);
-	gb.FillEllipse(_x14, _x9, _x4, _x4, c_normal);
+	gb.FillEllipse(_x14, _x10, _x4, _x4, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x3, _x2, _x3, _x10, 1, c_normal);
-	gb.DrawLine(9.75*zdpi, _x2, 9.75*zdpi, _x10, 1, c_normal);
+	gb.DrawLine(_x3, _x2, _x3, 11*zdpi, 1, c_normal);
+	gb.DrawLine(9.75*zdpi, _x3, 9.75*zdpi, 11*zdpi, 1, c_normal);
 	gb.DrawLine(16.5*zdpi, _x2, 16.5*zdpi, _x10, 1, c_normal);
 	gb.DrawLine(_x3, _x3, _x8, _x3, 1, c_normal);
-	gb.DrawLine(_x12, 11*zdpi, _x16, 11*zdpi, 1, c_normal);
+	gb.DrawLine(_x12, _x12, _x16, _x12, 1, c_normal);
 	gb.SetSmoothingMode(0);
 	img_lib.ReleaseGraphics(gb);
 }
@@ -646,7 +646,7 @@ function on_paint(gr) {
 		VolumeTip.Paint(gr);
 		MuteBtn.Paint(gr);
 		PBOBtn.Paint(gr);
-		gr.DrawImage(img_pbo[plman.PlaybackOrder], pbo_start + 1, Math.round(Math.max(0, btn_y + 2*zdpi)), pbo_btn_img.Width, pbo_btn_img.Width, 0, 0, pbo_btn_img.Width, pbo_btn_img.Width, 0);
+		gr.DrawImage(img_pbo[plman.PlaybackOrder], pbo_start + 1, Math.round(Math.max(0, btn_y + zdpi)), pbo_btn_img.Width, pbo_btn_img.Width, 0, 0, pbo_btn_img.Width, pbo_btn_img.Width, 0);
 		g_switchbar.draw(gr);
 	}	
 }

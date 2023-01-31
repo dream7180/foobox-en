@@ -9,7 +9,7 @@ var PBOTips = new Array("Default", "Repeat (playlist)", "Repeat (track)", "Rando
 var hbtn = false;
 var ww = 0,
 	wh = 0;
-var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y;
+var seek_len, seek_start,seek_h, vol_start, vol_len, pbo_start, btn_y, win_y, rec_r;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText;
 var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn;
@@ -22,13 +22,13 @@ LIST.ShowCaption = BRW.ShowCaption = LIB.ShowCaption = false;
 	
 //======================================================
 oSwitchbar = function() {
-	this.btw = z(30);
+	this.btw = z(28);
 	this.bth = z(24);
 	this.h_space = z(40);
 	this.x = 5;
 	this.y = 5;
 	this.w = this.h_space*2+this.btw + 2;
-	this.h = this.bth + 2;
+	this.h = this.bth + z(2);
 	this.hover_tab = 0;
 	this.tab_old = this.hover_tab;
 	this.down = 0;
@@ -119,13 +119,13 @@ oSwitchbar = function() {
 		set_panel();
 	}
 	this.draw = function(gr){
-		var ico_y = Math.ceil(this.y + z(6));//, h_space = z(40);
+		var ico_y = Math.ceil(this.y + z(6)), hoverbg_offset = Math.round(2*zdpi)-1;
 		gr.SetSmoothingMode(4);
-		gr.FillRoundRect(this.x + active_pid*this.h_space, this.y+z(1), this.btw, this.bth, 6, 6, c_normal & 0x30ffffff);
-		if(this.hover_tab && this.tip_show) gr.GdiDrawText(this.tip[this.hover_tab-1], g_font, c_font, this.x+this.w+z(8), this.y+z(1), this.tipw, this.bth, lc_txt);
+		gr.FillRoundRect(this.x + active_pid*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_normal & 0x30ffffff);
+		if(this.hover_tab && this.tip_show) gr.GdiDrawText(this.tip[this.hover_tab-1], g_font, c_font, this.x+this.w+z(8), this.y+hoverbg_offset, this.tipw, this.bth, lc_txt);
 		if(this.hover_tab && this.hover_tab-1 != active_pid){
-			if(this.down) gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+z(1), this.btw, this.bth, 6, 6, c_shadow);
-			else gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+z(1), this.btw, this.bth, 6, 6, c_shadow_h);
+			if(this.down) gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_shadow);
+			else gr.FillRoundRect(this.x + (this.hover_tab-1)*this.h_space, this.y+hoverbg_offset, this.btw, this.bth, rec_r, rec_r, c_shadow_h);
 		}
 		gr.SetSmoothingMode(0);
 		gr.DrawImage(img_list, this.x + z(5), ico_y, img_list.Width, img_list.Height, 0, 0, img_list.Width, img_list.Height,0,255);
@@ -212,6 +212,7 @@ function get_font() {
 	zdpi = g_font.Size / 12;
 	g_fsize = g_font.Size;
 	g_font_b = GdiFont(g_font.Name, g_fsize, 1);
+	rec_r = z(4);
 }
 
 function get_color() {
@@ -357,7 +358,7 @@ function get_images() {
 	gb.DrawEllipse(zdpi, zdpi, _x30, _x30, 2, c_normal);
 	gb.DrawLine(_x12, _x8, 25*zdpi, _x16, 2, c_normal);
 	gb.DrawLine(_x12, _x8, _x12, _x24, 2, c_normal);
-	gb.DrawLine(25*zdpi, _x16, _x16, _x22, 2, c_normal);
+	gb.DrawLine(25*zdpi, _x16, _x12, _x24, 2, c_normal);
 	gb.FillEllipse(0, imgh, imgh-_x2, imgh-_x2, c_shadow_h);
 	gb.FillEllipse(0, imgh2, imgh-_x2, imgh-_x2, c_shadow);
 	gb.SetSmoothingMode(0);
@@ -368,8 +369,8 @@ function get_images() {
 	gb.SetSmoothingMode(2);
 	gb.DrawEllipse(zdpi, zdpi, _x30, _x30, 2, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x12, _x9, _x12, 23*zdpi, 2, c_normal);
-	gb.DrawLine(_x21, _x9, _x21, 23*zdpi, 2, c_normal);
+	gb.DrawLine(_x12, _x9, _x12, Math.floor(23*zdpi)+1, 2, c_normal);
+	gb.DrawLine(_x21, _x9, _x21, Math.floor(23*zdpi)+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, imgh-_x2, imgh-_x2, c_shadow_h);
 	gb.FillEllipse(0, imgh2, imgh-_x2, imgh-_x2, c_shadow);
@@ -380,10 +381,7 @@ function get_images() {
 	img_stop = gdi.CreateImage(imgh, imgh * 3);
 	gb = img_stop.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x6, _x6, _x21+1, _x6, 2, c_normal);
-	gb.DrawLine(_x21, _x6+1, _x21, _x21, 2, c_normal);
-	gb.DrawLine(_x6+1, _x6+1, _x6+1, _x21, 2, c_normal);
-	gb.DrawLine(11*zdpi, _x21-1, _x21-1, _x21-1, 2, c_normal);
+	gb.DrawRect(_x6+1, _x6, Math.round(15*zdpi-1), Math.round(15*zdpi-1), 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, imgh, imgh, c_shadow_h);
 	gb.FillEllipse(0, imgh2, imgh, imgh, c_shadow);
@@ -397,7 +395,7 @@ function get_images() {
 	gb.DrawLine(_x7, _x5, _x7, _x21, 2, c_normal);
 	gb.DrawLine(_x7, _x21, 19*zdpi, _x13, 2, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x21, _x6, _x21, _x21, 2, c_normal);
+	gb.DrawLine(Math.floor(_x21)+1, _x6, Math.floor(_x21)+1, _x20+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, imgh, imgh, c_shadow_h);
 	gb.FillEllipse(0, imgh2, imgh, imgh, c_shadow);
@@ -410,7 +408,7 @@ function get_images() {
 	gb.SetSmoothingMode(2);
 	gb.DrawPolygon(c_normal,2,point_arr);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x5, _x21, _x21, _x21, 2, c_normal);
+	gb.DrawLine(_x5, _x21, Math.floor(_x21)+1, _x21, 2, c_normal);
 	point_arr = new Array(_x13, _x5 + imgh, _x20, 15*zdpi + imgh, _x6, 15*zdpi + imgh);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, imgh, imgh, c_shadow_h);
@@ -423,9 +421,9 @@ function get_images() {
 	gb.SetSmoothingMode(2);
 	gb.DrawLine(_x20, _x5, _x8, _x13, 2, c_normal);
 	gb.DrawLine(_x20, _x5, _x20, _x21, 2, c_normal);
-	gb.DrawLine(_x20, _x21, _x9, _x13, 2, c_normal);
+	gb.DrawLine(_x20, _x21, _x8, _x13, 2, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x7, _x6, _x7, _x21, 2, c_normal);
+	gb.DrawLine(_x6, _x6, _x6, _x20+1, 2, c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillEllipse(0, imgh, imgh, imgh, c_shadow_h);
 	gb.FillEllipse(0, imgh2, imgh, imgh, c_shadow);
@@ -434,20 +432,20 @@ function get_images() {
 
 	imgh =z(24);
 	imgh2 = imgh * 2;
-	img_vol = gdi.CreateImage(imgh, imgh * 3);
+	img_vol = gdi.CreateImage(z(26), imgh * 3);
 	gb = img_vol.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x3, z(8)+1, _x6+1, z(8)+1, 2, c_normal);
-	gb.DrawLine(_x13, z(5), _x13, z(19)+1, 2, c_normal);
-	gb.DrawLine(_x3, z(8), _x3, z(16)+1, 2, c_normal);
-	gb.DrawLine(_x3, z(16), _x6+1, z(16), 2, c_normal);
-	gb.DrawLine(_x17, _x10, _x17, _x14, 2, c_normal);
-	gb.DrawLine(_x21, _x8, _x21, _x16, 2, c_normal);
+	gb.DrawLine(_x4, z(8)+1, _x7+1, z(8)+1, 2, c_normal);
+	gb.DrawLine(_x14, z(5), _x14, z(19)+1, 2, c_normal);
+	gb.DrawLine(_x4, z(8), _x4, z(16)+1, 2, c_normal);
+	gb.DrawLine(_x4, z(16), _x7+1, z(16), 2, c_normal);
+	gb.DrawLine(_x18, _x10, _x18, _x14, 2, c_normal);
+	gb.DrawLine(_x22, _x8, _x22, _x16, 2, c_normal);
 	gb.SetSmoothingMode(2);
-	gb.DrawLine(_x6, z(8)+1, _x13, z(5), 2, c_normal);
-	gb.DrawLine(_x6, z(16)-1, _x13, z(19), 2, c_normal);
-	gb.FillRoundRect(1, imgh+1, imgh-2, imgh-2, 6, 6, c_shadow_h);
-	gb.FillRoundRect(1, imgh2+1, imgh-2, imgh-2, 6, 6, c_shadow);
+	gb.DrawLine(_x7, z(8)+1, _x14, z(5), 2, c_normal);
+	gb.DrawLine(_x7, z(16)-1, _x14, z(19), 2, c_normal);
+	gb.FillRoundRect(1, imgh+1, z(26)-2, imgh-2, rec_r, rec_r, c_shadow_h);
+	gb.FillRoundRect(1, imgh2+1, z(26)-2, imgh-2, rec_r, rec_r, c_shadow);
 	gb.SetSmoothingMode(0);
 	img_vol.ReleaseGraphics(gb);
 
@@ -534,7 +532,7 @@ function get_images() {
 	img_pbo[6] = gdi.CreateImage(imgh, imgh);
 	gb = img_pbo[6].GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.DrawRoundRect(_x5, _x7, _x14, _x12, 3, 3, 2, c_normal);
+	gb.DrawRoundRect(_x5, _x7, _x14, _x12, Math.round(rec_r/2), Math.round(rec_r/2), 2, c_normal);
 	gb.DrawEllipse(_x10, 11*zdpi, _x4, _x4, 2, c_normal);
 	gb.SetSmoothingMode(0);
 	gb.DrawLine(_x14, _x3, _x14, _x14, 2, c_normal);
@@ -561,11 +559,11 @@ function get_images() {
 	gb = vol_seeker.GetGraphics();
 	vol_seeker.ReleaseGraphics(gb);
 
-	pbo_btn_img = gdi.CreateImage(z(28), z(84));
+	pbo_btn_img = gdi.CreateImage(z(28), z(78));
 	gb = pbo_btn_img.GetGraphics();
 	gb.SetSmoothingMode(4);
-	gb.FillRoundRect(0, 28*zdpi, 26*zdpi, 26*zdpi, 6, 6, c_shadow_h);
-	gb.FillRoundRect(0, 56*zdpi, 26*zdpi, 26*zdpi, 6, 6, c_shadow);
+	gb.FillRoundRect(0, z(26), 26*zdpi, _x24, rec_r, rec_r, c_shadow_h);
+	gb.FillRoundRect(0, z(52), 26*zdpi, _x24, rec_r, rec_r, c_shadow);
 	gb.SetSmoothingMode(0);
 	pbo_btn_img.ReleaseGraphics(gb);
 	
@@ -581,33 +579,33 @@ function get_images() {
 	gb.DrawLine(_x6, zdpi+floor_x6*2, Math.floor(19*zdpi),  zdpi+floor_x6*2, 2, c_normal);
 	img_list.ReleaseGraphics(gb);
 	
-	point_arr = new Array(_x2, _x12-1, _x10, _x12-1, _x6, _x5);
+	point_arr = new Array(_x2, _x12-2, _x10, _x12-2, _x6, _x5-1);
 	img_cover = gdi.CreateImage(z(28), z(16));
 	gb = img_cover.GetGraphics();
 	gb.SetSmoothingMode(0);
-	gb.DrawRect(zdpi,zdpi,17*zdpi,_x12+1,2,c_normal);
+	gb.DrawRect(zdpi,zdpi,17*zdpi,_x12,2,c_normal);
 	gb.SetSmoothingMode(2);
 	gb.FillPolygon(c_normal, 0, point_arr);
-	gb.DrawLine(_x12, _x12-1, _x9, _x6, 2, c_normal);
-	gb.FillEllipse(11*zdpi, _x3, _x4, _x4, c_normal);
+	gb.DrawLine(_x12, _x12-2, _x9, _x6-1, 2, c_normal);
+	gb.FillEllipse(11.5*zdpi, 2.8*zdpi, _x4, _x4, c_normal);
 	gb.SetSmoothingMode(0);
 	img_cover.ReleaseGraphics(gb);
 	
 	img_lib = gdi.CreateImage(z(28), z(16));
 	gb = img_lib.GetGraphics();
 	gb.SetSmoothingMode(2);
-	gb.FillEllipse(zdpi, zdpi, _x4, _x4, c_normal);
-	gb.FillEllipse(zdpi, _x10, _x4, _x4, c_normal);
-	gb.FillEllipse(7.5*zdpi, zdpi, _x4, _x4, c_normal);
-	gb.FillEllipse(7.5*zdpi, _x10, _x4, _x4, c_normal);
-	gb.FillEllipse(_x14, zdpi, _x4, _x4, c_normal);
-	gb.FillEllipse(_x14, _x10, _x4, _x4, c_normal);
+	gb.FillEllipse(0, zdpi, _x4, _x4, c_normal);
+	gb.FillEllipse(0, _x10, _x4, _x4, c_normal);
+	gb.FillEllipse(6.5*zdpi, zdpi, _x4, _x4, c_normal);
+	gb.FillEllipse(6.5*zdpi, _x10, _x4, _x4, c_normal);
+	gb.FillEllipse(_x13, zdpi, _x4, _x4, c_normal);
+	gb.FillEllipse(_x13, _x10, _x4, _x4, c_normal);
 	gb.SetSmoothingMode(0);
-	gb.DrawLine(_x3, _x2, _x3, 11*zdpi, 1, c_normal);
-	gb.DrawLine(9.75*zdpi, _x3, 9.75*zdpi, 11*zdpi, 1, c_normal);
-	gb.DrawLine(16.5*zdpi, _x2, 16.5*zdpi, _x10, 1, c_normal);
-	gb.DrawLine(_x3, _x3, _x8, _x3, 1, c_normal);
-	gb.DrawLine(_x12, _x12, _x16, _x12, 1, c_normal);
+	gb.DrawLine(_x2, _x2, _x2, 11*zdpi, 1, c_normal);
+	gb.DrawLine(8.75*zdpi, _x3, 8.75*zdpi, 11*zdpi, 1, c_normal);
+	gb.DrawLine(15.5*zdpi, _x2, 15.5*zdpi, _x10, 1, c_normal);
+	gb.DrawLine(_x2, _x3, _x7, _x3, 1, c_normal);
+	gb.DrawLine(11*zdpi, _x12, 15*zdpi, _x12, 1, c_normal);
 	gb.SetSmoothingMode(0);
 	img_lib.ReleaseGraphics(gb);
 }

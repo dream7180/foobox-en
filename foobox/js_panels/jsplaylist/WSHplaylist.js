@@ -542,18 +542,18 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 								// *** check aspect ratio *** //
 							};
 
-							if (p.headerBar.columns[0].w < cover.max_w) {
-								gr.DrawImage(p.list.groups[this.group_index].cover_img.Resize(cv_w, cv_h, 2), cv_x, cv_y, cv_w, cv_h, 1, 1, cv_w-2, cv_h-2);
-							}
-							else {
-								gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
-							};
+							//if (p.headerBar.columns[0].w < cover.max_w) {
+							//	gr.DrawImage(p.list.groups[this.group_index].cover_img.Resize(cv_w, cv_h, 2), cv_x, cv_y, cv_w, cv_h, 1, 1, cv_w-2, cv_h-2);
+							//}
+							//else {
+							gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
+							//};
 						};
 					}
 					else {
 						var c_delta = Math.round(cv_h/8), cv_ww = cv_w - c_delta*2;
 						if(images.loading.Width != cv_ww) {
-							images.loading = images.loading.Resize(cv_ww, cv_h - c_delta*2, 7);
+							images.loading = images.loading.Resize(cv_ww, cv_h - c_delta*2, 2);
 						}
 						gr.DrawImage(images.loading, cv_x + c_delta, cv_y + c_delta, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 160);
 					};
@@ -776,19 +776,19 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 									// *** check aspect ratio *** //
 								};
 
-								if (this.obj.collapsed) {
-									gr.DrawImage(p.list.groups[this.group_index].cover_img.Resize(cv_w, cv_h, 2), cv_x, cv_y, cv_w, cv_h, 0, 0, cv_w, cv_h);
-								}
-								else {
-									gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 0, 0, p.list.groups[this.group_index].cover_img.Width, p.list.groups[this.group_index].cover_img.Height);
-								};
-								gr.DrawRect(cv_x, cv_y, cv_w, cv_h, 1.0, RGBA(255, 255, 255, 50));
+								//if (this.obj.collapsed) {
+									//gr.DrawImage(p.list.groups[this.group_index].cover_img.Resize(cv_w, cv_h, 2), cv_x, cv_y, cv_w, cv_h, 0, 0, cv_w, cv_h);
+								//}
+								//else {
+								gr.DrawImage(p.list.groups[this.group_index].cover_img, cv_x, cv_y, cv_w, cv_h, 1, 1, p.list.groups[this.group_index].cover_img.Width-2, p.list.groups[this.group_index].cover_img.Height-2);
+								//};
+								//gr.DrawRect(cv_x, cv_y, cv_w, cv_h, 1.0, RGBA(255, 255, 255, 50));
 							};
 						}
 						else {
 							var c_delta = Math.round(cv_h/8), cv_ww = cv_w - c_delta*2;
 							if(images.loading.Width != cv_ww) {
-								images.loading = images.loading.Resize(cv_ww, cv_h - c_delta*2, 7);
+								images.loading = images.loading.Resize(cv_ww, cv_h - c_delta*2, 2);
 							}
 							gr.DrawImage(images.loading, cv_x + c_delta, cv_y + c_delta, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 160);
 						};

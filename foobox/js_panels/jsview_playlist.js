@@ -585,6 +585,9 @@ function on_notify_data(name, info) {
 		gcursor.bar_w = sys_scrollbar ? utils.GetSystemMetrics(2) : 12*zdpi;
 		repaint_main1 = repaint_main2;
 		break;
+	case "LibviewUpdated":
+		load_pl(20);
+		break;
 	}
 }
 

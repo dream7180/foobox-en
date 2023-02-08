@@ -999,10 +999,10 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		var button_zoomSize = g_z16;
 		// button
 		if (this.status) {
-			this.button = new button(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
+			this.button = new button(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
 		}
 		else {
-			this.button = new button(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
+			this.button = new button(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
 		};
 	};
 	this.setButtons();
@@ -1012,10 +1012,10 @@ oCheckBox = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		if (this.status != this.prevStatus) {
 			var button_zoomSize = g_z16;
 			if (this.status) {
-				this.button.update(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
+				this.button.update(this.checkbox_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
 			}
 			else {
-				this.button.update(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
+				this.button.update(this.checkbox_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.checkbox_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
 			};
 			this.prevStatus = this.status;
 		};
@@ -1098,10 +1098,10 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 		var button_zoomSize = g_z16;
 		// button
 		if (this.status) {
-			this.button = new button(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
+			this.button = new button(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
 		}
 		else {
-			this.button = new button(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
+			this.button = new button(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
 		};
 	};
 	this.setButtons();
@@ -1109,10 +1109,10 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 	this.draw = function(gr) {
 		var button_zoomSize = g_z16;
 		if (this.status) {
-			this.button.update(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 7));
+			this.button.update(this.radiobt_normal_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_on.Resize(button_zoomSize, button_zoomSize, 2));
 		}
 		else {
-			this.button.update(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 7));
+			this.button.update(this.radiobt_normal_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2), this.radiobt_hover_off.Resize(button_zoomSize, button_zoomSize, 2));
 		};
 		this.ly = this.y - (p.settings.pages[this.parentPageId].offset * cSettings.rowHeight);
 		if (this.ly > cSettings.topBarHeight) {
@@ -2283,7 +2283,7 @@ oSettings = function() {
 		this.close_ov.ReleaseGraphics(gb);
 
 		button_zoomSize = Math.ceil(25 * zdpi);
-		this.closebutton = new button(this.close_off.Resize(button_zoomSize, button_zoomSize, 7), this.close_ov.Resize(button_zoomSize, button_zoomSize, 7), this.close_ov.Resize(button_zoomSize, button_zoomSize, 7));
+		this.closebutton = new button(this.close_off.Resize(button_zoomSize, button_zoomSize, 2), this.close_ov.Resize(button_zoomSize, button_zoomSize, 2), this.close_ov.Resize(button_zoomSize, button_zoomSize, 2));
 		
 		this.tabButtons.splice(0, this.tabButtons.length);
 		var fin = this.pages.length, tw = 0,

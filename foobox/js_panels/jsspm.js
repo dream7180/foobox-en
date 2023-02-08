@@ -545,7 +545,7 @@ oBrowser = function(name) {
 					}
 					if (plman.ActivePlaylist != this.rows[this.activeRow].idx && !(arrayContains(PlaylistExcludedIdx, plman.ActivePlaylist) && this.rows[this.activeRow].idx == DefaultPlaylistIdx && DefaultPlaylistIdx > -1)) {
 						if (this.inputboxID > -1) this.inputboxID = -1;
-						this.repaint();
+						//this.repaint();
 						plman.ActivePlaylist = this.rows[this.activeRow].idx;
 						cPlaylistManager.playlist_switch_pending = true;
 						window.SetCursor(IDC_WAIT);
@@ -554,7 +554,10 @@ oBrowser = function(name) {
 				this.repaint();
 			}
 			else {
-				if (this.inputboxID > -1) this.inputboxID = -1;
+				if (this.inputboxID > -1) {
+					this.inputboxID = -1;
+					this.repaint();
+				}
 				// scrollbar
 				if (/*cScrollBar.enabled && */cScrollBar.visible) {
 					this.scrollbar && this.scrollbar.on_mouse(event, x, y);
@@ -1739,9 +1742,11 @@ function on_key_down(vkey) {
 					if (ppt.showFilter && g_filterbox.inputbox.edit) return;
 					if (g_searchbox.inputbox.edit) return;
 					brw.repaint();
-					plman.ActivePlaylist = brw.selectedRow;
-					cPlaylistManager.playlist_switch_pending = true;
-					window.SetCursor(IDC_WAIT);
+					if(brw.selectedRow > -1) {
+						plman.ActivePlaylist = brw.selectedRow;
+						cPlaylistManager.playlist_switch_pending = true;
+						window.SetCursor(IDC_WAIT);
+					}
 				};
 				break;
 			case VK_END:

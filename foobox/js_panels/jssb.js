@@ -3169,7 +3169,7 @@ function on_playback_stop(reason) {
 
 function on_playback_new_track(metadb) {
 	g_metadb = metadb;
-	if(ppt.sourceMode == 0 || !window.IsVisible) {
+	if(ppt.sourceMode == 0) {
 		try{
 			playing_title = fb.TitleFormat("$if2(%title%,%filename%)").EvalWithMetadb(fb.GetNowPlaying());
 		} catch (e) {};
@@ -3289,7 +3289,6 @@ function on_playlist_items_reordered(playlist_idx) {
 
 
 function on_item_focus_change(playlist_idx, from, to) {
-	if(!window.IsVisible) return;
 	if (g_avoid_on_item_focus_change) {
 		g_avoid_on_item_focus_change = false;
 		return;
@@ -3320,7 +3319,7 @@ function on_metadb_changed() {
 };
 
 function on_playlist_items_selection_change() {
-	if (ppt.sourceMode == 1 && window.IsVisible) brw.repaint();
+	if (ppt.sourceMode == 1) brw.repaint();
 };
 
 function on_focus(is_focused) {

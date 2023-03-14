@@ -551,11 +551,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						};
 					}
 					else {
-						var c_delta = Math.round(cv_h/8), cv_ww = cv_w - c_delta*2;
-						if(images.loading.Width != cv_ww) {
-							images.loading = images.loading.Resize(cv_ww, cv_h - c_delta*2, 2);
+						if(images.loading.Width != cv_w) {
+							images.loading = images.loading.Resize(cv_w, cv_h, 2);
 						}
-						gr.DrawImage(images.loading, cv_x + c_delta, cv_y + c_delta, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 160);
+						gr.DrawImage(images.loading, cv_x, cv_y, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 255);
 					};
 				};
 			};
@@ -786,11 +785,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 							};
 						}
 						else {
-							var c_delta = Math.round(cv_h/8), cv_ww = cv_w - c_delta*2;
-							if(images.loading.Width != cv_ww) {
-								images.loading = images.loading.Resize(cv_ww, cv_h - c_delta*2, 2);
+							if(images.loading.Width != cv_w) {
+								images.loading = images.loading.Resize(cv_w, cv_h, 2);
 							}
-							gr.DrawImage(images.loading, cv_x + c_delta, cv_y + c_delta, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 160);
+							gr.DrawImage(images.loading, cv_x, cv_y, images.loading.Width, images.loading.Height, 0, 0, images.loading.Width, images.loading.Height, images.loading_angle, 255);
 						};
 					};
 				};

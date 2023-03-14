@@ -861,6 +861,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if (new_dir == "") new_dir = _dir;
 			if (new_dir){
 				dir_cover_name = new_dir;
+				window.SetProperty("foobox.cover.folder.name", dir_cover_name);
 			}
 			window.NotifyOthers("set_dir_name", dir_cover_name);
 			break;	
@@ -1755,7 +1756,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Record in file tag also", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Cover/info panel follow cursor, not follow playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Highlight color follow cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.75), oTextBox_3, cHeaderBar.height, "Cover filename for groups by folder", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.75), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by folder, divided by semicolon \";\" ", dir_cover_name, "settings_textboxes_action", this.id));			
 			break;
 		};
 	};

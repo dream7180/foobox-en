@@ -10,10 +10,6 @@ var DefaultPlaylistIdx = -1;
 var g_font, g_font_b, g_font_track;
 get_font();
 
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var WshShell = new ActiveXObject("WScript.Shell");
-var htmlfile = new ActiveXObject('htmlfile');
-
 var brw = null;
 var isScrolling = false;
 
@@ -91,6 +87,8 @@ ppt = {
 	headerBarHeight: 28,
 	showGrid: window.GetProperty("_PROPERTY: Show Grid", true),
 	//drawUpAndDownScrollbar: window.GetProperty("_PROPERTY: Draw Up and Down Scrollbar Buttons", false),
+	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
+	winver: null,
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
 
@@ -195,7 +193,59 @@ function renamePlaylist() {
 		brw.repaint();
 	};
 	brw.inputboxID = -1;
-};
+}
+
+
+function DeletePlaylist(delete_pid){
+	function delete_confirmation(status, confirmed) {
+		if(confirmed){
+			plman.RemovePlaylistSwitch(delete_pid);
+			brw.selectedRow = plman.ActivePlaylist;
+		}
+	}
+	var parsed_tabname = plman.GetPlaylistName(delete_pid);
+	HtmlDialog("Remove playlist", "Are you sure to remove this playlist?<p class=line_name>" + parsed_tabname + "</p>", "Yes", "No", delete_confirmation);
+}
+
+function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback){
+	utils.ShowHtmlDialog(window.ID, htmlCode(fb.FoobarPath + "themes\\foobox\\html","ConfirmDialog.html"), {
+		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback],
+	});
+}
+
+function htmlCode(directory,filename) {
+    let htmlCode = utils.ReadTextFile(directory+"\\"+filename);
+    let cssPath = directory;
+	if(ppt.winver == null) ppt.winver = get_windows_version();
+    if ( ppt.winver === '6.1' ) {
+        cssPath += "\\styles7.css";
+    }
+    else {
+        cssPath += "\\styles10.css";
+    }
+    htmlCode = htmlCode.replace(/href="styles10.css"/i, `href="${cssPath}"`);
+    return htmlCode;
+}
+
+function get_windows_version() {
+    let version = '';
+	var WshShell = new ActiveXObject("WScript.Shell");
+    try {
+        version = (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMajorVersionNumber')).toString();
+        version += '.';
+        version += (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMinorVersionNumber')).toString();
+        return version;
+    }
+    catch (e) {
+    }
+    try {
+        version = WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion');
+        return version;
+    }
+    catch (e) {
+    }
+    return '6.1';
+}
 
 //===================================================================================================
 //    Objects
@@ -926,6 +976,9 @@ oBrowser = function(name) {
 		};
 		if(setting_mode){
 			_menu.AppendMenuSeparator();
+			_menu.AppendMenuItem(MF_STRING, 16, "Confirmation before removing playlist");
+			_menu.CheckMenuItem(16, ppt.confirmRemove);
+			_menu.AppendMenuSeparator();
 			_menu.AppendMenuItem(MF_STRING, 9, "Show filter");
 			_menu.CheckMenuItem(9, ppt.showFilter);
 			_menu.AppendMenuItem(MF_STRING, 14, "Show grids");
@@ -1040,8 +1093,12 @@ oBrowser = function(name) {
 			break;
 		case (idx == 8):
 			if (brw.rowsCount > 0) {
-				plman.RemovePlaylistSwitch(brw.selectedRow);
-				brw.selectedRow = plman.ActivePlaylist;
+				if(ppt.confirmRemove){
+					DeletePlaylist(brw.selectedRow);
+				} else {
+					plman.RemovePlaylistSwitch(brw.selectedRow);
+					brw.selectedRow = plman.ActivePlaylist;
+				}
 			};
 			break;
 		case (idx == 9):
@@ -1062,6 +1119,10 @@ oBrowser = function(name) {
 			break;
 		case (idx == 15):
 			window.ShowProperties();
+			break;
+		case (idx == 16):
+			ppt.confirmRemove = !ppt.confirmRemove;
+			window.SetProperty("_PROPERTY: Confirm Before Removing", ppt.confirmRemove);
 			break;
 		case (idx == 14):
 			ppt.showGrid = !ppt.showGrid;
@@ -1769,10 +1830,14 @@ function on_key_down(vkey) {
 				break;
 			case VK_DELETE:
 				if (brw.rowsCount > 0 && brw.selectedRow > (ppt.lockReservedPlaylist ? 0 : -1)) {
-					plman.RemovePlaylistSwitch(brw.selectedRow);
-					brw.selectedRow = plman.ActivePlaylist;
-					break;
+					if(ppt.confirmRemove){
+						DeletePlaylist(brw.selectedRow);
+					} else {
+						plman.RemovePlaylistSwitch(brw.selectedRow);
+						brw.selectedRow = plman.ActivePlaylist;
+					}
 				}
+				break;
 			}
 		}
 		else {

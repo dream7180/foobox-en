@@ -6,7 +6,7 @@ var zdpi = 1;
 var dark_mode = 0;
 	var genre_cover_dir = fb.FoobarPath + "themes\\foobox\\Genre";
 //}
-var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg");
+var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var CACHE_FOLDER = fb.ProfilePath + "cache\\CoverCache\\";
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var g_fname, g_fsize, g_fstyle;
@@ -31,6 +31,7 @@ images = {
 	sw_btn_n0: null,
 	sw_btn_n1: null,
 	stream: null,
+	img_loading: null
 };
 
 ppt = {
@@ -142,7 +143,6 @@ cScrollBar = {
 };
 
 cover = {
-	masks: window.GetProperty("_PROPERTY: Cover art masks (for disk cache)", "*front*.*;*cover*.*;*folder*.*;*.*"),
 	//keepaspectratio: true,
 	max_w: 1
 };
@@ -272,20 +272,32 @@ image_cache = function() {
 							} catch(e) {}
 							try {
 								if(ppt.genre_dir){
-									var _path = ppt.tf_path_dir.EvalWithMetadb(metadb) + dir_cover_name;
-									if(path_img(_path)) var genre_img = gdi.Image(_path);
+									var dc_arr = dir_cover_name.split(";");
+									var folder_path = ppt.tf_path_dir.EvalWithMetadb(metadb);
+									var _path;
+									for (var i = 0; i <= dc_arr.length; i++) {
+										_path = folder_path + dc_arr[i];
+										if(path_img(_path)) {
+											var genre_img = gdi.Image(_path);
+											try {
+												brw.groups[albumIndex].load_requested = 1;
+												brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img, _path);
+											}catch(e) {}
+											if(brw.groups[albumIndex].cover_img != null) break;
+										}
+									}
+									brw.repaint();
 								}
 								else{
 									var _path = ppt.tf_path_genre +  GetGenre(arr[0]) + ".jpg";
 									var genre_img = gdi.Image(_path);
+									try {
+										brw.groups[albumIndex].load_requested = 1;
+										brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img, _path);
+										brw.repaint();
+									} catch(e) {}
 								}
 							} catch (e) {};
-							try {
-								brw.groups[albumIndex].load_requested = 1;
-								brw.groups[albumIndex].cover_img = g_image_cache.getit(metadb, albumIndex, genre_img, _path);
-								brw.repaint();
-							}
-							catch(e) {}
 						}
 						else {
 							this.albumArtId = ppt.albumArtId;
@@ -1057,6 +1069,7 @@ oBrowser = function(name) {
 
 	this.showItemFromItemHandle = function(metadb, isplaying) {
 		var total = this.groups.length;
+		if(total == 0 || metadb == null) return;
 		var total_tracks = 0;
 		var found = false;
 		for (var a = (ppt.showAllItem ? 1 : 0); a < total; a++) {
@@ -1683,7 +1696,7 @@ oBrowser = function(name) {
 					else {
 						var im_w = coverWidth;
 						var im_h = coverWidth;
-						gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 160);
+						gr.DrawImage(images.loading_draw, ax + Math.round((aw - images.loading_draw.Width) / 2), ay + Math.round((aw - images.loading_draw.Height) / 2), images.loading_draw.Width, images.loading_draw.Height, 0, 0, images.loading_draw.Width, images.loading_draw.Height, images.loading_angle, 255);
 					};
 
 					// in Grid mode (panelMode = 3), if cover is in portrait mode, adjust width to the stamp width
@@ -2048,7 +2061,7 @@ oBrowser = function(name) {
 		if (repaint_1) {
 			repaintforced = true;
 			repaint_main = true;
-			images.loading_angle = (images.loading_angle + 30) % 360;
+			images.loading_angle = (images.loading_angle + 15) % 360;
 			window.Repaint();
 		};
 
@@ -2105,7 +2118,7 @@ oBrowser = function(name) {
 		if (repaint_1) {
 			repaintforced = true;
 			repaint_main = true;
-			images.loading_angle = (images.loading_angle + 30) % 360;
+			images.loading_angle = (images.loading_angle + 15) % 360;
 			window.Repaint();
 		};
 
@@ -2411,12 +2424,8 @@ oBrowser = function(name) {
 //    Main
 //===================================================================================================
 
-var gtt = fb.CreateProfiler();
 var fso = new ActiveXObject("Scripting.FileSystemObject");
-var Img = new ActiveXObject("WIA.ImageFile.1");
-var cover_path = new RegExp("(artwork)|(cover)|(scan)|(image)");
-var cover_img = cover.masks.split(";");
-var stub_image, cell_null;
+var cover_img = null;//cover.masks.split(";");
 
 var brw = null;
 var g_1x1 = false;
@@ -2513,6 +2522,7 @@ function on_init() {
 	};
 	if (ppt.sourceMode != 0 && ppt.forceSorting) SortPlaylist();
 	get_images();
+	get_images_loading();
 	brw = new oBrowser("brw");
 	pman = new oPlaylistManager("pman");
 	g_filterbox = new oFilterBox();
@@ -2844,15 +2854,6 @@ function get_images() {
 	gb.FillSolidRect(0, 0, 150, 150, g_color_normal_txt & 0x10ffffff);
 	images.all.ReleaseGraphics(gb);
 
-	if (dark_mode) {
-		images.img_loading = gdi.Image(images.path + "load_light.png");
-	}
-	else {
-		images.img_loading = gdi.Image(images.path + "load_dark.png");
-	};
-	var iw = ppt.rowHeight / 2;
-	images.loading_draw = images.img_loading.Resize(iw, iw, 2);
-
 	var nw = 250,
 		nh = 250;
 	var _font = GdiFont(g_fname, Math.round(nh / 12 * 1.75), 1)
@@ -2924,7 +2925,22 @@ function get_images() {
 	gb.DrawLine(Math.round(x5),2*zdpi, Math.round(_x14),2*zdpi, 1, g_color_normal_txt);
 	gb.DrawLine(Math.round(x5),x5, Math.round(_x14),x5, 1, g_color_normal_txt);
 	images.genre.ReleaseGraphics(gb);
-};
+}
+
+function get_images_loading() {
+	images.img_loading = gdi.CreateImage(512, 512);
+	gb = images.img_loading.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillEllipse(233,186, 46, 46, g_color_highlight&0x75ffffff);//256,209
+	gb.FillEllipse(186,233, 46, 46, g_color_highlight&0x55ffffff);//209,256
+	gb.FillEllipse(233,280, 46, 46, g_color_highlight&0x35ffffff);//256,303
+	gb.FillEllipse(280,233, 46, 46, g_color_highlight&0x15ffffff);//303,256
+	gb.SetSmoothingMode(0);
+	images.img_loading.ReleaseGraphics(gb);
+	
+	var iw = ppt.rowHeight / 2;
+	images.loading_draw = images.img_loading.Resize(iw, iw, 2);
+}
 
 function get_font() {
 	g_font = window.GetFontDUI(FontTypeDUI.playlists);
@@ -3380,6 +3396,7 @@ function on_font_changed() {
 	get_font();
 	get_metrics();
 	get_images();
+	get_images_loading();
 	g_filterbox.inputbox.FontUpdte();
 	g_filterbox.getImages();
 	g_filterbox.setSize(cFilterBox.w, cFilterBox.h);
@@ -3390,6 +3407,7 @@ function on_font_changed() {
 function on_colours_changed() {
 	get_colors();
 	get_images();
+	get_images_loading();
 	if (brw)
 		brw.scrollbar.setNewColors();
 	g_filterbox.getImages();
@@ -3407,6 +3425,8 @@ function on_notify_data(name, info) {
 		if(g_color_highlight != c_ol_tmp){
 			repaint_main1 = repaint_main2;
 		}
+		get_images_loading();
+		break;
 	case "show_Now_Playing":
 		brw.showNowPlaying();
 		break;

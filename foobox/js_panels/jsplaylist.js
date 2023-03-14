@@ -7,13 +7,13 @@ var zdpi = 1;
 var follow_cursor = window.GetProperty("foobox.infoArt.follow.cursor", false);
 var rating2tag = window.GetProperty("foobox.rating.write.to.file", false);
 var genre_cover_dir = fb.FoobarPath + "themes\\foobox\\Genre";
-var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg");
+var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
 var sys_scrollbar = window.GetProperty("foobox.ui.scrollbar.system", false);
 var track_edit_app = window.GetProperty("foobox.track.editor", "D:\\MusicTag\\MusicTag.exe");
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
 let dark_mode = 0;
 // GLOBALS
-var g_script_version = "7.6";
+var g_script_version = "7.7";
 var g_middle_clicked = false;
 var g_middle_click_timer = false;
 var g_queue_origin = -1;
@@ -424,9 +424,13 @@ image_cache = function() {
 								full_repaint();
 							} else if (cGroup.pattern_idx == 5) {
 								var _path = fb.TitleFormat("$directory_path(%path%)\\").EvalWithMetadb(metadb);
-								var dir_img = gdi.Image( _path + dir_cover_name);
-								p.list.groups[albumIndex].load_requested = 1;
-								img = g_image_cache.getit(metadb, metadb_tracktype, dir_img, albumIndex);
+								var dc_arr = dir_cover_name.split(";");
+								for (var i = 0; i <= dc_arr.length; i++) {
+									var dir_img = gdi.Image( _path + dc_arr[i]);
+									p.list.groups[albumIndex].load_requested = 1;
+									img = g_image_cache.getit(metadb, metadb_tracktype, dir_img, albumIndex);
+									if(img != null) break;
+								}
 								full_repaint();
 							}
 							else {
@@ -602,8 +606,7 @@ function on_init() {
 		};
 
 		if (repaint_1) {
-			//images.loading_angle = (images.loading_angle < 360 ? images.loading_angle + 36 : 36);
-			images.loading_angle = (images.loading_angle + 30) % 360;
+			images.loading_angle = (images.loading_angle + 15) % 360;
 			window.Repaint();
 		};
 
@@ -630,8 +633,7 @@ function on_init() {
 			window_visible = true;
 		};
 
-		//images.loading_angle = (images.loading_angle < 360 ? images.loading_angle + 36 : 36);
-		images.loading_angle = (images.loading_angle + 30) % 360;
+		images.loading_angle = (images.loading_angle + 15) % 360;
 
 		if (repaint_cover1 == repaint_cover2) {
 			repaint_cover2 = !repaint_cover1;
@@ -2302,6 +2304,16 @@ function get_images_color() {
 	images.mood_ico.ReleaseGraphics(gb);
 	
 	images.beam = draw_beam_image();
+	
+	images.loading = gdi.CreateImage(512, 512);
+	gb = images.loading.GetGraphics();
+	gb.SetSmoothingMode(2);
+	gb.FillEllipse(233,186, 46, 46, g_color_highlight&0x75ffffff);//256,209
+	gb.FillEllipse(186,233, 46, 46, g_color_highlight&0x55ffffff);//209,256
+	gb.FillEllipse(233,280, 46, 46, g_color_highlight&0x35ffffff);//256,303
+	gb.FillEllipse(280,233, 46, 46, g_color_highlight&0x15ffffff);//303,256
+	gb.SetSmoothingMode(0);
+	images.loading.ReleaseGraphics(gb);
 }
 
 function get_images_ui() {
@@ -2323,9 +2335,6 @@ function get_images_ui() {
 	gb.DrawLine(g_z7, 12*zdpi, 13*zdpi, g_z3, 1, g_color_normal_txt);
 	gb.SetSmoothingMode(0);
 	images.selected_ico.ReleaseGraphics(gb);
-	
-	if (dark_mode) images.loading = gdi.Image(images.path + "load_light.png");
-	else images.loading = gdi.Image(images.path + "load_dark.png");
 };
 
 function get_images_static() {

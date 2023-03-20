@@ -780,9 +780,9 @@ oLink = function (){
 		gpic = pic.GetGraphics();
 	this.w1 = gpic.CalcTextWidth("Preferences", g_font);
 	this.x2 = gpic.CalcTextWidth("Preferences  |  ", g_font);
-	this.w2 = gpic.CalcTextWidth("foobx Help", g_font);
-	this.x3 = gpic.CalcTextWidth("Preferences  |  foobx Help  |  ", g_font);
-	this.w3 = gpic.CalcTextWidth("foobar2000 Home", g_font);
+	this.w2 = gpic.CalcTextWidth("foobox theme", g_font);
+	this.x3 = gpic.CalcTextWidth("Preferences  |  foobox theme  |  ", g_font);
+	this.w3 = gpic.CalcTextWidth("foobox blog", g_font);
 	this.w_sep = gpic.CalcTextWidth("  |  ", g_font);
 	this.w = this.x3 + this.w3;
 	pic.ReleaseGraphics(gpic);
@@ -792,9 +792,9 @@ oLink = function (){
 		this.y = y;
 		gr.GdiDrawText("Preferences", (this.link_hover == 1) ? g_font_ud : g_font, g_color_highlight, this.x, this.y, this.w1, this.h, lc_txt);
 		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.w1, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobx Help", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
+		gr.GdiDrawText("foobox theme", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
 		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.x2 + this.w2, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobar2000 Home", (this.link_hover == 3) ? g_font_ud : g_font, g_color_highlight, this.x + this.x3, this.y, this.w3, this.h, lc_txt);
+		gr.GdiDrawText("foobox blog", (this.link_hover == 3) ? g_font_ud : g_font, g_color_highlight, this.x + this.x3, this.y, this.w3, this.h, lc_txt);
 	}
 	this.repaint = function(){
 		window.RepaintRect(this.x, this.y, this.w, this.h);
@@ -835,10 +835,10 @@ oLink = function (){
 					fb.RunMainMenuCommand("File/Preferences");
 					break;
 				case 2:
-					this.ShellExecute("https://dream7180.gitee.io/2023/foobox-release/", "", "", "open", 1);
+					this.ShellExecute("https://github.com/dream7180/foobox-en", "", "", "open", 1);
 					break;
 				case 3:
-					this.ShellExecute("https://www.foobar2000.org", "", "", "open", 1);
+					this.ShellExecute("https://dream7180.gitee.io/2023/foobox-release/", "", "", "open", 1);
 					break;
 			};
 			this.link_hover = 0;

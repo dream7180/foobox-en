@@ -653,7 +653,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 				gr.GdiDrawText(this.l1, g_font_group1, this.l1_color, line_x, l1_y - 1, this.w - g_z8 - lg1_right_field_w, this.h, lcs_txt);
 				var l1_x1 = gr.CalcTextWidth(this.l1, g_font_group1);
 				var txt_l2 = "";
-				if(this.l2 != "") {
+				if(this.l2 != "" && !(cGroup.pattern_idx == 0 && this.l1 == "Single" && this.obj.count > 1)) {
 					txt_l2 = " | " + this.l2;
 					gr.GdiDrawText(txt_l2, g_font_group2, this.l2_color, line_x + l1_x1, l1_y - 1, this.w - g_z8 - lg1_right_field_w, this.h, lcs_txt);
 				}
@@ -1460,7 +1460,7 @@ oList = function(object_name, playlist) {
 					break;
 				case 9:
 					// l1
-					fields.push(new Array("$if2(%album%,'Unknown album')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [Disc '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'Single','Radio'))", "$if2(%album artist%,'Unknown artist')", "$if2(%artist%,'Unknown artist')", "$if2(%genre%,'Unknown genre')", "$directory(%path%,1)"));
+					fields.push(new Array("$if2(%album%,'Single')", "$if(%album%,%album%$if(%discnumber%,$ifgreater(%totaldiscs%,1,' - [Disc '%discnumber%$if(%totaldiscs%,'/'%totaldiscs%']',']'),),),$if(%length%,'Single','Radio'))", "$if2(%album artist%,'Unknown artist')", "$if2(%artist%,'Unknown artist')", "$if2(%genre%,'Unknown genre')", "$directory(%path%,1)"));
 					break;
 				case 10:
 					// r1
@@ -1468,7 +1468,7 @@ oList = function(object_name, playlist) {
 					break;
 				case 11:
 					// l2
-					fields.push(new Array("$if(%album%, $if2(%album artist%,'Unknown artist'),$if2(%album artist%,'Unknown artist')...)", "$if2(%album artist%,'Unknown artist')", "", "", "", "$directory(%path%,2)"));
+					fields.push(new Array("$if2(%album artist%,'Unknown artist')", "$if2(%album artist%,'Unknown artist')", "", "", "", "$directory(%path%,2)"));
 					break;
 				case 12:
 					// r2

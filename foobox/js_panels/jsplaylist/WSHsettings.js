@@ -1523,7 +1523,7 @@ oPage = function(id, objectName, label, nbrows) {
 	this.init = function() {
 		var txtbox_x = 20;
 		var oTextBox_1 = 600*zdpi;//ww - txtbox_x * 2 - this.scrollbarWidth;
-		var oTextBox_2 = 350*zdpi;
+		var oTextBox_2 = 340*zdpi;
 		var oTextBox_3 = 250*zdpi;
 		switch (this.id) {
 		case 0:
@@ -1541,7 +1541,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Append \"Selection\" sub-contextmenu", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Play next playlist at the end (for default playback order only, stop if playlist is empty).", "repeat_pls", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_2, cHeaderBar.height, "Path of external track editor", p.settings.ext_app[0], "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x+oTextBox_2+p.settings.btn_off.Width+11*zdpi, Math.ceil(cSettings.topBarHeight + rh * 9.75), 115*zdpi, cHeaderBar.height, "Editor name", p.settings.ext_app[1], "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 9.75), 115*zdpi, cHeaderBar.height, "Editor name", p.settings.ext_app[1], "settings_textboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1691,8 +1691,8 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Behaviour", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 4.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Editor can be called in the contextmenu, e.g. MusicTag, Mp3tag", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			var bx = txtbox_x+356*zdpi, by = Math.ceil(cSettings.topBarHeight + rh * 10.55);
+			gr.GdiDrawText("Editor such as MusicTag or Mp3tag, can be called in the contextmenu", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			var bx = txtbox_x+350*zdpi, by = Math.ceil(cSettings.topBarHeight + rh * 10.55);
 			p.settings.browsebutton.draw(gr, bx, by, 255);
 			gr.GdiDrawText("Browse", g_font_b, p.settings.color2, bx, by, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			break;
@@ -2008,6 +2008,9 @@ oPage = function(id, objectName, label, nbrows) {
 					} else if(fso.FileExists(FolderItem + "Mp3tag.exe")){
 						p.settings.ext_app[1] = "Mp3tag.exe";
 						p.settings.pages[0].elements[7].inputbox.text = "Mp3tag.exe";
+					} else if(p.settings.ext_app[1] == "MusicTag.exe" || p.settings.ext_app[1] == "Mp3tag.exe"){
+						p.settings.ext_app[1] = "";
+						p.settings.pages[0].elements[7].inputbox.text = "";
 					}
 					if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 					else track_edit_app = "";
@@ -2127,8 +2130,8 @@ oSettings = function() {
 		this.color0 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.15);
 		this.color1 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.65);
 		this.color2 = g_color_normal_txt;
-		this.color3 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.30);
-		this.color4 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.35);
+		this.color3 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.25);
+		this.color4 = blendColors(g_color_normal_bg, g_color_normal_txt, 0.30);
 	};
 	this.setColors();
 

@@ -616,6 +616,7 @@ function settings_textboxes_action(pageId, elementId) {
 			if(cList.scrollstep < 0) cList.scrollstep = 1;
 			else if(cList.scrollstep > 20) cList.scrollstep = 20;
 			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.scrollstep);
+			window.NotifyOthers("ScrollStep", cList.scrollstep);
 			break;
 		case 3:
 			cList.touchstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
@@ -1544,8 +1545,8 @@ oPage = function(id, objectName, label, nbrows) {
 			// Behaviour options
 			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "Smooth scrolling", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 3.25, "Touch scrolling control (disable drag'n drop)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "Wheel scroll step", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(3, txtbox_x + 170*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "Touch scroll step", cList.touchstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "Wheel scroll step (global)", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x + 190*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "Touch scroll step", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = zoom(70, zdpi);
 			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
@@ -1702,7 +1703,7 @@ oPage = function(id, objectName, label, nbrows) {
 		switch (this.id) {
 		case 0:
 			gr.GdiDrawText("Behaviour", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("(Range: 1-20)", g_font, p.settings.color1, txtbox_x + 72*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("(Range: 1-20)", g_font, p.settings.color1, txtbox_x + 82*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Editor such as MusicTag or Mp3tag, can be called in the contextmenu", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);

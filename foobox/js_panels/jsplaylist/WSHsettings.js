@@ -203,6 +203,17 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("foobox.color.by.cover", color_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
+		case 5:
+			if (status) {
+				show_extrabtn = true;
+			}
+			else {
+				show_extrabtn = false;
+			}
+			window.NotifyOthers("Show_open_stop_buttons", show_extrabtn);
+			window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
 		}
 		break;
 	};
@@ -774,7 +785,7 @@ function settings_textboxes_action(pageId, elementId) {
 		break;
 	case 3:
 		switch (elementId) {
-		case 5:
+		case 6:
 			var _dir = dir_cover_name;
 			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_dir == "") new_dir = _dir;
@@ -1668,7 +1679,8 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Overwrite file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Cover/info panel follows cursor, not follows playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Highlight color follows cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(5, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.75), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Show 'Open' 和 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));			
 			break;
 		};
 	};
@@ -1779,8 +1791,8 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Miscellaneous", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("folder cover located in the track directory，jpg or png format", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 10.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 12.25 - (this.offset * cSettings.rowHeight));
+			gr.GdiDrawText("folder cover located in the track directory，jpg or png format", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 13.25 - (this.offset * cSettings.rowHeight));
 			break;
 		};
 
@@ -2282,7 +2294,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 14));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 18));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 34));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 12));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 14));
 		};
 		var fin = this.pages.length;
 		for (var i = 0; i < fin; i++) {

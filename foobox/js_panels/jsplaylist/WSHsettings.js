@@ -1679,7 +1679,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Overwrite file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Cover/info panel follows cursor, not follows playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Highlight color follows cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Show 'Open' 和 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.75), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));			
 			break;
 		};

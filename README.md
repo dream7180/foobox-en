@@ -2,7 +2,7 @@
 
 foobox is a DUI (Default User Interface) layout for foobar2000, providing friendly & modern UI and extensive capability for library management, artwork support etc. <br/><br/> 
 -----------------------------------\
-[Installation]\
+**[Installation]**\
 For the time being, foobar2000 x64 is not supported due to the component JSplitter (32 bit only).\
 Unpack the latest release package and then:\
 --> Copy "themes" folder to your foobar2000 installation directory;\

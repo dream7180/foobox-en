@@ -186,7 +186,7 @@ function arrayContains(array, name) {
 
 function renamePlaylist() {
 	if (!brw.inputbox.text || brw.inputbox.text == "" || brw.inputboxID == -1) brw.inputbox.text = brw.rows[brw.inputboxID].name;
-	if (brw.inputbox.text.length > 1) {
+	if (brw.inputbox.text.length > 0) {
 		brw.rows[brw.inputboxID].name = brw.inputbox.text;
 		plman.RenamePlaylist(brw.rows[brw.inputboxID].idx, brw.inputbox.text);
 		window.SetCursor(IDC_ARROW);
@@ -1462,6 +1462,8 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 			else return images.icon_auto_pl_hl;
 		}else{
 			if (name.substr(0, 5) == "Radio") return images.radios_icon_hl;
+			else if(name.substr(0, 14) == "Internet Radio") return images.radios_icon_hl;
+
 			else return images.icon_normal_pl_playing_hl;
 		}
 	} else {
@@ -1474,6 +1476,7 @@ function playlistName2icon(name, auto_playlist, playing_playlist) {
 			else return images.icon_auto_pl;
 		} else{
 			if (name.substr(0, 5) == "Radio") return images.radios_icon;
+			else if(name.substr(0, 14) == "Internet Radio") return images.radios_icon;
 			else return images.icon_normal_pl;
 		}
 	}

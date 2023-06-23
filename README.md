@@ -5,8 +5,18 @@ foobox is a DUI (Default User Interface) layout for foobar2000, providing friend
 
 Unpack the latest release package and then:
 * Copy "themes" folder to your foobar2000 installation directory;
-* Copy "profile" folder to foobar2000 profile directory.
+* Copy all folders of "profile" to foobar2000 profile directory.
 
-> **Note** for non-portable installation, foobar2000 profile is located in the user's data directory:  C:\Users\YourUsername\AppData\Roaming\foobar2000. 
+> **Note** for portable installation, foobar2000 profile is located under root directory of foobar2000.
+> Directory structure:
+> ![alt](info/portable.png#pic_left)
 
-![alt text](info/screenshot.jpg "foobox - DUI foobar2000 media player")
+> **Note** for non-portable installation, foobar2000 profile is located in the user's data directory:  
+> **C:\Users\YourUsername\AppData\Roaming\foobar2000** (version 1.x)
+> **C:\Users\YourUsername\AppData\Roaming\foobar2000-v2** (version 2.x)
+> Directory structure (2.x):
+> ![alt](info/nonportable.png#pic_left)
+
+![alt text](info/screenshot-dark.jpg "foobox - DUI foobar2000 media player")
+
+![alt text](info/screenshot-light.jpg "foobox - DUI foobar2000 media player")

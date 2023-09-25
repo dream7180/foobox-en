@@ -1565,7 +1565,7 @@ oPage = function(id, objectName, label, nbrows) {
 			var listBoxRowHeight = zoom(21, zdpi);
 			var listBoxRowNum = 6;
 			var listBoxWidth = zoom(175, zdpi);
-			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "播放列表布局", arr, layout.setting_idx, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
+			this.elements.push(new oListBox(0, "p.settings.pages[" + this.id.toString() + "].elements[0]", 20, Math.floor(cSettings.topBarHeight + rh * 1.75 + p.settings.txtHeight), listBoxWidth + cScrollBar.width, listBoxRowNum, listBoxRowHeight, "Playlist layouts", arr, layout.setting_idx, "settings_listboxes_action", "p.settings.pages[" + this.id.toString() + "]", this.id, 0));
 			this.elements.push(new oCheckBox(1, txtbox_x, cSettings.topBarHeight + rh * 7.75, "Show cover in group header (valid when header height ≥ 2 and cover column is not showed. Default: yes)", "layout.config[layout.setting_idx][1] == '1' ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, txtbox_x, cSettings.topBarHeight + rh * 8.75, "Auto-collapse", "layout.config[layout.setting_idx][2] == '1' ? true : false", "settings_checkboxes_action", this.id));
 			/*if (layout.gopts[3] < 0 || layout.gopts[3] > 3) {

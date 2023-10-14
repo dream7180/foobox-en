@@ -21,7 +21,7 @@ Unpack the latest release package and then:
 <span style="display:block;text-align:left">![](info/nonportable.png)</span>
 
 ## [Extra panel of video]
-From version 7.16, foobox supports foo-youtube and foo-mpv video panel integration, but they are not included in standard release pack. As needed, you may download the video panel integration packs([github](https://github.com/dream7180/foobox-en/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video)), install them as per instruction (similar with above), and then you may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".\
+From version 7.16, foobox supports foo-youtube and foo-mpv video panel integration, but they are not included in standard release pack. As needed, you may download the video panel integration packs([github](https://github.com/dream7180/foobox-en/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video)), install them as per instruction (similar with above), and then you may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".
 
 <span style="display:block;text-align:left">![](info/dui.png)</span>
 

@@ -75,17 +75,6 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 5:
 			if (status) {
-				show_extrabtn = true;
-			}
-			else {
-				show_extrabtn = false;
-			}
-			window.NotifyOthers("Show_open_stop_buttons", show_extrabtn);
-			window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
-			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 6:
-			if (status) {
 				albcov_lt = true;
 			}
 			else {
@@ -94,6 +83,17 @@ function settings_checkboxes_action(id, status, parentId) {
 			get_covercahe_config();
 			window.NotifyOthers("alb_ignoring_art", albcov_lt);
 			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 7:
+			if (status) {
+				show_extrabtn = true;
+			}
+			else {
+				show_extrabtn = false;
+			}
+			window.NotifyOthers("Show_open_stop_buttons", show_extrabtn);
+			window.SetProperty("foobox.show.Open.Stop.buttons", show_extrabtn);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		}
@@ -205,6 +205,20 @@ function settings_radioboxes_action(id, status, parentId) {
 				p.headerBar && p.headerBar.setButtons();
 				resize_panels();
 			//}
+			break;
+		case 8:
+			p.settings.pages[pid].elements[8].status = true;
+			p.settings.pages[pid].elements[9].status = false;
+			libbtn_fuc = true;
+			window.NotifyOthers("Lib_button_function", libbtn_fuc);
+			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
+			break;
+		case 9:
+			p.settings.pages[pid].elements[8].status = false;
+			p.settings.pages[pid].elements[9].status = true;
+			libbtn_fuc = false;
+			window.NotifyOthers("Lib_button_function", libbtn_fuc);
+			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
 			break;
 		};
 		full_repaint();
@@ -706,7 +720,7 @@ function settings_textboxes_action(pageId, elementId) {
 		break;
 	case 3:
 		switch (elementId) {
-		case 7:
+		case 6:
 			var _dir = dir_cover_name;
 			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_dir == "") new_dir = _dir;
@@ -1549,9 +1563,11 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Overwrite file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Cover/info panel follows cursor, not follows playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Highlight color follows cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 9.25, "Optimize performance, ignoring various artists (if any), to cache the album cover.", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 10.75), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));			
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Optimize performance, ignoring various artists (if any), to cache the album cover.", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 12.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(8, 20, cSettings.topBarHeight + rh * 14.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(9, zoom(120, zdpi), cSettings.topBarHeight + rh * 14.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1695,9 +1711,10 @@ oPage = function(id, objectName, label, nbrows) {
 		case 3:
 			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Miscellaneous", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("folder cover located in the track directory，jpg or png format", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 12.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 14.25 - (this.offset * cSettings.rowHeight));
+			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 15.75 - (this.offset * cSettings.rowHeight));
 			break;
 		case 4:
 			var listBoxWidth = zoom(175, zdpi);
@@ -2313,7 +2330,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 14));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 15));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 16));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "Playlist layouts", 15));
 		};
 		var fin = this.pages.length;

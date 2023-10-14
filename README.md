@@ -5,7 +5,8 @@ foobox is a DUI (Default User Interface) layout for foobar2000, providing friend
 
 Unpack the latest release package and then:
 * Copy "themes" folder to your foobar2000 installation directory;
-* Copy all folders of "profile" to foobar2000 profile directory.
+* Copy all folders of "profile" to foobar2000 profile directory;
+* Biography panel(Wil-B) requires [fontawesome-webfont.ttf](https://ghproxy.com/https://github.com/beakerbrowser/beakerbrowser.com/raw/master/fonts/fontawesome-webfont.ttf), copy it to  C:\Windows\Fonts
 
 > **Note** for portable installation, foobar2000 profile is located under root directory of foobar2000.
 > Directory structure:
@@ -18,6 +19,10 @@ Unpack the latest release package and then:
 > Directory structure (2.x):
 
 <span style="display:block;text-align:left">![](info/nonportable.png)</span>
+
+## [Extra panel of video]
+From version 7.16, foobox supports foo-youtube and foo-mpv video panel integration, but they are not included in standard release pack. As needed, you may download the [video panel integration packs](https://dream7180.gitee.io/2023/foobox-release/), install them as per instruction (similar with above), and then you may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".
+<span style="display:block;text-align:left">![](info/dui.png)</span>
 
 ## [Preview]
 

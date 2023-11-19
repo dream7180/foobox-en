@@ -1,12 +1,12 @@
 # foobox
 foobox is a DUI (Default User Interface) layout for [foobar2000](https://www.foobar2000.org), providing friendly & modern UI and extensive capability for library management, artwork support etc.
 ## [Develop]
-The following third-party component are used:   
+The following third-party component are required:   
 * [ESLyric](https://github.com/ESLyric/release) by ttsping;  
 * [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378) based on [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel);  
-* [foo_enhanced_spectrum_analyzer] (https://hydrogenaud.io/index.php/topic,116014.0.html).  
+* [foo_enhanced_spectrum_analyzer](https://hydrogenaud.io/index.php/topic,116014.0.html).  
 
-The following excellent codes were modified and used:    
+The following excellent codes are modified and used:  
 * JS Smooth Playlist Manager，WSH Pplaylist View，JS Smooth Browser by br3tt;  
 * WSH Cover Panel by Jensen;  
 * Search box by Asion;  

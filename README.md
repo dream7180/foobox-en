@@ -1,5 +1,17 @@
 # foobox
-foobox is a DUI (Default User Interface) layout for foobar2000, providing friendly & modern UI and extensive capability for library management, artwork support etc.
+foobox is a DUI (Default User Interface) layout for [foobar2000](https://www.foobar2000.org), providing friendly & modern UI and extensive capability for library management, artwork support etc.
+## [Develop]
+The following third-party component are used:   
+* [ESLyric](https://github.com/ESLyric/release) by ttsping;  
+* [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378) based on [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel);  
+* [foo_enhanced_spectrum_analyzer] (https://hydrogenaud.io/index.php/topic,116014.0.html).  
+
+The following excellent codes were modified and used:    
+* JS Smooth Playlist Manager，WSH Pplaylist View，JS Smooth Browser by br3tt;  
+* WSH Cover Panel by Jensen;  
+* Search box by Asion;  
+* [Biography](https://github.com/Wil-B/Biography) by Wil-B;
+* Web Radio List maintained by [Fanmingming](https://github.com/fanmingming);
 ## [Installation]
 > **Note** So far foobar2000 x64 is not supported due to the component JSplitter having x86 version only.
 

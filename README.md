@@ -10,11 +10,15 @@ The following excellent codes are modified and used:
 * JS Smooth Playlist Manager，WSH Pplaylist View，JS Smooth Browser by br3tt;  
 * WSH Cover Panel by Jensen;  
 * Search box by Asion;  
-* [Biography](https://github.com/Wil-B/Biography) by Wil-B;
-* Web Radio List maintained by [Fanmingming](https://github.com/fanmingming);
-## [Installation]
-> **Note** So far foobar2000 x64 is not supported due to the component JSplitter having x86 version only.
+* [Biography](https://github.com/Wil-B/Biography) by Wil-B;  
+* Web Radio List maintained by [Fanmingming](https://github.com/fanmingming);  
+## [Installation]  
+> **Note** So far foobar2000 x64 is not supported due to the component JSplitter having x86 version only.  
 
+From version 7.17, installer is provided, with official foobar2000 installer features, foobox integration, optional encoders and no more.  
+Installation of extra video panel is optional. The video playback feature is provided by [foo-youtube](https://fy.3dyd.com/download/) and [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) components.   
+
+<!--
 Unpack the latest release package and then:
 * Copy "themes" folder to your foobar2000 installation directory;
 * Copy all folders of "profile" to foobar2000 profile directory;
@@ -33,7 +37,9 @@ Unpack the latest release package and then:
 <span style="display:block;text-align:left">![](info/nonportable.png)</span>
 
 ## [Extra panel of video]
-From version 7.16, foobox supports foo-youtube and foo-mpv video panel integration, but they are not included in standard release pack. As needed, you may download the video panel integration packs([github](https://github.com/dream7180/foobox-en/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video)), install them as per instruction (similar with above), and then you may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".
+From version 7.16, foobox supports foo-youtube and foo-mpv video panel integration, but they are not included in standard release pack. As needed, you may download the video panel integration packs([github](https://github.com/dream7180/foobox-en/releases/tag/video) | [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video)), install them as per instruction (similar with above), and then 
+-->
+You may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".
 
 <span style="display:block;text-align:left">![](info/dui.png)</span>
 

@@ -48,17 +48,6 @@ var g_color_normal_txt = 0;
 var g_color_selected_txt = 0;
 var g_color_highlight = 0;
 var c_default_hl = 0;
-// boolean to avoid callbacks
-var g_avoid_on_playlists_changed = false;
-var g_avoid_on_item_focus_change = false;
-var g_avoid_on_playlist_items_added = false;
-var g_avoid_on_playlist_items_removed = false;
-var g_avoid_on_playlist_items_removed_callbacks_on_sendItemToPlaylist = false;
-var g_avoid_on_playlist_items_reordered = false;
-// mouse actions
-var g_lbtn_click = false;
-var g_rbtn_click = false;
-//
 var g_first_populate_launched = false;
 //
 var repaintforced = false;
@@ -1310,7 +1299,6 @@ oBrowser = function(name) {
 			(PLRecManager.Count >= 1) && PLRecManager.Restore(idx - 2001);
 			break;
 		};
-		g_rbtn_click = false;
 		brw.repaint();
 		return true;
 	};
@@ -1362,9 +1350,6 @@ function on_paint(gr) {
 };
 
 function on_mouse_lbtn_down(x, y) {
-	g_lbtn_click = true;
-	g_rbtn_click = false;
-
 	// stop inertia
 	if (cTouch.timer) {
 		window.ClearInterval(cTouch.timer);
@@ -1445,8 +1430,6 @@ function on_mouse_lbtn_up(x, y) {
 			}, 75);
 		};
 	};
-
-	g_lbtn_click = false;
 };
 
 function on_mouse_lbtn_dblclk(x, y, mask) {
@@ -1465,13 +1448,11 @@ function on_mouse_rbtn_down(x, y, mask) {
 };
 
 function on_mouse_rbtn_up(x, y) {
-	g_rbtn_click = true;
 	if (!utils.IsKeyPressed(VK_SHIFT)) {
 		if(ppt.showFilter) g_filterbox.on_mouse("rbtn_down", x, y);
 		g_searchbox.on_mouse("rbtn_down", x, y);
 		brw.on_mouse("right", x, y);
 	};
-	g_rbtn_click = false;
 	//if (!utils.IsKeyPressed(VK_SHIFT)) {
 	return true;
 	//};
@@ -2114,8 +2095,6 @@ function process_string(str) {
 };
 
 function checkMediaLibrayPlaylist() {
-	g_avoid_on_playlists_changed = true;
-
 	// check if library playlist is present
 	var isMediaLibraryFound = false;
 	var total = plman.PlaylistCount;
@@ -2135,7 +2114,6 @@ function checkMediaLibrayPlaylist() {
 		// Always move it to the top
 		plman.MovePlaylist(mediaLibraryIndex, 0);
 	};
-	g_avoid_on_playlists_changed = false;
 };
 
 function check_scroll(scroll___) {

@@ -587,13 +587,13 @@ function settings_textboxes_action(pageId, elementId) {
 			p.settings.ext_app[0] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
-			window.SetProperty("foobox.track.editor", track_edit_app);
+			save_misccfg();
 			break;
 		case 9:
 			p.settings.ext_app[1] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
-			window.SetProperty("foobox.track.editor", track_edit_app);
+			save_misccfg();
 			break;
 		}
 		break;
@@ -729,7 +729,17 @@ function settings_textboxes_action(pageId, elementId) {
 				window.SetProperty("foobox.cover.folder.name", dir_cover_name);
 			}
 			window.NotifyOthers("set_dir_name", dir_cover_name);
-			break;	
+			break;
+		case 10:
+			var _radiom3u = radiom3u;
+			var new_m3u = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			if (new_m3u == "") new_m3u = _radiom3u;
+			if (new_m3u){
+				radiom3u = new_m3u;
+				save_misccfg();
+			}
+			window.NotifyOthers("Radio_list", radiom3u);
+			break;
 		}
 		break;
 	};
@@ -1568,6 +1578,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 12.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oRadioButton(8, 20, cSettings.topBarHeight + rh * 14.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(9, zoom(120, zdpi), cSettings.topBarHeight + rh * 14.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "URL of Internet Radio for Playlist Manager Panel (put ';' between them for multiple URL)", radiom3u, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1714,7 +1725,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 15.75 - (this.offset * cSettings.rowHeight));
+			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 18 - (this.offset * cSettings.rowHeight));
 			break;
 		case 4:
 			var listBoxWidth = zoom(175, zdpi);
@@ -2026,7 +2037,7 @@ oPage = function(id, objectName, label, nbrows) {
 		}
 		return state;
 	}
-	
+
 	this.browseButtonCheck = function(event, x, y) {
 		var state = p.settings.browsebutton.checkstate(event, x, y);
 		switch (event) {
@@ -2052,7 +2063,7 @@ oPage = function(id, objectName, label, nbrows) {
 					}
 					if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 					else track_edit_app = "";
-					window.SetProperty("foobox.track.editor", track_edit_app);
+					save_misccfg();
 					full_repaint();
 				}
 			};
@@ -2330,7 +2341,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 14));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 16));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 18));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "Playlist layouts", 15));
 		};
 		var fin = this.pages.length;

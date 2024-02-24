@@ -1720,12 +1720,15 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Note: Header line 2, right field is valid only when the group header height is 3.", g_font, p.settings.color2, txtbox_x, cSettings.topBarHeight + rh * 21.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			break;
 		case 3:
-			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 1.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 3.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 5.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 11.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.g_link.draw(gr, txtbox_x, cSettings.topBarHeight + rh * 18 - (this.offset * cSettings.rowHeight));
+			var dy = cSettings.topBarHeight - (this.offset * cSettings.rowHeight);
+			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, dy + rh * 1.5, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, dy + rh * 3.5, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
+			p.settings.resetRadio.draw(gr, txtbox_x, dy + rh * 17.5, 255);
+			gr.GdiDrawText("Reset radio addresses", g_font_b, p.settings.color2, txtbox_x, dy + rh * 17.5, p.settings.btn_off_2.Width, p.settings.btn_off_2.Height, cc_txt);
+			p.settings.g_link.draw(gr, txtbox_x, dy + rh * 19.25);
 			break;
 		case 4:
 			var listBoxWidth = zoom(175, zdpi);
@@ -1907,6 +1910,26 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 		return state;
 	};
+	
+	this.resetRadioCheck = function(event, x, y) {
+		var state = p.settings.resetRadio.checkstate(event, x, y);
+		switch (event) {
+		case "up":
+			if (state == ButtonStates.hover) {
+				var _radiom3u = radiom3u;
+				//radiom3u = "https://raw.githubusercontent.com/fanmingming/live/main/radio/m3u/index.m3u;https://raw.githubusercontent.com/dream7180/foobox-icons/main/radio/Kimentanm.m3u";
+				radiom3u = "https://cdn.jsdelivr.us/gh/fanmingming/live@main/radio/m3u/index.m3u;https://cdn.jsdelivr.us/gh/dream7180/foobox-icons@main/radio/Kimentanm.m3u";
+				if (radiom3u != _radiom3u){
+					save_misccfg();
+					window.NotifyOthers("Radio_list", radiom3u);
+					p.settings.pages[3].elements[10].inputbox.text = radiom3u;
+					full_repaint();
+				}
+			}
+			break;
+		}
+		return state;
+	}
 
 	this.delButtonPatternCheck = function(event, x, y) {
 		if (p.headerBar.columns.length <= 2) return;
@@ -2133,11 +2156,13 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			break;
 		case 3:
-			if(!p.settings.g_link.on_mouse(event, x, y)) {
-				var fin = this.elements.length;
-				for (var i = 0; i < fin; i++) {
-					this.elements[i].on_mouse(event, x, y, delta);
-				};
+			if(!this.resetRadioCheck(event, x, y)) {
+				if(!p.settings.g_link.on_mouse(event, x, y)) {
+					var fin = this.elements.length;
+					for (var i = 0; i < fin; i++) {
+						this.elements[i].on_mouse(event, x, y, delta);
+					};
+				}
 			};
 			break;
 		case 4:
@@ -2266,9 +2291,10 @@ oSettings = function() {
 		this.newbuttonPattern = new button(this.btn_off, this.btn_ov, this.btn_ov);
 		// Delete a Custom "Group By" Pattern
 		this.delbuttonPattern = new button(this.btn_off, this.btn_ov, this.btn_ov);
+		//other buttons
 		this.delbuttonLayout = new button(this.btn_off, this.btn_ov, this.btn_ov);
 		this.delbuttonLayouts = new button(this.btn_off_2, this.btn_ov_2, this.btn_ov_2);
-		//browse ext Apple
+		this.resetRadio = new button(this.btn_off_2, this.btn_ov_2, this.btn_ov_2);
 		this.browsebutton = new button(this.btn_off, this.btn_ov, this.btn_ov);
 
 		// Close Settings Button (BACK)
@@ -2341,7 +2367,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 14));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 18));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 20));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "Playlist layouts", 15));
 		};
 		var fin = this.pages.length;

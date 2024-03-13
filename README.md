@@ -1,5 +1,5 @@
 # foobox
-foobox is a DUI (Default User Interface) layout for [foobar2000](https://www.foobar2000.org), providing friendly & modern UI and extensive capability for library management, artwork support etc.
+foobox is a DUI (Default User Interface) theme for [foobar2000, x86 version](https://www.foobar2000.org). It is user-friendly, powerful and runs in high efficiency.
 ## [Develop]
 The following third-party component are required:   
 * [ESLyric](https://github.com/ESLyric/release) by ttsping;  
@@ -15,7 +15,7 @@ The following excellent codes are modified and used:
 ## [Installation]  
 > **Note** So far foobar2000 x64 is not supported due to the component JSplitter having x86 version only.  
 
-From version 7.17, installer is provided, with official foobar2000 installer features, foobox integration, optional encoders and no more.  
+From version 7.24, installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org)  
 Installation of extra video panel is optional. The video playback feature is provided by [foo-youtube](https://fy.3dyd.com/download/) and [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) components.   
 
 <!--

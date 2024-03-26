@@ -1825,18 +1825,21 @@ oList = function(object_name, playlist) {
 		p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 		if (properties.smoothscrolling) set_scroll_delta();
 		
+		this.checkInfoPane();
+		InfoPane.show = false;
+		if (!p.list.drawRectSel) full_repaint();
+	};
+	
+	this.checkInfoPane = function(){
 		if(InfoPane.rowindex > -1){
 			if(this.items[InfoPane.rowindex].empty_row_index != 0 || this.items[InfoPane.rowindex].type != 0) {
 				InfoPane.index = -1;
+				InfoPane.show = false;
 			}else {
 				InfoPane.index = this.items[InfoPane.rowindex].row_index;
 			}
 		}
-		if(InfoPane.show || !p.list.drawRectSel) {
-			InfoPane.show = false;
-			full_repaint();
-		}
-	};
+	}
 
 	this.setItems = function(forceFocus) {
 		var track_index_in_group = 0;

@@ -1342,7 +1342,7 @@ function on_key_up(vkey) {
 };
 
 function on_key_down(vkey) {
-
+	InfoPane.show = false;
 	var mask = GetKeyboardMask();
 
 	if (cSettings.visible) {
@@ -1877,7 +1877,17 @@ function on_playback_starting(cmd, is_paused) {
 };
 
 function on_playback_new_track(metadb) {
-	full_repaint();
+	if(fb.CursorFollowPlayback) {
+		var checkInfoPaneTimeout = false;
+		if (!checkInfoPaneTimeout) {
+			checkInfoPaneTimeout = window.SetTimeout(function() {
+			p.list.checkInfoPane();
+			full_repaint();
+			checkInfoPaneTimeout && window.ClearTimeout(checkInfoPaneTimeout);
+			checkInfoPaneTimeout = false;
+			}, 50);
+		};
+	} else full_repaint();
 };
 
 function on_playback_stop(reason) { // reason: (integer, begin with 0): user, eof, starting_another

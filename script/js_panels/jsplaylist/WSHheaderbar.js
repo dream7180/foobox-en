@@ -786,9 +786,9 @@ oHeaderBar = function() {
 		_menu.AppendMenuSeparator();
 
 		if (layout.showgroupheaders) {
-			_groups.AppendTo(_menu, MF_STRING, "Collapse and expand groups");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "Collapse all (Tab)");
-			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "Expand all (Shift+Tab)");	
+			_groups.AppendTo(_menu, MF_STRING, "Collapse and expand groups (Tab)");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 80, "Collapse all");
+			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "Expand all");	
 		};
 		_sorting.AppendTo(_menu, MF_STRING, "Sort order");
 		_sorting.AppendMenuItem(MF_STRING, 205, "Album artist");
@@ -818,7 +818,7 @@ oHeaderBar = function() {
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
 			break;
 		case (idx == 12):
-			show_setting(3, column_index);
+			show_setting(3);
 			break;
 		case (idx == 14):
 			window.ShowProperties();
@@ -946,7 +946,7 @@ oHeaderBar = function() {
 			this.initColumns();
 
 			// set minimum rows / cover column size
-			get_grprow_minimum(this.columns[0].w, true);
+			get_grprow_minimum(this.columns[0].w);
 			update_playlist(layout.collapseGroupsByDefault);
 			break;
 		case (idx == 205):

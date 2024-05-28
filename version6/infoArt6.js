@@ -1759,13 +1759,13 @@ function Controller(imgArray, imgDisplay, prop) {
 		if (!currentMetadb) return;
 		switch (arr[0]) {
 		case 0:
-			fb.RunContextCommandWithMetadb("Properties", arr[1]) || fb.RunContextCommandWithMetadb("Properties", arr[1]);
+			fb.RunContextCommandWithMetadb("Properties", arr[1]);
 			break;
 		case 1:
-			fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]) || fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Batch attach pictures", arr[1]);
 			break;
 		case 2:
-			fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]) || fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
+			fb.RunContextCommandWithMetadb("Remove all pictures", arr[1]);
 			break;
 		}
 	}

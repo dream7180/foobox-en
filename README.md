@@ -14,7 +14,7 @@ The following excellent codes are modified and used:
 * Web Radio List maintained by [Fanmingming](https://github.com/fanmingming);  
 ## [Installation]   
 * From version 7.24, installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org)  
-* From 7.26, version 7 is dedicated for x64 foobar2000. foobox 6 Remastered revision is added for 32-bit application, with UI Hacks component integrated, it combines the features of 6 and 7.    
+* From 7.26, foobox 6 Remastered revision is added for 32-bit application, with UI Hacks component integrated, it combines the features of 6 and 7.    
 * Installation of extra video panel is optional. The video playback feature is provided by [foo-youtube](https://fy.3dyd.com/download/) and [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) components.   
 
 <!--

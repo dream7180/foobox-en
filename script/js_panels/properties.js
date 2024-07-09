@@ -173,6 +173,7 @@ function _sb(t, v, fn) {
 	}
 	
 	this.move = (x, y) => {
+		if(this.mx == x && this.my == y) return false;
 		if (this.trace(x, y)) {
 			window.SetCursor(IDC_HAND);
 			return true;

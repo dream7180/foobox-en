@@ -1587,7 +1587,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "URL of Internet Radio for Playlist Manager Panel (put ';' between them for multiple URL)", radiom3u, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1735,9 +1735,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.resetRadio.draw(gr, txtbox_x, dy + rh * 17.5, 255);
-			gr.GdiDrawText("Reset radio addresses", g_font_b, p.settings.color2, txtbox_x, dy + rh * 17.5, p.settings.btn_off_2.Width, p.settings.btn_off_2.Height, cc_txt);
-			p.settings.g_link.draw(gr, txtbox_x, dy + rh * 19.25);
+			p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
 			break;
 		case 4:
 			var listBoxWidth = z(175);
@@ -1919,25 +1917,6 @@ oPage = function(id, objectName, label, nbrows) {
 		};
 		return state;
 	};
-	
-	this.resetRadioCheck = function(event, x, y) {
-		var state = p.settings.resetRadio.checkstate(event, x, y);
-		switch (event) {
-		case "up":
-			if (state == ButtonStates.hover) {
-				var _radiom3u = radiom3u;
-				radiom3u = "https://raw.githubusercontent.com/dream7180/Resource/main/radio/fmm.m3u;https://raw.githubusercontent.com/dream7180/Resource/main/radio/Kimentanm.m3u";
-				if (radiom3u != _radiom3u){
-					save_misccfg();
-					window.NotifyOthers("Radio_list", radiom3u);
-					p.settings.pages[3].elements[11].inputbox.text = radiom3u;
-					full_repaint();
-				}
-			}
-			break;
-		}
-		return state;
-	}
 
 	this.delButtonPatternCheck = function(event, x, y) {
 		if (p.headerBar.columns.length <= 2) return;
@@ -2163,14 +2142,12 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			break;
 		case 3:
-			if(!this.resetRadioCheck(event, x, y)) {
-				if(!p.settings.g_link.on_mouse(event, x, y)) {
-					var fin = this.elements.length;
-					for (var i = 0; i < fin; i++) {
-						this.elements[i].on_mouse(event, x, y, delta);
-					};
-				}
-			};
+			if(!p.settings.g_link.on_mouse(event, x, y)) {
+				var fin = this.elements.length;
+				for (var i = 0; i < fin; i++) {
+					this.elements[i].on_mouse(event, x, y, delta);
+				};
+			}
 			break;
 		case 4:
 			if (this.delButtonLayoutCheck(event, x, y) != ButtonStates.hover) {
@@ -2302,7 +2279,6 @@ oSettings = function() {
 		//other buttons
 		this.delbuttonLayout = new button(this.btn_off, this.btn_ov, this.btn_ov);
 		this.delbuttonLayouts = new button(this.btn_off_2, this.btn_ov_2, this.btn_ov_2);
-		this.resetRadio = new button(this.btn_off_2, this.btn_ov_2, this.btn_ov_2);
 		this.browsebutton = new button(this.btn_off, this.btn_ov, this.btn_ov);
 
 		// Close Settings Button (BACK)
@@ -2375,7 +2351,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 14));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 20));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 19));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "Playlist layouts", 15));
 		};
 		var fin = this.pages.length;

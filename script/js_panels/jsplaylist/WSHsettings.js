@@ -28,6 +28,11 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("PLAYBACK: Repeat playlists", status);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
+		case 8:
+			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
+			window.SetProperty("Playlist: Turn on queue playlist", status);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
 		};
 		break;
 	case 3:
@@ -460,7 +465,6 @@ function settings_listboxes_action(pageId, id, selectedId) {
 				p.settings.pages[2].elements[1].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[2].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[3].inputbox.check("down", 0, 0);
-				//p.settings.pages[2].elements[4].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[4].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[5].inputbox.check("down", 0, 0);
 				p.settings.pages[2].elements[6].inputbox.check("down", 0, 0);
@@ -592,15 +596,15 @@ function settings_textboxes_action(pageId, elementId) {
 			cList.touchstep = Number(p.settings.pages[pageId].elements[elementId].inputbox.text);
 			if(cList.touchstep < 0) cList.touchstep = 1;
 			else if(cList.touchstep > 20) cList.touchstep = 20;
-			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.touchstep);
+			window.SetProperty("SYSTEM.Playlist Touch Step", cList.touchstep);
 			break;
-		case 8:
+		case 9:
 			p.settings.ext_app[0] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
 			save_misccfg();
 			break;
-		case 9:
+		case 10:
 			p.settings.ext_app[1] = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 			else track_edit_app = "";
@@ -1025,9 +1029,7 @@ oRadioButton = function(id, x, y, label, linkedVariable, func, parentPageId) {
 	};
 
 	this.on_key = function(event, vkey) {};
-
 	this.on_char = function(code) {};
-
 	this.on_focus = function(is_focused) {};
 };
 
@@ -1059,12 +1061,12 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 		};
 	};
 
-	this.on_mouse = function(event, x, y, delta) {
+	this.on_mouse = function(event, x, y) {
 		if (this.ly + this.h <= cSettings.topBarHeight) return;
 		if(p.settings.currentPageId == 1 && p.settings.pages[1].elements[0].ishover) return;
 		if(p.settings.currentPageId == 2 && p.settings.pages[2].elements[0].ishover) return;
 		if (this.ly > cSettings.topBarHeight + g_z5) {
-			this.inputbox.check(event, x, y, delta);
+			this.inputbox.check(event, x, y, true);
 		};
 	};
 
@@ -1174,8 +1176,8 @@ oTextBox = function(id, x, y, w, h, label, value, func, parentPageId) {
 		this.inputbox.on_char(code);
 	};
 
-	this.on_focus = function(is_focused) {
-		this.inputbox.on_focus(is_focused);
+	this.on_focus = function(is_focused, validate) {
+		this.inputbox.on_focus(is_focused, validate);
 	};
 };
 
@@ -1375,7 +1377,6 @@ oListBox = function(id, object_name, x, y, w, row_num, row_height, label, arr, s
 	};
 
 	this.on_char = function(code) {};
-
 	this.on_focus = function(is_focused) {};
 
 	this.contextMenu = function(x, y, id) {
@@ -1511,8 +1512,9 @@ oPage = function(id, objectName, label, nbrows) {
 
 			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 9.25, "Append \"Selection\" sub-contextmenu", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 10.25, "Play next playlist automatically (for default playback order only).", "repeat_pls", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(8, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 11.75), oTextBox_2, cHeaderBar.height, "Path of external track editor", p.settings.ext_app[0], "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(9, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 11.75), 115*zdpi, cHeaderBar.height, "Editor name", p.settings.ext_app[1], "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 11.25, "Create Queue Content playlist automatically when playback queue is not empty", "queue_pl_on", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(9, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 12.75), oTextBox_2, cHeaderBar.height, "Path of external track editor", p.settings.ext_app[0], "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(10, txtbox_x+oTextBox_2+p.settings.btn_off.Width+20*zdpi, Math.ceil(cSettings.topBarHeight + rh * 12.75), 115*zdpi, cHeaderBar.height, "Editor name", p.settings.ext_app[1], "settings_textboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1667,8 +1669,8 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("(Range: 1-20)", g_font, p.settings.color1, txtbox_x + 82*zdpi, cSettings.topBarHeight + rh * 5.25 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Default Playlist Action", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 6.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Others", g_font_b, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 8.5 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Editor such as MusicTag or Mp3tag, can be called in the contextmenu", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 13.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
-			var bx = txtbox_x+350*zdpi, by = cSettings.topBarHeight + rh * 12.55 - (this.offset * cSettings.rowHeight);
+			gr.GdiDrawText("Editor such as MusicTag or Mp3tag, can be called in the contextmenu", g_font, p.settings.color1, txtbox_x, cSettings.topBarHeight + rh * 14.75 - (this.offset * cSettings.rowHeight), txt_width, p.settings.lineHeight, lc_txt);
+			var bx = txtbox_x+350*zdpi, by = cSettings.topBarHeight + rh * 13.55 - (this.offset * cSettings.rowHeight);
 			p.settings.browsebutton.draw(gr, bx, by, 255);
 			gr.GdiDrawText("Browse", g_font_b, p.settings.color2, bx, by, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			break;
@@ -2061,17 +2063,17 @@ oPage = function(id, objectName, label, nbrows) {
 				if (Folder != null) {
 					let FolderItem = Folder.Items().Item().Path;
 					if(FolderItem.substr(FolderItem.length-1, 1) != "\\") FolderItem += "\\";
-					p.settings.pages[0].elements[8].inputbox.text = FolderItem;
+					p.settings.pages[0].elements[9].inputbox.text = FolderItem;
 					p.settings.ext_app[0] = FolderItem;
 					if (utils.FileExists(FolderItem + "MusicTag.exe")) {
 						p.settings.ext_app[1] = "MusicTag.exe";
-						p.settings.pages[0].elements[9].inputbox.text = "MusicTag.exe";
+						p.settings.pages[0].elements[10].inputbox.text = "MusicTag.exe";
 					} else if(utils.FileExists(FolderItem + "Mp3tag.exe")){
 						p.settings.ext_app[1] = "Mp3tag.exe";
-						p.settings.pages[0].elements[9].inputbox.text = "Mp3tag.exe";
+						p.settings.pages[0].elements[10].inputbox.text = "Mp3tag.exe";
 					} else if(p.settings.ext_app[1] == "MusicTag.exe" || p.settings.ext_app[1] == "Mp3tag.exe"){
 						p.settings.ext_app[1] = "";
-						p.settings.pages[0].elements[9].inputbox.text = "";
+						p.settings.pages[0].elements[10].inputbox.text = "";
 					}
 					if(p.settings.ext_app[0] != "") track_edit_app = p.settings.ext_app[0] + p.settings.ext_app[1];
 					else track_edit_app = "";
@@ -2351,7 +2353,7 @@ oSettings = function() {
 	
 	this.initpages = function(){
 		if (this.pages.length <= 0) {
-			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 14));
+			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 15));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
 			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 19));
@@ -2380,7 +2382,6 @@ oSettings = function() {
 			tpad = 10 + cSettings.tabPaddingWidth,
 			cx = 0,
 			cw = 0;
-
 		// draw main background
 		gr.FillSolidRect(this.x, this.y, this.w, this.h, g_color_normal_bg);
 		// draw current page content
@@ -2474,5 +2475,34 @@ oSettings = function() {
 			};
 		};
 	};
-	this.on_focus = function(is_focused) {};
+	
+	this.on_focus = function(is_focused) {
+		switch(this.currentPageId){
+			case 0:
+				this.pages[this.currentPageId].elements[2].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[3].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[9].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[10].inputbox.on_focus(is_focused, true);
+				break;
+			case 1:
+				this.pages[this.currentPageId].elements[1].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[2].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[3].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[4].inputbox.on_focus(is_focused, true);
+				break;
+			case 2:
+				this.pages[this.currentPageId].elements[1].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[2].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[3].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[4].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[5].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[6].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[7].inputbox.on_focus(is_focused, true);
+				break;
+			case 3:
+				this.pages[this.currentPageId].elements[7].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[11].inputbox.on_focus(is_focused, true);
+				break;
+		}
+	};
 };

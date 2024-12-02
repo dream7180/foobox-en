@@ -800,8 +800,66 @@ function settings_textboxes_action(pageId, elementId) {
 
 // =================================================================== // Objects
 
-oLink = function (){
-	//thix.id = id;
+oTextBtn = function(text){
+	this.x = 0;
+	this.y = 0;
+	this.h = p.settings.lineHeight;
+	this.text = text;
+	this.link_hover = 0;
+	var pic = gdi.CreateImage(100, 20);
+	gpic = pic.GetGraphics();
+	this.w = gpic.CalcTextWidth(this.text, g_font);
+	this.xoffset = gpic.CalcTextWidth("Show more track info on titlebar. ", g_font_b);
+	pic.ReleaseGraphics(gpic);
+	
+	this.draw = function(gr, x, y){
+		this.x = x;
+		this.y = y;
+		gr.GdiDrawText(this.text, this.ishover ? g_font_ud : g_font, g_color_highlight, this.x, this.y, this.w, this.h, lc_txt);
+	}
+	
+	this.repaint = function(){
+		window.RepaintRect(this.x, this.y, this.w, this.h);
+	}
+	
+	this._isHover = function(x, y) {
+		return (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h);
+	};
+	
+	this.on_mouse = function(event, x, y) {
+		var state_old = this.ishover;
+		this.ishover = this._isHover(x, y);
+		switch (event) {
+		case "move":
+			if(this.ishover){
+				window.SetCursor(IDC_HAND);
+			}
+			else {
+				window.SetCursor(IDC_ARROW);
+			}
+			break;
+		case "up":
+			if (this.ishover){
+				p.settings.pages[3].elements[12].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
+				var new_titleadd = p.settings.pages[3].elements[12].inputbox.text;
+				if (new_titleadd != title_add){
+					full_repaint();
+					title_add = new_titleadd;
+					save_misccfg();
+					window.NotifyOthers("titlebar_addinfo", title_add);
+				}
+			}
+			break;
+		case "leave":
+			window.SetCursor(IDC_ARROW);
+			break;
+		}
+		if(state_old != this.ishover) this.repaint();
+		return this.ishover;
+	}
+}
+
+oLink = function(){
 	this.x = 0;
 	this.y = 0;
 	this.h = p.settings.lineHeight;
@@ -810,11 +868,9 @@ oLink = function (){
 		gpic = pic.GetGraphics();
 	this.w1 = gpic.CalcTextWidth("Preferences", g_font);
 	this.x2 = gpic.CalcTextWidth("Preferences  |  ", g_font);
-	this.w2 = gpic.CalcTextWidth("foobox theme", g_font);
-	this.x3 = gpic.CalcTextWidth("Preferences  |  foobox theme  |  ", g_font);
-	this.w3 = gpic.CalcTextWidth("foobox blog", g_font);
+	this.w2 = gpic.CalcTextWidth("foobox@github", g_font);
 	this.w_sep = gpic.CalcTextWidth("  |  ", g_font);
-	this.w = this.x3 + this.w3;
+	this.w = this.x2 + this.w2;
 	pic.ReleaseGraphics(gpic);
 	
 	this.draw = function(gr, x, y){
@@ -822,9 +878,7 @@ oLink = function (){
 		this.y = y;
 		gr.GdiDrawText("Preferences", (this.link_hover == 1) ? g_font_ud : g_font, g_color_highlight, this.x, this.y, this.w1, this.h, lc_txt);
 		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.w1, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobox theme", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
-		gr.GdiDrawText("  |  ", g_font, g_color_highlight, this.x + this.x2 + this.w2, this.y, this.w_sep, this.h, lc_txt);
-		gr.GdiDrawText("foobox blog", (this.link_hover == 3) ? g_font_ud : g_font, g_color_highlight, this.x + this.x3, this.y, this.w3, this.h, lc_txt);
+		gr.GdiDrawText("foobox@github", (this.link_hover == 2) ? g_font_ud : g_font, g_color_highlight, this.x + this.x2, this.y, this.w2, this.h, lc_txt);
 	}
 	this.repaint = function(){
 		window.RepaintRect(this.x, this.y, this.w, this.h);
@@ -848,10 +902,10 @@ oLink = function (){
 		case "move":
 			if(this.ishover){
 				if(x < this.x + this.w1) this.link_hover = 1;
-				else if (x > this.x + this.x3) this.link_hover = 3;
 				else if (x > this.x + this.x2 && x < this.x + this.x2 + this.w2) this.link_hover = 2;
 				else this.link_hover = 0;
 				if(this.link_hover) window.SetCursor(IDC_HAND);
+				else window.SetCursor(IDC_ARROW);
 			}
 			else {
 				this.link_hover = 0;
@@ -866,9 +920,6 @@ oLink = function (){
 					break;
 				case 2:
 					this.ShellExecute("https://github.com/dream7180/foobox-en", "", "", "open", 1);
-					break;
-				case 3:
-					this.ShellExecute("https://dream7180.github.io/2023/foobox-release/", "", "", "open", 1);
 					break;
 			};
 			this.link_hover = 0;
@@ -1628,7 +1679,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar, e.g.: %codec% | $if2(%codec_profile% | ,)%bitrate%K | %samplerate%Hz", title_add, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar.", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1767,8 +1818,10 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
-			if(g_version == "6") p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
-			else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
+			if(g_version == "6") {
+				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 18.15);
+				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
+			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
 			break;
 		case 4:
 			var listBoxWidth = z(175);
@@ -2181,6 +2234,14 @@ oPage = function(id, objectName, label, nbrows) {
 					this.elements[i].on_mouse(event, x, y, delta);
 				};
 			}
+			if(g_version == "6" && !p.settings.g_link.ishover){
+				if(!p.settings.textBtn1.on_mouse(event, x, y)) {
+					var fin = this.elements.length;
+					for (var i = 0; i < fin; i++) {
+						this.elements[i].on_mouse(event, x, y, delta);
+					};
+				}
+			}
 			break;
 		case 4:
 			if (this.delButtonLayoutCheck(event, x, y) != ButtonStates.hover) {
@@ -2358,12 +2419,11 @@ oSettings = function() {
 			this.tabButtons.push(new button(this.tab_img, this.tab_img, this.tab_img));
 		};
 		pic.ReleaseGraphics(gpic);
+		this.textBtn1 = new oTextBtn("Set to Recommended Value");
 		this.g_link = new oLink();
-		//pic.Dispose();
 	};
 
 	this.refreshColors = function() {
-		//get_colors();
 		this.setColors();
 		this.setButtons();
 		for (var p = 0; p < this.pages.length; p++) {

@@ -809,7 +809,7 @@ oTextBtn = function(text){
 	var pic = gdi.CreateImage(100, 20);
 	gpic = pic.GetGraphics();
 	this.w = gpic.CalcTextWidth(this.text, g_font);
-	this.xoffset = gpic.CalcTextWidth("Show more track info on titlebar. ", g_font_b);
+	this.xoffset = gpic.CalcTextWidth("Show more track info on titlebar | ", g_font_b);
 	pic.ReleaseGraphics(gpic);
 	
 	this.draw = function(gr, x, y){
@@ -1679,7 +1679,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar.", title_add, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -2228,19 +2228,13 @@ oPage = function(id, objectName, label, nbrows) {
 			};
 			break;
 		case 3:
-			if(!p.settings.g_link.on_mouse(event, x, y)) {
+			var check_link = !p.settings.g_link.on_mouse(event, x, y);
+			if(g_version == "6") check_link = check_link && !p.settings.textBtn1.on_mouse(event, x, y);
+			if(check_link) {
 				var fin = this.elements.length;
 				for (var i = 0; i < fin; i++) {
 					this.elements[i].on_mouse(event, x, y, delta);
 				};
-			}
-			if(g_version == "6" && !p.settings.g_link.ishover){
-				if(!p.settings.textBtn1.on_mouse(event, x, y)) {
-					var fin = this.elements.length;
-					for (var i = 0; i < fin; i++) {
-						this.elements[i].on_mouse(event, x, y, delta);
-					};
-				}
 			}
 			break;
 		case 4:
@@ -2419,7 +2413,7 @@ oSettings = function() {
 			this.tabButtons.push(new button(this.tab_img, this.tab_img, this.tab_img));
 		};
 		pic.ReleaseGraphics(gpic);
-		this.textBtn1 = new oTextBtn("Set to Recommended Value");
+		this.textBtn1 = new oTextBtn("Set to recommended value");
 		this.g_link = new oLink();
 	};
 

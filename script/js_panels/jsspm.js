@@ -950,8 +950,7 @@ oBrowser = function() {
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "Tracks unrated");
 		_radiolist.AppendTo(_newplaylist, MF_STRING, "Internet radio");
 		_radiolist.AppendMenuItem(MF_STRING, 30, "live.m3u (github)");
-		_radiolist.AppendMenuItem(MF_STRING, 31, "live.m3u (github proxy 1)");
-		_radiolist.AppendMenuItem(MF_STRING, 32, "live.m3u (github proxy 2)");
+		_radiolist.AppendMenuItem(MF_STRING, 31, "live.m3u (github mirror)");
 		if(radiom3u.length > 0){
 			for(var urlcount = 0; urlcount < radiom3u.length; urlcount++){
 				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, radiom3u[urlcount]);
@@ -1036,10 +1035,7 @@ oBrowser = function() {
 			LoadRadio("Internet Radio", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
 			break;
 		case (idx == 31):
-			LoadRadio("Internet Radio", "https://ghp.ci/https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
-			break;
-		case (idx == 32):
-			LoadRadio("Internet Radio", "https://ghproxy.net/https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
+			LoadRadio("Internet Radio", "https://raw.kkgithub.com/dream7180/Resource/main/radio/live.m3u");
 			break;
 		case (idx >= 300 && idx < 300 + radiom3u.length):
 			LoadRadio("Internet Radio", radiom3u[idx - 300]);

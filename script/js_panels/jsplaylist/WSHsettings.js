@@ -61,6 +61,18 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 4:
 			if (status) {
+				albcov_lt = true;
+			}
+			else {
+				albcov_lt = false;
+			}
+			get_covercahe_config();
+			window.NotifyOthers("alb_ignoring_art", albcov_lt);
+			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
+			p.settings.pages[parentId].elements[id].repaint();
+			break;
+		case 5:
+			if (status) {
 				color_bycover = true;
 			}
 			else {
@@ -78,7 +90,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("foobox.color.by.cover", color_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 5:
+		case 6:
 			if (status) {
 				color_noesl = true;
 			}
@@ -89,19 +101,7 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.SetProperty("foobox.color.by.cover.except.ESL", color_noesl);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
-		case 6:
-			if (status) {
-				albcov_lt = true;
-			}
-			else {
-				albcov_lt = false;
-			}
-			get_covercahe_config();
-			window.NotifyOthers("alb_ignoring_art", albcov_lt);
-			window.SetProperty("Album.cover.ignoring.artist", albcov_lt);
-			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 8:
+		case 9:
 			if (status) {
 				show_extrabtn = true;
 			}
@@ -222,16 +222,16 @@ function settings_radioboxes_action(id, status, parentId) {
 				resize_panels();
 			//}
 			break;
-		case 9:
-			p.settings.pages[pid].elements[9].status = true;
-			p.settings.pages[pid].elements[10].status = false;
+		case 10:
+			p.settings.pages[pid].elements[10].status = true;
+			p.settings.pages[pid].elements[11].status = false;
 			libbtn_fuc = true;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
 			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
 			break;
-		case 10:
-			p.settings.pages[pid].elements[9].status = false;
-			p.settings.pages[pid].elements[10].status = true;
+		case 11:
+			p.settings.pages[pid].elements[10].status = false;
+			p.settings.pages[pid].elements[11].status = true;
 			libbtn_fuc = false;
 			window.NotifyOthers("Lib_button_function", libbtn_fuc);
 			window.SetProperty("foobox.library.button: Show.Albumlist", libbtn_fuc);
@@ -768,6 +768,15 @@ function settings_textboxes_action(pageId, elementId) {
 	case 3:
 		switch (elementId) {
 		case 7:
+			var org_threshold = color_threshold;
+			color_threshold = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!color_threshold) color_threshold = org_threshold;
+			else if(color_threshold < 1) color_threshold = 1;
+			else if(color_threshold > 10) color_threshold = 10;
+			window.SetProperty("foobox.color.threshold", color_threshold);
+			window.NotifyOthers("set_corlor_threshold", color_threshold);
+			break;
+		case 8:
 			var _dir = dir_cover_name;
 			var new_dir = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_dir == "") new_dir = _dir;
@@ -777,7 +786,7 @@ function settings_textboxes_action(pageId, elementId) {
 			}
 			window.NotifyOthers("set_dir_name", dir_cover_name);
 			break;
-		case 11:
+		case 12:
 			var new_m3u = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_m3u != radiom3u){
 				radiom3u = new_m3u;
@@ -785,7 +794,7 @@ function settings_textboxes_action(pageId, elementId) {
 				window.NotifyOthers("Radio_list", radiom3u);
 			}
 			break;
-		case 12:
+		case 13:
 			var new_titleadd = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_titleadd != title_add){
 				title_add = new_titleadd;
@@ -840,8 +849,8 @@ oTextBtn = function(text){
 			break;
 		case "up":
 			if (this.ishover){
-				p.settings.pages[3].elements[12].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
-				var new_titleadd = p.settings.pages[3].elements[12].inputbox.text;
+				p.settings.pages[3].elements[13].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
+				var new_titleadd = p.settings.pages[3].elements[13].inputbox.text;
 				if (new_titleadd != title_add){
 					full_repaint();
 					title_add = new_titleadd;
@@ -1582,6 +1591,7 @@ oPage = function(id, objectName, label, nbrows) {
 		var oTextBox_1 = 600*zdpi;
 		var oTextBox_2 = 340*zdpi;
 		var oTextBox_3 = 250*zdpi;
+		var oTextBox_4 = 50*zdpi;
 		switch (this.id) {
 		case 0:
 			// General
@@ -1589,13 +1599,13 @@ oPage = function(id, objectName, label, nbrows) {
 			// Behaviour options
 			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.25, "Smooth scrolling", "properties.smoothscrolling", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(1, 20, cSettings.topBarHeight + rh * 3.25, "Touch scrolling control (disable drag'n drop)", "properties.enableTouchControl", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "Wheel scroll step (global)", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(3, txtbox_x + 190*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), 50*zdpi, cHeaderBar.height, "Touch scroll step", cList.touchstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(2, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_4, cHeaderBar.height, "Wheel scroll step (global)", cList.scrollstep.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(3, txtbox_x + 190*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_4, cHeaderBar.height, "Touch scroll step", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = z(70);
 			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), 50*zdpi, cHeaderBar.height, "Row height of list (global)", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), oTextBox_4, cHeaderBar.height, "Row height of list (global)", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 11.5, "Append \"Selection\" sub-contextmenu", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "Play next playlist automatically (for default playback order only).", "repeat_pls", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 13.5, "Create Queue Content playlist automatically when playback queue is not empty", "queue_pl_on", "settings_checkboxes_action", this.id));
@@ -1671,15 +1681,16 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Overwrite file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Right side over/info and properties panels follow cursor, not follows playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Highlight color follows vivid cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(5, z(260), cSettings.topBarHeight + rh * 7.25, "Except ESLyric highlight color", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 8.25, "Optimize performance, ignoring various artists (if any), to cache the album cover.", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(9, 20, cSettings.topBarHeight + rh * 14.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(10, z(120), cSettings.topBarHeight + rh * 14.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
-			this.elements.push(new oTextBox(11, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15.55), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
-			if(g_version == "6") this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.05), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Optimize performance, ignoring various artists (if any), to cache the album cover.", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Highlight color follows vivid cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(6, z(260), cSettings.topBarHeight + rh * 8.25, "Except ESLyric highlight color", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_4, cHeaderBar.height, "Threshold when getting color scheme from cover, 1-10 (1-best speed, 10-best accuracy)", color_threshold.toString(), "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(8, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 11.25), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 14.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(10, 20, cSettings.topBarHeight + rh * 16.25, "Album List", (libbtn_fuc == true), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(11, z(120), cSettings.topBarHeight + rh * 16.25, "ReFacets", (libbtn_fuc == false), "settings_radioboxes_action", this.id));
+			this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 17.55), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
+			if(g_version == "6") this.elements.push(new oTextBox(13, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 20.05), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1816,12 +1827,12 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Scrollbar width", g_font_b, p.settings.color1, txtbox_x, dy + rh * 1.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Rating scheme", g_font_b, p.settings.color1, txtbox_x, dy + rh * 3.5, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Album art panels", g_font_b, p.settings.color1, txtbox_x, dy + rh * 5.5, txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, dy + rh * 11.75, txt_width, p.settings.lineHeight, lc_txt);
-			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, dy + rh * 13.5, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, dy + rh * 13.75, txt_width, p.settings.lineHeight, lc_txt);
+			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, dy + rh * 15.5, txt_width, p.settings.lineHeight, lc_txt);
 			if(g_version == "6") {
-				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 18.15);
-				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.75);
-			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 18.25);
+				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 20.15);
+				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 22.75);
+			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.25);
 			break;
 		case 4:
 			var listBoxWidth = z(175);
@@ -2438,7 +2449,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 18));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", g_version == "6" ? 21 : 19));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", g_version == "6" ? 23 : 21));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "Playlist layouts", 15));
 		};
 		var fin = this.pages.length;
@@ -2584,7 +2595,8 @@ oSettings = function() {
 				break;
 			case 3:
 				this.pages[this.currentPageId].elements[7].inputbox.on_focus(is_focused, true);
-				this.pages[this.currentPageId].elements[11].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[8].inputbox.on_focus(is_focused, true);
+				this.pages[this.currentPageId].elements[12].inputbox.on_focus(is_focused, true);
 				break;
 		}
 	};

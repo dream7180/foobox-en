@@ -14,6 +14,7 @@ var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
 var color_bycover = window.GetProperty("foobox.color.by.cover", true);
+var color_threshold = window.GetProperty("foobox.color.threshold", 5);
 var auto_eslprop = window.GetProperty("auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
 try{
@@ -1935,26 +1936,38 @@ function Controller(imgArray, imgDisplay, prop) {
 	getColorSchemeFromImage = function() {
 		let imgColor = null;
 		if(!currentImage || currentImage == null){
-			window.NotifyOthers("color_scheme_updated", imgColor);
+			window.NotifyOthers("color_scheme_updated", false);
 			if(setEslHL) eslPanels.SetTextHighlightColor(c_default_hl);
 			get_imgCol = false;
 		}else{
-			let imgColorData = JSON.parse(currentImage.GetColourSchemeJSON(1));
-			imgColor = toRGB(imgColorData[0].col);
-			let c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
-			let cv_max = Math.max(...imgColor);
-			let c_dev = cv_max - Math.min(...imgColor);
-			if(c_dev < 16) imgColor = false;
-			else if(c_aggr > 450){
-				let reduction = Math.round((c_aggr - 450) / 3);
-				imgColor[0] = Math.max(imgColor[0]-reduction, 0);
-				imgColor[1] = Math.max(imgColor[1]-reduction, 0);
-				imgColor[2] = Math.max(imgColor[2]-reduction, 0);
-			}else if(dark_mode && cv_max<90){
-				let reduction = Math.round((270-c_aggr) / 3);
-				imgColor[0] = imgColor[0]+reduction;
-				imgColor[1] = imgColor[1]+reduction;
-				imgColor[2] = imgColor[2]+reduction;
+			let c_dev, c_aggr, cv_max;
+			let calibrate = true;
+			let dark_nocali;
+			let ColorData = JSON.parse(currentImage.GetColourSchemeJSON(color_threshold));
+			for(let i = 0; i < color_threshold; i++){
+				imgColor = toRGB(ColorData[i].col);
+				c_aggr = imgColor[0]+imgColor[1]+imgColor[2];
+				cv_max = Math.max(...imgColor);
+				c_dev = cv_max - Math.min(...imgColor);
+				dark_nocali = dark_mode && (cv_max >= 90);
+				if(c_dev >= 16 && c_aggr <= 450 && dark_nocali){
+					calibrate = false;
+					break;
+				}
+			}
+			if(calibrate) {
+				if(c_dev < 16) imgColor = false;
+				else if(c_aggr > 450){
+					let reduction = Math.round((c_aggr - 450) / 3);
+					imgColor[0] = Math.max(imgColor[0]-reduction, 0);
+					imgColor[1] = Math.max(imgColor[1]-reduction, 0);
+					imgColor[2] = Math.max(imgColor[2]-reduction, 0);
+				}else if(dark_mode && cv_max < 90){
+					let reduction = Math.round((270-c_aggr) / 3);
+					imgColor[0] = imgColor[0]+reduction;
+					imgColor[1] = imgColor[1]+reduction;
+					imgColor[2] = imgColor[2]+reduction;
+				}
 			}
 			window.NotifyOthers("color_scheme_updated", imgColor);
 			get_imgCol = false;
@@ -2408,6 +2421,10 @@ function on_notify_data(name, info) {
 		window.SetProperty("ESLyric.hightlight.follow.cover", sw_eslcolor);
 		setEslHL = eslPanels && sw_eslcolor;
 		if(eslPanels) eslPanels.SetTextHighlightColor(sw_eslcolor ? c_highlight : c_default_hl);
+		break;
+	case "set_corlor_threshold":
+		color_threshold = info;
+		window.SetProperty("foobox.color.threshold", color_threshold);
 		break;
 	}
 }

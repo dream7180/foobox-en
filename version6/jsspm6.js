@@ -949,8 +949,8 @@ oBrowser = function() {
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "Tracks rated 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "Tracks unrated");
 		_radiolist.AppendTo(_newplaylist, MF_STRING, "Internet radio");
-		_radiolist.AppendMenuItem(MF_STRING, 30, "live.m3u (github)");
-		_radiolist.AppendMenuItem(MF_STRING, 31, "live.m3u (github mirror)");
+		_radiolist.AppendMenuItem(MF_STRING, 30, "Radio (github)");
+		_radiolist.AppendMenuItem(MF_STRING, 31, "Radio (gitee)");
 		if(radiom3u.length > 0){
 			for(var urlcount = 0; urlcount < radiom3u.length; urlcount++){
 				_radiolist.AppendMenuItem(MF_STRING, 300 + urlcount, radiom3u[urlcount]);
@@ -1032,10 +1032,10 @@ oBrowser = function() {
 			g_searchbox.historyreset();
 			break;
 		case (idx == 30):
-			LoadRadio("Internet Radio", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/live.m3u");
+			LoadRadio("Internet Radio", "https://raw.githubusercontent.com/dream7180/Resource/main/radio/radio.fpl");
 			break;
 		case (idx == 31):
-			LoadRadio("Internet Radio", "https://raw.kkgithub.com/dream7180/Resource/main/radio/live.m3u");
+			LoadRadio("Internet Radio", "https://gitee.com/dream7180/Resource/raw/main/radio/radio.fpl");
 			break;
 		case (idx >= 300 && idx < 300 + radiom3u.length):
 			LoadRadio("Internet Radio", radiom3u[idx - 300]);

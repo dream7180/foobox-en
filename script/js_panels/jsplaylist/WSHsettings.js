@@ -812,7 +812,7 @@ function settings_textboxes_action(pageId, elementId) {
 oTextBtn = function(text){
 	this.x = 0;
 	this.y = 0;
-	this.h = p.settings.lineHeight;
+	this.h = cHeaderBar.height;
 	this.text = text;
 	this.link_hover = 0;
 	var pic = gdi.CreateImage(100, 20);
@@ -1680,8 +1680,8 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Overwrite file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Right side over/info and properties panels follow cursor, not follows playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Optimize performance, ignoring various artists (if any), to cache the album cover.", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Right side cover/info and properties panels follow cursor, not follow playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Optimize performance, cache the album cover ignoring variation of album artists", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Highlight color follows vivid cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(6, z(260), cSettings.topBarHeight + rh * 8.25, "Except ESLyric highlight color", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(7, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 9.25), oTextBox_4, cHeaderBar.height, "Threshold when getting color scheme from cover, 1-10 (1-best speed, 10-best accuracy)", color_threshold.toString(), "settings_textboxes_action", this.id));
@@ -1830,7 +1830,7 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Bottom toolbar", g_font_b, p.settings.color1, txtbox_x, dy + rh * 13.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("Library button function (effective for foobar2000 v2+)", g_font, p.settings.color1, txtbox_x, dy + rh * 15.5, txt_width, p.settings.lineHeight, lc_txt);
 			if(g_version == "6") {
-				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, dy + rh * 20.15);
+				p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, Math.ceil(dy + rh * 20.05));
 				p.settings.g_link.draw(gr, txtbox_x, dy + rh * 22.75);
 			} else p.settings.g_link.draw(gr, txtbox_x, dy + rh * 20.25);
 			break;

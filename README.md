@@ -15,9 +15,7 @@ The following excellent codes are modified and used:
 ## [Installation]   
 * From version 7.24, installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org)  
 * From 7.26, foobox 6 Remastered revision is added for 32-bit application, with UI Hacks component integrated, it combines the features of 6 and 7.   
-* From 7.42, Windows 7 is not supported due to update of JSPlitter, 7.4.2 release supporting win7 by using old JSPlitter can be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/7.42) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/7.42)
-* Extra video panel is optional (play video with fb2k is not recommended). foobox-video could be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/video76) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video76).  
-* The video playback feature is provided by [foo-youtube](https://fy.3dyd.com/download/), [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) and [foo-mpv](https://github.com/sammoth/foo_mpv) & its [x64](https://github.com/intrigit/foo_mpv) components.     
+* Extra video panel is optional (play video with fb2k is not recommended). foobox-video could be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/video76) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video76), includes [foo-youtube](https://fy.3dyd.com/download/), [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) and [foo-mpv](https://github.com/sammoth/foo_mpv) & its [x64](https://github.com/intrigit/foo_mpv) components.     
 
 * You may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".
 

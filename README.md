@@ -1,5 +1,5 @@
 # foobox
-foobox is a DUI (Default User Interface) theme for [foobar2000, x86 version](https://www.foobar2000.org). It is user-friendly, powerful and runs in high efficiency.
+foobox is a DUI (Default User Interface) theme for [foobar2000](https://www.foobar2000.org). It is user-friendly, powerful and runs in high efficiency.
 ## [Develop]
 The following third-party component are required:   
 * [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378) based on [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel);  

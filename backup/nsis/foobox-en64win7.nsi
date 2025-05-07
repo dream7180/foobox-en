@@ -14,7 +14,7 @@ Var initDestination
 Var FontDir
 
 #APP
-!define FBOX_VER "7.43"
+!define FBOX_VER "8.0"
 !define BUILD_NUM "1"
 
 # Setup
@@ -42,24 +42,24 @@ DirText "Setup will detect the installation path of foobar2000. If foobar2000 is
 BrandingText "NSIS v3"
 
 # --- MUI Settings Start ---
-ReserveFile ".\common\installer\install7.ico"
-ReserveFile ".\common\installer\foobox7.bmp"
+ReserveFile ".\common\installer\install8.ico"
+ReserveFile ".\common\installer\foobox8.bmp"
 
 # MUI
 !define MUI_UI_COMPONENTSPAGE_SMALLDESC "${NSISDIR}\Contrib\UIs\modern_smalldesc.exe"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 
 # Icon
-!define MUI_ICON ".\common\installer\install7.ico"
+!define MUI_ICON ".\common\installer\install8.ico"
 # Bitmap
-!define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\foobox7.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\foobox8.bmp"
 
 # - InstallPage -
 !define MUI_ABORTWARNING
 
 !define MUI_WELCOMEPAGE_TEXT "\
 foobox is a feature-rich Default User Interface (DUI) theme for foobar2000 audio player based on JSplitter (Spider Monkey Panel version). It is user-friendly, powerful and runs in high efficiency.$\n$\n\
-You should have foobar2000 (64-bit vresion) installed in your computer before extracting foobox 7 theme into it.$\n$\n\
+You should have foobar2000 (64-bit vresion) installed in your computer before extracting foobox theme into it.$\n$\n\
 Note: This installer use legacy version of JSpliiter (3.6.1.10) to support Windows 7."
 
 !define MUI_WELCOMEPAGE_LINK "Download the latest release of foobar2000"
@@ -87,6 +87,8 @@ Page Custom OptionsPageCreate OptionsPageLeave
 # --- Install Section ---
 Section "foobox theme and required components" fooboxCore
     SectionIn RO
+	
+	Delete "$INSTDIR\themes\foobox*.fth"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\en\xcommon\themes\*.*"
@@ -213,6 +215,7 @@ ${If} $noConfig = 1
 	${NSD_Check} $CfgCheckbox
 ${EndIf}
 ${NSD_CreateLabel} 20u 40u 90% 20u "If checked, theme.fth will not be copied. Caution: keep unchecked if unsure!"
+EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 

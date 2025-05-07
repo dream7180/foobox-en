@@ -152,8 +152,6 @@ let properties = [
 
 	['Double-Click Toggle', true, 'dblClickToggle'],
 	['Expand Lists', true, 'expandLists'],
-	['Fallback Text Biography: Heading|No Heading', 'Nothing Found|There is no biography to display', 'bioFallbackText'],
-	['Fallback Text Review: Heading|No Heading', 'Nothing Found|There is no review to display', 'revFallbackText'],
 
 	['Filmstrip Autofit', true, 'filmStripAutofit'],
 	['Filmstrip Cover Regular-0 Auto-Fill-1 Circular-2', 1, 'filmCoverStyle'],
@@ -304,8 +302,6 @@ let properties = [
 	['Reflection Size (%)', 100, 'reflSize'],
 	['Reflection Strength (%)', 14.5, 'reflStrength'],
 
-	['Scroll Position Bio', JSON.stringify({}), 'bioScrollPos'],
-	['Scroll Position Rev', JSON.stringify({}), 'revScrollPos'],
 	['Scroll Step 0-10 (0 = Page)', 3, 'scrollStep'],
 	['Scroll Smooth Duration 0-5000 msec (Max)', 500, 'durationScroll'],
 	['Scroll Touch Flick Duration 0-5000 msec (Max)', 3000, 'durationTouchFlick'],

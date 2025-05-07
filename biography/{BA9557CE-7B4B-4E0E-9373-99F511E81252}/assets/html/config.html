@@ -234,8 +234,6 @@
 				<div id="layout"></div>
 				<div class="div_text6">Look-up button</div>
 				<div id="look_up"></div>
-				<div class="div_text1" style="padding:1.25em 0 0.15em;">Fallback text: Heading|NoHeading</div>
-				<div id="fall_back"></div>	
 				<div class="div_text12">Scroll</div>
 				<span class="info3">Bar:</span>
 				<span style="margin:0 0 0.31em;" class="dropdown"><a id="sbarShow_dropdown" class="dropbtn" href="#" onclick="toggle('sbarShow');"></a>
@@ -1132,7 +1130,6 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var cusTextLabels = ['Supports tags or full paths: text, lyrics and item properties. Uses first found for each view.', 'Preview', 'Synchronise with newly downloaded', 'Scroll synced', 'Scroll unsynced'];
 				var dlLabels = ['Custom', 'Default (package data)', 'Review', 'Biography', 'Review', 'Biography', 'Photo', 'Review albumart', 'Similar artists', 'Review', 'Biography', 'Enable'];
 				var dropShadowLevelLabels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-				var fallbackLabels = ['Biography', 'Review'];
 				var filmStripLabels = ['Flush', 'Align with image', 'Apply image margins','Align with text', 'Apply text margins', ]
 				var filterLabels = ['KB max size', 'KB min size', 'PX min resolution', 'Min number (top priority)'];
 				var flaglabels = ['Artist view', 'Album view'];
@@ -1182,8 +1179,8 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 
 				var input = {
 					behaviour: {
-						name: ['cycTimeItem', 'bioFallbackText', 'revFallbackText', 'overlayStrength', 'overlayGradient', 'overlayBorderWidth'],
-						type: ['float', 'text', 'text', 'float', 'float', 'float']
+						name: ['cycTimeItem', 'overlayStrength', 'overlayGradient', 'overlayBorderWidth'],
+						type: ['float', 'float', 'float', 'float']
 					},
 					display: {
 						name: ['borT', 'borL', 'borR', 'borB', 'textT', 'textL', 'textR', 'textB', 'gap', 'textPad', 'amRatingName', 'lfmRatingName'],
@@ -1533,7 +1530,6 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					for (i = 0; i < 3; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
 					sbar_icon_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
 					for (i = 0; i < 4; i++) {window.scrolling.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scroll_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="scroll_checkbox'+i+'" class="checkbox_label">'+scrollLabels[i]+'</label></div>');}
-					for (i = 0; i < 2; i++) {window.fall_back.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="fallback_container'+i+'" name="behaviour_input" class="input54" /><label for="fallback_container'+i+'" class="inp_label2">'+fallbackLabels[i]+'</label></div>');}
 
 					window.overlay_dropdown.innerHTML = overlayLabels[ppt['typeOverlay_internal'].value];
 					for (i = 0; i < 5; i++) {window.overlayType.insertAdjacentHTML('beforeend', '<a onclick="setOverlayType(' + i + ');">'+overlayLabels[i]+'</a>');}

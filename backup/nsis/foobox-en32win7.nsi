@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "7.43"
+!define FBOX_VER "8.0"
 !define BUILD_NUM "1"
 
 # Setup
@@ -44,17 +44,17 @@ DirText "Setup will detect the installation path of foobar2000. If foobar2000 is
 BrandingText "NSIS v3"
 
 # --- MUI Settings Start ---
-ReserveFile ".\common\installer\install7.ico"
-ReserveFile ".\common\installer\foobox7.bmp"
+ReserveFile ".\common\installer\install8.ico"
+ReserveFile ".\common\installer\foobox8.bmp"
 
 # MUI
 !define MUI_UI_COMPONENTSPAGE_SMALLDESC "${NSISDIR}\Contrib\UIs\modern_smalldesc.exe"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 
 # Icon
-!define MUI_ICON ".\common\installer\install7.ico"
+!define MUI_ICON ".\common\installer\install8.ico"
 # Bitmap
-!define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\foobox7.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\foobox8.bmp"
 
 # - InstallPage -
 !define MUI_ABORTWARNING
@@ -89,6 +89,9 @@ Page Custom OptionsPageCreate OptionsPageLeave
 # --- Install Section ---
 Section "foobox theme and required components" fooboxCore
     SectionIn RO
+	
+	Delete "$INSTDIR\themes\foobox*.fth"
+	RmDir /r "$ProfileDir\foobox\version6"
 	
 	SetOutPath "$INSTDIR\themes"
 	File ".\en\xcommon\themes\*.*"
@@ -151,13 +154,6 @@ Section "foobox theme and required components" fooboxCore
 			System::Call "gdi32::RemoveFontResource(t '$FontDir\fontawesome-webfont.ttf')"
 		${EndIf} 
 	${EndIf}
-SectionEnd
-
-Section "foobox 6 Remastered UI (with uihacks)" foobox6
-	SetOutPath "$INSTDIR\themes"
-	File ".\en\x86_v6\themes\*.*"
-	SetOutPath "$ProfileDir"
-	File /r ".\en\x86_v6\profile\*.*"
 SectionEnd
 
 Section "File format icons" Icons
@@ -227,6 +223,7 @@ ${If} $noConfig = 1
 	${NSD_Check} $CfgCheckbox
 ${EndIf}
 ${NSD_CreateLabel} 20u 75u 90% 20u "If checked, theme.fth will not be copied. Caution: keep unchecked if unsure!"
+EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 
@@ -312,6 +309,5 @@ FunctionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${fooboxCore} "Files and components required by foobox DUI theme."
-	!insertmacro MUI_DESCRIPTION_TEXT ${foobox6} "foobox 6 Remastered themes based on foobox 7, with uihacks component."
 	!insertmacro MUI_DESCRIPTION_TEXT ${Icons} "Replacing the icons for file format associations with foobox themed icons."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

@@ -17,13 +17,13 @@ Var initVersion
 
 #APP
 !define /date ComplieTime "%y%m%d"
-!define FBOX_VER "7.29+"
+!define FBOX_VER "8"
 !define VER_DATE "20${ComplieTime}"
 !define BUILD_NUM "1"
 
 # Setup
 Name "video panels for foobox"
-OutFile "foobox-video_x86.en.${VER_DATE}.exe"
+OutFile "foobox8-video_x86.en.${VER_DATE}.exe"
 # VerInfo
 VIProductVersion "${VER_DATE}.0.0.${BUILD_NUM}"
 VIAddVersionKey "ProductName" "foobox video"
@@ -46,7 +46,7 @@ DirText "Setup will detect the installation path of foobar2000. If foobar2000 is
 BrandingText "NSIS v3"
 
 # --- MUI Settings Start ---
-ReserveFile ".\common\installer\install7p.ico"
+ReserveFile ".\common\installer\installer.ico"
 ReserveFile ".\common\installer\boxvideo.bmp"
 
 # MUI
@@ -54,7 +54,7 @@ ReserveFile ".\common\installer\boxvideo.bmp"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 
 # Icon
-!define MUI_ICON ".\common\installer\install7p.ico"
+!define MUI_ICON ".\common\installer\installer.ico"
 # Bitmap
 !define MUI_WELCOMEFINISHPAGE_BITMAP ".\common\installer\boxvideo.bmp"
 
@@ -90,27 +90,29 @@ Page Custom OptionsPageCreate OptionsPageLeave
 # --- Install Section ---
 
 Section "foo_input_ffmpeg component - ffmpeg decoder wrapper" fooffmpeg
+	SectionIn RO
 	SetOutPath "$ProfileDir\user-components\foo_input_ffmpeg"
-	File ".\en\video\vx86\profile\user-components\foo_input_ffmpeg\*.*"
+	File ".\en\vx86\profile\user-components\foo_input_ffmpeg\*.*"
 	${If} $noConfig = 0
 		SetOutPath "$ProfileDir\configuration"
-		File ".\en\video\vxcommon\profile\configuration\foo_input_ffmpeg.dll.cfg"
+		File ".\en\vxcommon\profile\configuration\foo_input_ffmpeg.dll.cfg"
 	${EndIf}
 	SetOutPath "$INSTDIR\encoders\ffmpeg"
 	File /r ".\common\vx86\profile\foo_youtube\ffmpeg\*.*"
+	Delete "$INSTDIR\themes\foobox*.fth"
 SectionEnd
 
 Section "Video panel foo-youtube" VideoYoutube
 	;SectionIn 2
 	
 	;remove old version files
-	;IfFileExists "$INSTDIR\encoders\video\LAVFilters" 0 +6
+	;IfFileExists "$INSTDIR\encoders\LAVFilters" 0 +6
 	;${If} $noAdmin = 0
-		;UnRegDLL "$INSTDIR\encoders\video\LAVFilters\LAVSplitter.ax"
-		;UnRegDLL "$INSTDIR\encoders\video\LAVFilters\LAVVideo.ax"
-		;UnRegDLL "$INSTDIR\encoders\video\LAVFilters\LAVAudio.ax"
+		;UnRegDLL "$INSTDIR\encoders\LAVFilters\LAVSplitter.ax"
+		;UnRegDLL "$INSTDIR\encoders\LAVFilters\LAVVideo.ax"
+		;UnRegDLL "$INSTDIR\encoders\LAVFilters\LAVAudio.ax"
 	;${EndIf}
-	;RMDir /r "$INSTDIR\encoders\video"
+	;RMDir /r "$INSTDIR\encoders"
 	;RMDir /r "$ProfileDir\foo_youtube"
 	;install new file
 	SetOutPath "$ProfileDir\user-components\foo_youtube"
@@ -118,26 +120,19 @@ Section "Video panel foo-youtube" VideoYoutube
 	File ".\common\vxcommon\foo_youtube\*.*"
 	${If} $noConfig = 0
 		SetOutPath "$ProfileDir"
-		File ".\en\video\vx86\profile\theme.fth"
+		File ".\en\vx86\profile\theme.fth"
 		SetOutPath "$ProfileDir\configuration"
 		${If} $noAdmin = 0
-			File /oname=foo_youtube.dll.cfg ".\en\video\vxcommon\profile\configuration\foo_youtube_admin.dll.cfg"
+			File /oname=foo_youtube.dll.cfg ".\en\vxcommon\profile\configuration\foo_youtube_admin.dll.cfg"
 		${Else}
-			File /oname=foo_youtube.dll.cfg ".\en\video\vxcommon\profile\configuration\foo_youtube_noadmin.dll.cfg"
+			File /oname=foo_youtube.dll.cfg ".\en\vxcommon\profile\configuration\foo_youtube_noadmin.dll.cfg"
 		${EndIf}
 	${EndIf}
 	SetOutPath "$INSTDIR\themes"
-	File ".\en\video\vx86\themes\foobox-7 + biography + video (youtube).fth"
-	File ".\en\video\vx86\themes\foobox-7 + video (youtube).fth"
-	IfFileExists "$ProfileDir\foobox\version6" 0 +6
-	SetOutPath "$INSTDIR\themes"
-	File ".\en\video\vx86_v6\themes\foobox-6 + biography + video (youtube).fth"
-	File ".\en\video\vx86_v6\themes\foobox-6 + video (youtube).fth"
-	SetOutPath "$ProfileDir"
-	File ".\en\video\vx86_v6\profile\theme.fth"
-	SetOutPath "$ProfileDir\foo_youtube"
+	File ".\en\vx86\themes\foobox8 + biography + video(youtube).fth"
+	File ".\en\vx86\themes\foobox8 + video(youtube).fth"
 	File /r ".\common\vx86\profile\foo_youtube\*.*"
-	File /r ".\en\video\vx86\profile\foo_youtube\*.*"
+	File /r ".\en\vx86\profile\foo_youtube\*.*"
 	File ".\common\vxcommon\youtube-dl.exe"
 	${If} $noAdmin = 0
 		ExecWait '"$SYSDIR\regsvr32.exe" /s "$ProfileDir\foo_youtube\LAVFilters\LAVSplitter.ax"'
@@ -146,30 +141,26 @@ Section "Video panel foo-youtube" VideoYoutube
 	${EndIf}
 	SetOutPath "$INSTDIR"
 	${If} $PortableMode = 0
-        File "/oname=LavFilters assistant.bat" ".\en\video\vxcommon\lavassist\LavFilters_assistant_0.bat"
+        File "/oname=LavFilters assistant.bat" ".\en\vxcommon\lavassist\LavFilters_assistant_0.bat"
 	${ElseIf} $PortableMode = 1
-        File "/oname=LavFilters assistant.bat" ".\en\video\vxcommon\lavassist\LavFilters_assistant_1.bat"
+        File "/oname=LavFilters assistant.bat" ".\en\vxcommon\lavassist\LavFilters_assistant_1.bat"
 	${Else}
-		File "/oname=LavFilters assistant.bat" ".\en\video\vxcommon\lavassist\LavFilters_assistant_2.bat"
+		File "/oname=LavFilters assistant.bat" ".\en\vxcommon\lavassist\LavFilters_assistant_2.bat"
     ${EndIf}
 SectionEnd
 
 Section /o "Video panel foo-mpv" VideoMPV
 	SetOutPath "$ProfileDir\user-components\foo_mpv"
-	File /r ".\en\video\vx86\profile\user-components\foo_mpv\*.*"
+	File /r ".\en\vx86\profile\user-components\foo_mpv\*.*"
 	${If} $noConfig = 0
 		SetOutPath "$ProfileDir\configuration"
-		File ".\en\video\vxcommon\profile\configuration\foo_mpv.dll.cfg"
+		File ".\en\vxcommon\profile\configuration\foo_mpv.dll.cfg"
 	${EndIf}
 	SetOutPath "$INSTDIR\themes"
-	File ".\en\video\vx86\themes\foobox-7 + biography + video (mpv).fth"
-	File ".\en\video\vx86\themes\foobox-7 + video (mpv).fth"
-	IfFileExists "$ProfileDir\foobox\version6" 0 +4
-	SetOutPath "$INSTDIR\themes"
-	File ".\en\video\vx86_v6\themes\foobox-6 + biography + video (mpv).fth"
-	File ".\en\video\vx86_v6\themes\foobox-6 + video (mpv).fth"
+	File ".\en\vx86\themes\foobox8 + biography + video(mpv).fth"
+	File ".\en\vx86\themes\foobox8 + video(mpv).fth"
 	SetOutPath "$ProfileDir\mpv"
-	File /r ".\en\video\vxcommon\profile\*.*"
+	File /r ".\en\vxcommon\profile\mpv\*.*"
 SectionEnd
 
 /*

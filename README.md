@@ -13,9 +13,9 @@ The following excellent codes are modified and used:
 * [Biography](https://github.com/Wil-B/Biography) by Wil-B;  
 * Web Radio Lists collected from [Fanmingming](https://github.com/fanmingming) and [Kimentanm](https://github.com/Kimentanm).  
 ## [Installation]   
-* From version 7.24, installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org)  
-* From 7.26, foobox 6 Remastered revision is added for 32-bit application, with UI Hacks component integrated, it combines the features of 6 and 7.   
-* Extra video panel is optional (play video with fb2k is not recommended). foobox-video could be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/video76) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video76), includes [foo-youtube](https://fy.3dyd.com/download/), [foo_input_ffmpeg](https://www.foobar2000.org/components/view/foo_input_ffmpeg) and [foo-mpv](https://github.com/sammoth/foo_mpv) & its [x64](https://github.com/intrigit/foo_mpv) components.     
+* Installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org)  
+* Both 64-bit and 32-bit foobar2000 are supported. 32-bit foobox with UI Hacks component integrated, is able to implement complete background color changing feature.   
+* Extra video panel is optional (play video with fb2k is not recommended). foobox-video could be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/video8) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video8).     
 
 * You may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".
 

@@ -1694,7 +1694,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oRadioButton(0, 20, cSettings.topBarHeight + rh * 2.25, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(1, z(120), cSettings.topBarHeight + rh * 2.25, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(2, 20, cSettings.topBarHeight + rh * 4.25, "Overwrite file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Right side cover/info and properties panels follow cursor, not follow playback", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.25, "Right side cover/info and properties panels follow cursor, not follow playback  (will disable UI color following cover)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(4, 20, cSettings.topBarHeight + rh * 7.25, "Optimize performance, cache the album cover ignoring variation of album artists", "albcov_lt ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(5, 20, cSettings.topBarHeight + rh * 8.25, "Interface color follows vivid cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(6, z(260), cSettings.topBarHeight + rh * 8.25, "Except background", "cbkg_bycover ? false : true", "settings_checkboxes_action", this.id));

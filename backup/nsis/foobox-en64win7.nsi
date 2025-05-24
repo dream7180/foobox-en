@@ -14,7 +14,7 @@ Var initDestination
 Var FontDir
 
 #APP
-!define FBOX_VER "8.0"
+!define FBOX_VER "8.3"
 !define BUILD_NUM "1"
 
 # Setup
@@ -215,7 +215,7 @@ ${If} $noConfig = 1
 	${NSD_Check} $CfgCheckbox
 ${EndIf}
 ${NSD_CreateLabel} 20u 40u 90% 20u "If checked, theme.fth will not be copied. Caution: keep unchecked if unsure!"
-EnableWindow $CfgCheckbox 0
+;EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 

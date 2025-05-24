@@ -16,7 +16,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.0"
+!define FBOX_VER "8.3"
 !define BUILD_NUM "1"
 
 # Setup
@@ -221,7 +221,7 @@ ${If} $winLegacy = 0
 	${NSD_CreateCheckbox} 10u 65u 90% 10u "Install legacy version of ESLyric (0.5.4.1028) instead"
 	Pop $ESLCheckbox
 ${EndIf}
-EnableWindow $CfgCheckbox 0
+;EnableWindow $CfgCheckbox 0
 nsDialogs::Show
 FunctionEnd
 

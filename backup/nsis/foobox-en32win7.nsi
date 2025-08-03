@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "8.3"
+!define FBOX_VER "8.5"
 !define BUILD_NUM "1"
 
 # Setup
@@ -182,6 +182,9 @@ Function .onVerifyInstDir
 	IfFileExists $INSTDIR\foobar2000.exe PathGood
     Abort
 	PathGood:
+	IfFileExists $INSTDIR\vcruntime140_1.dll 0 +3
+	MessageBox MB_OK|MB_ICONEXCLAMATION "64 bit foobar2000 detected, please choose 32 bit instead."
+	Abort
 FunctionEnd
 
 Function Check_Dir

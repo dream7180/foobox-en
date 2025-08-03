@@ -1757,7 +1757,7 @@ oBrowser = function() {
 			}
 		}
 		Context.BuildMenu(_menu, 2, -1);
-		_menu.AppendMenuItem(MF_STRING, 1010, "Reset cache of selected");
+		_menu.AppendMenuItem(MF_STRING, 1010, "Refresh selected (reset cache)");
 		_child01.AppendTo(_menu, MF_STRING, "Selected add to...");
 		_child01.AppendMenuItem(MF_STRING, 2000, "New playlist");
 
@@ -1881,15 +1881,28 @@ oBrowser = function() {
 		case (idx >= 50 && idx <= 51):
 			ppt.sourceMode = idx - 50;
 			window.SetProperty("_PROPERTY: Source Mode", ppt.sourceMode);
-			window.Reload();
+			brw.populate();
 			break;
 		case (idx == 52):
 			ppt.locklibpl = !ppt.locklibpl;
-			if (ppt.lock_lib_playlist) g_active_playlist = 0;
-			else g_active_playlist = plman.ActivePlaylist;
 			window.SetProperty("_PROPERTY: Lock to Library playlist", ppt.locklibpl);
 			window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
-			window.Reload();
+			if(ppt.locklibpl) {
+				if(!fb.IsLibraryEnabled()) {
+					ppt.locklibpl = false;
+				} else {
+					g_active_playlist = 0;
+					if (plman.GetPlaylistName(0) != "Library") {
+						g_active_playlist = plman.ActivePlaylist;
+					}
+				}
+				var timeout_lock = window.SetTimeout(function() {
+					window.NotifyOthers("lock_lib_playlist", ppt.locklibpl);
+					timeout_lock && window.ClearTimeout(timeout_lock);
+					timeout_lock = false;
+				}, 400);
+			} else g_active_playlist = plman.ActivePlaylist;
+			brw.populate();
 			break;
 		case (idx >= 111 && idx <= 112):
 			ppt.tagMode = 1;

@@ -16,7 +16,7 @@ Var FontDir
 Var winLegacy
 
 #APP
-!define FBOX_VER "8.3"
+!define FBOX_VER "8.5"
 !define BUILD_NUM "1"
 
 # Setup
@@ -116,6 +116,12 @@ Section "foobox theme and required components" fooboxCore
 		File ".\common\eslyric\x64\legacy\foo_uie_eslyric.dll"
 	${EndIf}
 	
+	SetOutPath "$ProfileDir\user-components-x64\foo_openhacks"
+	File ".\common\foo_openhacks\x64\foo_openhacks.dll"
+	
+	SetOutPath "$ProfileDir\configuration"
+	File ".\common\foo_openhacks\x64\foo_openhacks.dll.cfg"
+	
 	Delete "$ProfileDir\user-components-x64\foo_uie_jsplitter\mozjs-lur-102.dll"
 	Delete "$ProfileDir\foobox\script\html\styles10.css"
 	Delete "$ProfileDir\foobox\script\html\styles7.css"
@@ -181,6 +187,9 @@ Function .onVerifyInstDir
 	IfFileExists $INSTDIR\foobar2000.exe PathGood
     Abort
 	PathGood:
+	IfFileExists $INSTDIR\vcruntime140_1.dll +3 0
+	MessageBox MB_OK|MB_ICONEXCLAMATION "32 bit foobar2000 detected, please choose 64 bit instead."
+	Abort
 FunctionEnd
 
 Function Check_Dir

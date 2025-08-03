@@ -12,9 +12,10 @@ The following excellent codes are modified and used:
 * Search box by Asion;  
 * [Biography](https://github.com/Wil-B/Biography) by Wil-B;  
 * Web Radio Lists collected from [Fanmingming](https://github.com/fanmingming) and [Kimentanm](https://github.com/Kimentanm).  
+  
 ## [Installation]   
-* Installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org)  
-* Both 64-bit and 32-bit foobar2000 are supported. 32-bit foobox with UI Hacks component integrated, is able to implement complete background color changing feature.   
+* Installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org), both 32-bit and 64-bit foobar2000 are supported.  
+
 * Extra video panel is optional (play video with fb2k is not recommended). foobox-video could be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/video8) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video8).     
 
 * You may switch various foobox layouts from "Main Menu -- View -- Layout -- Quick setup".

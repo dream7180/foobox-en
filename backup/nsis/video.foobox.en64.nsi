@@ -113,9 +113,9 @@ Section "Video panel foo-youtube" VideoYoutube
 	;RMDir /r "$INSTDIR\encoders"
 	;RMDir /r "$ProfileDir\foo_youtube"
 	;install new file
-	SetOutPath "$ProfileDir\user-components-x64\foo_youtube"
-	File ".\common\vx64\profile\user-components-x64\foo_youtube\*.*"
-	File ".\common\vxcommon\foo_youtube\*.*"
+	;SetOutPath "$ProfileDir\user-components-x64\foo_youtube"
+	;File ".\common\vx64\profile\user-components-x64\foo_youtube\*.*"
+	;File ".\common\vxcommon\foo_youtube\*.*"
 	${If} $noConfig = 0
 		SetOutPath "$ProfileDir"
 		File ".\en\vx64\profile\theme.fth"
@@ -132,7 +132,7 @@ Section "Video panel foo-youtube" VideoYoutube
 	SetOutPath "$ProfileDir\foo_youtube"
 	File /r ".\common\vx64\profile\foo_youtube\*.*"
 	File /r ".\en\vx64\profile\foo_youtube\*.*"
-	File ".\common\vxcommon\youtube-dl.exe"
+	File ".\common\vx64\youtube-dlp.exe"
 	${If} $noAdmin = 0
 		ExecWait '"$SYSDIR\regsvr32.exe" /s "$ProfileDir\foo_youtube\LAVFilters\LAVSplitter.ax"'
 		ExecWait '"$SYSDIR\regsvr32.exe" /s "$ProfileDir\foo_youtube\LAVFilters\LAVVideo.ax"'

@@ -62,7 +62,7 @@ ReserveFile ".\common\installer\foobox8.bmp"
 !define MUI_WELCOMEPAGE_TEXT "\
 foobox is a feature-rich Default User Interface (DUI) theme for foobar2000 audio player based on JSplitter (Spider Monkey Panel version). It is user-friendly, powerful and runs in high efficiency.$\n$\n\
 You should have foobar2000 (32-bit vresion) installed in your computer before extracting foobox theme into it.$\n$\n\
-Note: This installer use legacy version of JSpliiter (3.6.1.10) to support Windows 7."
+Note: This installer use legacy version of JSpliiter (3.7.x) to support Windows 7."
 
 !define MUI_WELCOMEPAGE_LINK "Download the latest release of foobar2000"
 !define MUI_WELCOMEPAGE_LINK_LOCATION "https://www.foobar2000.org"
@@ -105,6 +105,10 @@ Section "foobox theme and required components" fooboxCore
 	
 	SetOutPath "$ProfileDir\user-components\foo_playcount"
 	File ".\en\x86\profile\user-components\foo_playcount\foo_playcount.dll"
+	
+	SetOutPath "$ProfileDir\user-components\foo_ui_hacks"
+	File ".\cn\x86\profile\user-components\foo_ui_hacks\foo_ui_hacks.dll"
+	File ".\cn\x86\profile\user-components\foo_ui_hacks\UIHacks.js"
 	
 	SetOutPath "$ProfileDir\user-components\foo_uie_jsplitter"
 	File ".\en\win7\jsplitter-x86\*.*"

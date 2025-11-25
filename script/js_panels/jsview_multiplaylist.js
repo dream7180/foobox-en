@@ -413,18 +413,21 @@ oBrowser = function(name) {
 			_menu.AppendMenuItem((plman.IsAutoPlaylist(pidx) || plman.GetPlaylistName(pidx) == "Queue Content")?MF_DISABLED|MF_GRAYED:MF_STRING, 800, "Remove");
 			Context.InitContext(metadblist_selection);
 			Context.BuildMenu(_menu, 3, -1);
-			_child01.AppendTo(_menu, MF_STRING, "Selected add to...");
-			_child01.AppendMenuItem(MF_STRING, 801, "New playlist");
-			var addline = true;
-			for (var i = 0; i < plman.PlaylistCount; i++) {
-				if (i != pidx && !plman.IsAutoPlaylist(i)) {
-					if (addline) {
-						_child01.AppendMenuSeparator();
-						addline = false;
+			if(plman.PlaylistCount > 1 && plman.PlaylistCount < 51){
+				var addline = true;
+				for (var i = 0; i < plman.PlaylistCount; i++) {
+					if (i != pidx && !plman.IsAutoPlaylist(i)) {
+						if (addline) {
+							_child01.AppendTo(_menu, MF_STRING, "Add to...");
+							_child01.AppendMenuItem(MF_STRING, 801, "New playlist");
+							_child01.AppendMenuSeparator();
+							addline = false;
+						}
+						_child01.AppendMenuItem(MF_STRING, 1000 + i, plman.GetPlaylistName(i));
 					}
-					_child01.AppendMenuItem(MF_STRING, 1000 + i, plman.GetPlaylistName(i));
 				}
-			}
+				if(addline) _menu.AppendMenuItem(MF_STRING, 801, "Send to new playlist");
+			} else _menu.AppendMenuItem(MF_STRING, 801, "Send to new playlist");
 		}
 		var ret = _menu.TrackPopupMenu(x, y);
 		if (ret > 2 && ret < 800) {
@@ -619,7 +622,8 @@ function on_mouse_lbtn_up(x, y) {
 		};
 	};
 	if (btn_clicked && btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
-		PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		if(plman.PlaylistCount < 51) PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		else fb.RunMainMenuCommand("View/Playlist Manager");
 		btn_sw.state = ButtonStates.normal;
 		btn_sw.repaint();
 	}

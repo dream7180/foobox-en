@@ -116,9 +116,6 @@ Section "foobox theme and required components" fooboxCore
 		File ".\common\eslyric\x64\legacy\foo_uie_eslyric.dll"
 	${EndIf}
 	
-	SetOutPath "$ProfileDir\user-components-x64\foo_openhacks"
-	File ".\common\foo_openhacks\x64\foo_openhacks.dll"
-	
 	SetOutPath "$ProfileDir\configuration"
 	File ".\common\foo_openhacks\x64\foo_openhacks.dll.cfg"
 	

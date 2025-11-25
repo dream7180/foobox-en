@@ -2262,27 +2262,30 @@ oList = function(object_name, playlist) {
 			}
 		}
 		if(properties.selectionmenu){
+			var pl_count = plman.PlaylistCount;
 			_child01.AppendTo(_menu, MF_STRING, "Selection...");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "Crop");
-			_child02.AppendTo(_child01, MF_STRING, "Add to...");
-			_child03.AppendTo(_child01, MF_STRING, "Send to...");
-			_child03.AppendMenuItem(MF_STRING, 4000, "New playlist");
+			if(pl_count > 1 && pl_count < 51){
+				let addSep = true;
+				for (var i = 0; i < pl_count; i++) {
+					if (i != this.playlist && !plman.IsAutoPlaylist(i)) {
+						if(addSep) {
+							_child02.AppendTo(_child01, MF_STRING, "Add to...");
+							_child03.AppendTo(_child01, MF_STRING, "Send to...");
+							_child03.AppendMenuItem(MF_STRING, 4000, "New playlist");
+							_child03.AppendMenuItem(MF_SEPARATOR, 0, "");
+							addSep = false;
+						}
+						_child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
+						_child03.AppendMenuItem(MF_STRING, 4001 + i, plman.GetPlaylistName(i));
+					}
+				}
+				if(addSep) _child01.AppendMenuItem(MF_STRING, 4000, "Send to new playlist");
+			} else _child01.AppendMenuItem(MF_STRING, 4000, "Send to new playlist");
 			_child01.AppendMenuSeparator();
 			_child01.AppendMenuItem(MF_STRING, 7000, "Convert tag (ZH_TW -> ZH_CN)");
 			_child01.AppendMenuItem(MF_STRING, 7001, "Convert tag (ZH_CN -> ZH_TW)");
-
-			var pl_count = plman.PlaylistCount;
-
-			if (plman.PlaylistCount > 1) {
-				_child03.AppendMenuItem(MF_SEPARATOR, 0, "");
-			}
-			for (var i = 0; i < pl_count; i++) {
-				if (i != this.playlist && !plman.IsAutoPlaylist(i)) {
-					_child02.AppendMenuItem(MF_STRING, 2001 + i, plman.GetPlaylistName(i));
-					_child03.AppendMenuItem(MF_STRING, 4001 + i, plman.GetPlaylistName(i));
-				}
-			}
 		}
 
 		var ret = _menu.TrackPopupMenu(x, y);

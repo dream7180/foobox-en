@@ -106,7 +106,7 @@ class DldWikipedia {
 		}
 
 		this.func = null;
-		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		
 		switch (this.searchItem) {
 			case 0:
@@ -593,20 +593,18 @@ class DldWikipedia {
 	get(URL, force) {
 		this.func = this.analyse;
 		if (ppt.multiServer && !force && server.urlDone(md5.hashStr(this.artist + this.title + this.type + this.pth + cfg.partialMatch + URL))) return;
-		try{
-			this.xmlhttp.open('GET', URL);
-			this.xmlhttp.onreadystatechange = this.ready_callback;
-			this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');
-			if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
-			if (!this.timer) {
-				const a = this.xmlhttp;
-				this.timer = setTimeout(() => {
-					a.abort();
-					this.timer = null;
-				}, 60000);
-			}
-			this.xmlhttp.send();
-		}catch(e){}
+		this.xmlhttp.open('GET', URL);
+		this.xmlhttp.onreadystatechange = this.ready_callback;
+		this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');
+		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+		if (!this.timer) {
+			const a = this.xmlhttp;
+			this.timer = setTimeout(() => {
+				a.abort();
+				this.timer = null;
+			}, 60000);
+		}
+		this.xmlhttp.send();
 	}
 
 	getHeadings(text) {
@@ -653,7 +651,7 @@ class DldWikipedia {
 
 		if (this.type == 0) {
 			this.wiki = txt.add([this.info.active, this.info.start, this.info.bornIn, this.info.end, this.info.foundedIn], this.wiki);
-			const value = $.jsonParse(txt.countryCodes, {}, 'file')[this.artist.toLowerCase()];
+			const value = txt.countryCodesDic[this.artist.toLowerCase()]; // Regorxxx <- Force UTF-8. Cache country codes ->
 			if (!value) {
 				let countryCode = '';
 				let locale = this.info.bornIn || this.info.foundedIn;
@@ -693,7 +691,7 @@ class DldWikipedia {
 				server.res();
 			}
 		} else {
-			const text = $.jsonParse(this.pth, {}, 'file');
+			const text = $.jsonParse(this.pth, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 			if (this.fo) {
 				$.buildPth(this.fo);
 				if (this.site == 'en') {
@@ -720,18 +718,17 @@ class DldWikipedia {
 			else $.trace('wikipedia: ' + this.name + ': not found', true);
 		}
 	}
-
+	// Regorxxx <- Cache country codes
 	saveCountryCode(code, force) {
 		if (!code) return;
 		const a = this.artist.toLowerCase();
-		const m = $.jsonParse(txt.countryCodes, {}, 'file');
-		const value = m[a];
+		const value = txt.countryCodesDic[a];
 		if (code == value && !force) return;
-			m[a] = code;
-			$.save(txt.countryCodes, JSON.stringify($.sortKeys(m), null, 3), true);
-			server.res();
+		txt.countryCodesDic[a] = code;
+		$.save(txt.countryCodes, JSON.stringify($.sortKeys(txt.countryCodesDic), null, 3), true);
+		server.res();
 	}
-
+	// Regorxxx ->
 	tidyWiki(n, en) {
 		n = en ? n.replace(/\.\n+/g, '.\r\n\r\n') : n.replace(/\n+/g, '\r\n\r\n');
 		n = n.replace(/\(\)/g, '').replace(/\(;\s/g, '(').replace(/^thumb\r\n\r\n/i, '').replace(/\."([^\s"])/g, '. "$1').replace(/[.,]:\s\d+/g, '.').replace(/Ph\.D\./g, 'PhD')

@@ -629,7 +629,7 @@ Font style codes: 0 regular, 1 bold, 2 italic,  3 bold italic, 4 underline
 			<div class="info8">
 The variables are used in searching, & should be used in save folder paths and headings to ensure correct functionality.
 
-An advanced radio stream parser designed for use with streams that contain the artist name and song title in a non-standard format is located in foo_spider_monkey_panel\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}. It's user configurable (open in a text editor).
+An advanced radio stream parser designed for use with streams that contain the artist name and song title in a non-standard format is located in foo_uie_jsplitter\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}. It's user configurable (open in a text editor).
 </div>
 			<div style="clear:both;"></div>
 			<div class="div_text11">Classical music extension</div>
@@ -778,7 +778,7 @@ To add to the whitelist, enter comma separated genres below:
 			<div id="lfmGenreTag"></div>
 			<div class="div_text3">Notify tags</div>
 			<div id="notifyTags"></div>
-			<div class="div_text3">Show confirm popup before tagging files</div>
+			<div class="div_text3">File tagging</div>
 			<div id="taggerConfirm"></div>
 			<div style="display:inline-block; padding-top:1.25em; padding-bottom:0.7em; width:18%"><a id="setSize" href="#" onclick="showTaggerHelp();return false;">Tagger help</a></div>
 			<div id="tagger_help" style="display: none;">
@@ -798,7 +798,7 @@ To add to the whitelist, enter comma separated genres below:
 <div class="input_cnt2"><input class="input99" value="$replace($meta(Artist Statistics Last.fm,1[playcount]),',',,.,, ,)"/></div>
 <br>
 			<div class="info4"><b>Notify tags</b></div>
-			<div class="info4">If checked, enabled tags for the current track are notified to other Spider Monkey Panels. This includes artist data for radio streams. Notifications are sent on track change and when new or updated data is received.
+			<div class="info4">If checked, enabled tags for the current track are notified to other JSplitter Panels. This includes artist data for radio streams. Notifications are sent on track change and when new or updated data is received.
 
 The current track will be the playing track or selected track depending on the panel display mode. Default tag names are used instead of any custom names, so third party scripts know what to expect.
 
@@ -1161,7 +1161,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var seekerLabels = ['Counter', 'Seeker', 'Bar', 'Dots'];
 				var siteNameLabels = ['AllMusic', 'Last.fm', 'Wikipedia'];
 				var summaryLabels = ['Genres', 'Dates', 'Locale*', 'Popular now (last.fm)', 'Latest release (wikipedia)', 'Other'];
-				var tagLabel = ['Album Genre', 'Album mood', 'Album rating', 'Album theme', 'Artist genre', 'Album genre', 'Album statistics', 'Artist genre', 'Artist statistics', 'Locale', 'Similar artists', 'Album genre', 'Artist genre', '', 'Current track'];
+				var tagLabel = ['Album Genre', 'Album mood', 'Album rating', 'Album theme', 'Artist genre', 'Album genre', 'Album statistics', 'Artist genre', 'Artist statistics', 'Locale', 'Similar artists', 'Album genre', 'Artist genre', '', 'Current track', 'Show confirm popup before tagging files'];
 				var textStyleLabels = ['Top align', 'Expand lists', 'Auto-optimise if multiple items shown'];
 				var tfLabels = ['Biography', 'Review', 'Title', 'Lyrics', 'Title'];
 				var tfServLabels = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%', 'Composition tag'];
@@ -1746,7 +1746,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					}
 					i = 13; window.similarArtists.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="tag_checkbox'+i+'" class="inp_label3">Number similar artists 1-6</label><input id="tag_container'+i+'" name="tagger_input" class="input60" /></div>');
 					i = 14; window.notifyTags.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
-					i = 15; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /></div>');
+					i = 15; window.taggerConfirm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="tag_checkbox'+i+'" name="tagger_checkbox" type="checkbox" /><label for="tag_checkbox'+i+'" class="checkbox_label">'+tagLabel[i]+'</label></div>');
 					for (i = 0; i < 2; i++) {window.whitelist.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="useWhitelist'+i+'" name="useWhitelist" style="'+cbox+'" type="radio" /><label for="useWhitelist'+i+'" class="checkbox_label">'+whitelistLabels[i]+'</label></div>');}
 					i = 0; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
 					i = 1; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><label for="lfmGenreTag_container'+i+'" class="inp_label1">Translate:</label><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');

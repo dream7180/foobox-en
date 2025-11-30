@@ -28,11 +28,12 @@ var albcov_lt = window.GetProperty("Album.cover.ignoring.artist", false);
 var libbtn_fuc = window.GetProperty("foobox.library.button: Show.Albumlist", true);
 var queue_pl_on =  window.GetProperty("Playlist: Turn on queue playlist", false);
 var openhacks = utils.CheckComponent("foo_openhacks");
-var show_menu = true;
 if(openhacks) {
-	show_menu = fb.IsMainMenuCommandChecked("View/Show main menu");
+	var show_menu = fb.IsMainMenuCommandChecked("View/Show main menu");
 	var show_status = fb.IsMainMenuCommandChecked("View/Show status bar");
-} else show_menu =  window.GetProperty("foobox.Show.menu.bar", true);
+} else {
+	var show_menu =  window.GetProperty("foobox.Show.menu.bar", false);
+}
 var title_add = "";
 var radiom3u = "";
 let dark_mode = 0;

@@ -14,8 +14,8 @@ Var initDestination
 Var FontDir
 
 #APP
-!define FBOX_VER "8.5"
-!define BUILD_NUM "2"
+!define FBOX_VER "8.6"
+!define BUILD_NUM "1"
 
 # Setup
 Name "foobox"
@@ -104,7 +104,7 @@ Section "foobox theme and required components" fooboxCore
 	File ".\en\x64\profile\user-components-x64\foo_playcount\foo_playcount.dll"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_openhacks"
-	File ".\cn\x64\profile\user-components-x64\foo_openhacks\foo_openhacks.dll"
+	File ".\en\x64\profile\user-components-x64\foo_openhacks\foo_openhacks.dll"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File ".\en\win7\jsplitter-x64\*.*"

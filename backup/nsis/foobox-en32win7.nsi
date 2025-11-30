@@ -16,7 +16,7 @@ Var initVersion
 Var FontDir
 
 #APP
-!define FBOX_VER "8.5"
+!define FBOX_VER "8.6"
 !define BUILD_NUM "1"
 
 # Setup
@@ -107,8 +107,8 @@ Section "foobox theme and required components" fooboxCore
 	File ".\en\x86\profile\user-components\foo_playcount\foo_playcount.dll"
 	
 	SetOutPath "$ProfileDir\user-components\foo_ui_hacks"
-	File ".\cn\x86\profile\user-components\foo_ui_hacks\foo_ui_hacks.dll"
-	File ".\cn\x86\profile\user-components\foo_ui_hacks\UIHacks.js"
+	File ".\en\x86\profile\user-components\foo_ui_hacks\foo_ui_hacks.dll"
+	File ".\en\x86\profile\user-components\foo_ui_hacks\UIHacks.js"
 	
 	SetOutPath "$ProfileDir\user-components\foo_uie_jsplitter"
 	File ".\en\win7\jsplitter-x86\*.*"

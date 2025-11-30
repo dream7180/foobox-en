@@ -22,7 +22,9 @@ var lib_tooltip = lib_albumlist ? "Album List" : "ReFacets";
 var bio_panel, video_panel;
 var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
 var p_tips = ['Playlist', 'Browser'];
-var show_status = utils.CheckComponent("foo_openhacks") && fb.IsMainMenuCommandChecked("View/Show status bar");
+var show_status = true;
+var openhacks = utils.CheckComponent("foo_openhacks");
+if(openhacks) show_status = fb.IsMainMenuCommandChecked("View/Show status bar");
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 
 //=====================================================

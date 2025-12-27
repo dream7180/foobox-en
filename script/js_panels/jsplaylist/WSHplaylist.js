@@ -907,12 +907,11 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 					full_repaint();
 				}
 				else { // track
-					var cmd = properties.defaultPlaylistItemAction;
-					if (cmd == "Play") {
+					if (properties.defaultPlaylistItemAction != 0) {
 						plman.ExecutePlaylistDefaultAction(p.list.playlist, this.track_index);
 					}
 					else {
-						fb.RunContextCommandWithMetadb(cmd, this.metadb, 0);
+						fb.RunContextCommandWithMetadb("Add to playback queue", this.metadb, 0);
 					};
 				};
 			};

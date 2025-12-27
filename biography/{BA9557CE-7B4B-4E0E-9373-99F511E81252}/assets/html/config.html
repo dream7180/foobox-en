@@ -20,7 +20,7 @@
 	.tablink2 a:hover {padding:0.31em 2px; border:none; background-color:#777;}
 	.tablink2 a:focus {padding:0.31em 2px; border:none; background-color:#777;}
 	.tablink2 a:focus a:hover {padding:0.31em 2px; border:none; background-color:#777;}
-	.tabcontent2 {display:none; padding:1px;}
+	.tabcontent2 {display:none; padding:1px;overflow: hidden;}
 
 	input[type="checkbox"] {vertical-align:middle; position:relative; width:17px; height:15px; border:0; padding:2px 1px; margin:5px 0;}
 	input[type="checkbox"]:focus {border:1px solid #0078D7; padding:1px 0;}
@@ -128,7 +128,7 @@
 	.input35, .input40, .input73, .input96 {
 		display:inline-block; vertical-align:middle;
 	}
-	.input99 {display:inline-block; vertical-align:middle; width:98%; border:none !important; background:none}
+	.input99 {display:inline-block; vertical-align:middle; width:98%; border:none !important; background:none;}
 
 	.inp_label1 {display:block; margin:0.31em 0;}
 	.inp_label2 {padding-left:0.46em;}
@@ -136,7 +136,7 @@
 	.inp_label4 {display:inline-block; width:21%;}
 	.inp_label5 {vertical-align:middle; padding-left:0.46em;}
 	.inp_label6 {display:block; margin:0 0 0.31em 0;}
-	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0;}
+	.btn_cnt {padding:0.7em 1em; position:absolute; bottom:0; right:0; left:0;z-index: 2;}
 	#btn_cnt_right {background:#e5e5e5; border-top:1px solid #d0d0d0; text-align:right;}
 	#btn_cnt_left {text-align:left;}
 	#btn_cnt_center {text-align:center;}
@@ -148,9 +148,9 @@
 	tr {border:0;}
 	.table75 {width:75%;}
 
-	.dropbtn {white-space:nowrap; width:100px; background-color:#3e8e41; color:white; text-decoration:none; padding:0.13em 5px; border:none; cursor:pointer;}
+	.dropbtn {white-space:nowrap; width:100%; background-color:#3e8e41; color:white; text-decoration:none; padding:0.13em 5px; border:none; cursor:pointer;}
 	.dropbtn:after {font-family: FontAwesome; content: "\f107"; padding-left:0.5em; padding-right:0.19em;}
-	.dropdown {margin-top: 10px; position:static; display:inline-block;}
+	.dropdown {margin-top: 10px; position:relative; display:inline-block;}
 	.dropdown-content {display:none; position:absolute; background-color:#f9f9f9; min-width:10em; white-space:nowrap; box-shadow:0 8px 1.01em 0 rgba(0,0,0,0.2); z-index:1;}
  	.dropdown-content a {padding:0.13em 5px; color:black; text-decoration:none; display:block;}
 	.dropdown-content a:hover {background-color:#f1f1f1;}
@@ -258,11 +258,7 @@
 				<span id="overlayType" class="dropdown-content"></span>
 				</span>
 				<div id="overlayMetrics"></div>
-				<div style= "margin-right:10%;" class="info2">Flat & rounded support custom colours.
-
-As an alternative for lyrics, try menu > layout > full overlay with: flat style,
-<input class="input99" value="strength 61 & a custom overlay colour of RGB(0,0,0). For the lyrics use:"/>
-<input class="input99" value="a bold white font, highlight RGB(255,240,132), drop shadow level 2."/></div>
+				<div style="margin-right:10%;" class="info2">Flat and rounded support custom colours.<br>As an alternative for lyrics, try menu > layout > full overlay with:<br>Flat style, strength 61 and a custom overlay colour of RGB(0,0,0).<br>For the lyrics use a bold white font, highlight RGB(255,240,132), drop shadow level 2.</div>
 				<div class="div_text7">Extra menu items</div>
 				<table id="menu" class="table75">
 					<colgroup>
@@ -331,7 +327,7 @@ As an alternative for lyrics, try menu > layout > full overlay with: flat style,
 
 		<div id="headings" class="tabcontent">	
 		<div class="row">
-			<div style="padding-right:6%; "class="column60">
+			<div style="padding-right:6%;" class="column55">
 				<span class="alignLeftH">Main</span>
 				<span class="alignRightH">Title format</span>
 				<div style="clear:both;"></div>
@@ -373,29 +369,31 @@ As an alternative for lyrics, try menu > layout > full overlay with: flat style,
 				</span>
 				<div style="clear:both;"></div>
 	
-			</div>			
-			<div class="row">
-			<div class="div_text3">Main</div>
-				<div class="column50">
-					<div class="info2"><b>Format</b></div>
-					<div id="headingStyle"></div>
-				</div>
-				<div class="column50">
-					<div class="info2"><b>Button Style</b></div>
-					<div id="btn"></div>
-				</div>
 			</div>
-			<div class="row">
-				<div class="column50">
-					<div class="info2"><b>Line</b></div>
-					<div id="line"></div>
-					<div class="info2"><b>Country flag</b></div>
-					<div id="flag"></div>
-					<div id="flagInfo" class="info2"><i>Flag display requires heading format set to left</i></div>					
-				</div>		
-				<div class="column50">
-					<div class="info2"><b>Padding +/-</b></div>
-					<div id="headingPadding"></div>
+			<div class="column33">
+				<div class="row">
+					<div class="div_text3">Main</div>
+					<div class="column50">
+						<div class="info2"><b>Format</b></div>
+						<div id="headingStyle"></div>
+					</div>
+					<div class="column50">
+						<div class="info2"><b>Button Style</b></div>
+						<div id="btn"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="column50">
+						<div class="info2"><b>Line</b></div>
+						<div id="line"></div>
+						<div class="info2"><b>Country flag</b></div>
+						<div id="flag"></div>
+						<div id="flagInfo" class="info2"><i>Flag display requires heading format set to left</i></div>					
+					</div>		
+					<div class="column50">
+						<div class="info2"><b>Padding +/-</b></div>
+						<div id="headingPadding"></div>
+					</div>
 				</div>	
 			</div>
 		</div>
@@ -581,7 +579,7 @@ Font style codes: 0 regular, 1 bold, 2 italic,  3 bold italic, 4 underline
 		</div>
 			</div>
 			<div class="column50">
-				<p style="font:1.2em Arial;" "><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool#ColorPicker_tool" target=\"_blank\">Colour picker</a></p>
+				<p style="font-weight:bold"><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool#ColorPicker_tool" target=\"_blank\">Colour picker</a></p>
 				<div class="info3">
 <i>Colours</i>: flexible entry, e.g. 255,0,0 or 0-255-0 or rgba(255,0,0,64)
 <i>Alpha</i>: 0-255 or 0-1 scale

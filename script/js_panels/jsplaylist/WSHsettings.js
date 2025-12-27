@@ -195,13 +195,13 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 4:
 			p.settings.pages[pid].elements[4].status = true;
 			p.settings.pages[pid].elements[5].status = false;
-			properties.defaultPlaylistItemAction = "Play";
+			properties.defaultPlaylistItemAction = 1;
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
 		case 5:
 			p.settings.pages[pid].elements[4].status = false;
 			p.settings.pages[pid].elements[5].status = true;
-			properties.defaultPlaylistItemAction = "Add to playback queue";
+			properties.defaultPlaylistItemAction = 0;
 			window.SetProperty("SYSTEM.Default Playlist Action", properties.defaultPlaylistItemAction);
 			break;
 		};
@@ -1656,8 +1656,8 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(3, txtbox_x + 190*zdpi, Math.ceil(cSettings.topBarHeight + rh * 4.25), oTextBox_4, cHeaderBar.height, "Touch scroll step", cList.touchstep.toString(), "settings_textboxes_action", this.id));
 			// play option
 			var spaceBetween_w = z(70);
-			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction == "Play"), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == "Add to playback queue"), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, txtbox_x, cSettings.topBarHeight + rh * 7.25, "Play", (properties.defaultPlaylistItemAction != 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, txtbox_x + spaceBetween_w, cSettings.topBarHeight + rh * 7.25, "Enqueue", (properties.defaultPlaylistItemAction == 0), "settings_radioboxes_action", this.id));
 			this.elements.push(new oTextBox(6, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 8.55), oTextBox_4, cHeaderBar.height, "Row height of list (global)", cRow.default_playlist_h.toString(), "settings_textboxes_action", this.id));
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 11.5, "Append \"Selection\" sub-contextmenu", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "Play next playlist automatically (for default playback order only).", "repeat_pls", "settings_checkboxes_action", this.id));

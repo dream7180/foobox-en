@@ -774,7 +774,7 @@ oHeaderBar = function() {
 		_sorting.AppendMenuItem(MF_STRING, 215, "Plays");
 		_sorting.AppendMenuItem(MF_STRING, 216, "Codec");
 		_sorting.AppendMenuItem(MF_STRING, 217, "Random");
-		_sorting.AppendMenuItem(MF_STRING, 218, "颠倒");
+		_sorting.AppendMenuItem(MF_STRING, 218, "Reverse");
 
 		_menu.AppendMenuSeparator();
 		_menu.AppendMenuItem(MF_STRING, 17, "Keep cover image aspect ratio");

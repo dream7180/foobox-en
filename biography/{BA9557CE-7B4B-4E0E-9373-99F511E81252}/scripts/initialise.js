@@ -34,7 +34,7 @@ timer.image();
 
 timer.clear(timer.zSearch);
 timer.zSearch.id = setTimeout(() => {
-		if ($.server && ppt.panelActive) {
+		if ($.server) {
 		server.download(false, {ix:0, focus:false}, {ix:0, focus:false}); server.download(false, {ix:0, focus:true}, {ix:0, focus:true});
 		}
 		timer.zSearch.id = null;

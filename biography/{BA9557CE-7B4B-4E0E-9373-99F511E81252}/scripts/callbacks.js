@@ -46,7 +46,6 @@ function on_get_album_art_done(handle, art_id, image, image_path) {
 }
 
 function on_item_focus_change() {
-	if (!ppt.panelActive) return;
 	if (fb.IsPlaying && !panel.id.focus) return;
 	txt.notifyTags();
 	if (panel.id.lookUp) panel.getList(true, true);
@@ -118,19 +117,16 @@ function on_key_up(vkey) {
 }
 
 function on_library_items_added() {
-	if (!ppt.panelActive) return;
 	if (!lib) return;
 	lib.update = true;
 }
 
 function on_library_items_removed() {
-	if (!ppt.panelActive) return;
 	if (!lib) return;
 	lib.update = true;
 }
 
 function on_library_items_changed() {
-	if (!ppt.panelActive) return;
 	if (!lib) return;
 	lib.update = true;
 }
@@ -141,7 +137,6 @@ function on_load_image_done(task_id, image, image_path) {
 }
 
 function on_metadb_changed() {
-	if (!ppt.panelActive) return;
 	if (panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
 	panel.getList(true, true);
 	panel.focusLoad();
@@ -149,7 +144,6 @@ function on_metadb_changed() {
 }
 
 function on_mouse_lbtn_dblclk(x, y) {
-	if (!ppt.panelActive) return;
 	but.lbtn_dn(x, y);
 	if (!txt.lyricsDisplayed()) txt.scrollbar_type().lbtn_dblclk(x, y);
 	if (!ppt.dblClickToggle) return;
@@ -162,7 +156,6 @@ function on_mouse_lbtn_dblclk(x, y) {
 }
 
 function on_mouse_lbtn_down(x, y) {
-	if (!ppt.panelActive) return;
 	if (ppt.touchControl) panel.id.last_pressed_coord = {
 		x: x,
 		y: y
@@ -181,7 +174,6 @@ function on_mouse_lbtn_down(x, y) {
 }
 
 function on_mouse_lbtn_up(x, y) {
-	if (!ppt.panelActive) {panel.inactivate(); return;}
 	alb_scrollbar.lbtn_drag_up();
 	art_scrollbar.lbtn_drag_up();
 	art_scroller.lbtn_drag_up();
@@ -197,7 +189,6 @@ function on_mouse_lbtn_up(x, y) {
 }
 
 function on_mouse_leave() {
-	if (!ppt.panelActive) return;
 	panel.leave();
 	but.leave();
 	alb_scrollbar.leave();
@@ -213,23 +204,19 @@ function on_mouse_leave() {
 function on_mouse_mbtn_up(x, y, mask) {
 	// hacks at default settings blocks on_mouse_mbtn_up, at least in windows; workaround configure hacks: main window > move with > caption only & ensure pseudo-caption doesn't overlap buttons
 	switch (true) {
-		case mask == 0x0004:
-			panel.inactivate();
-			break;
 		case utils.IsKeyPressed(0x12):
 			filmStrip.mbtn_up('onOff');
 			break;
 		case panel.trace.film && !but.trace('lookUp', x, y):
 			filmStrip.mbtn_up('showCurrent');
 			break;
-		case ppt.panelActive:
+		default:
 			panel.mbtn_up(x, y);
 			break;
 	}
 }
 
 function on_mouse_move(x, y) {
-	if (!ppt.panelActive) return;
 	if (panel.m.x == x && panel.m.y == y) return;
 	panel.move(x, y);
 	but.move(x, y);
@@ -252,7 +239,6 @@ function on_mouse_rbtn_up(x, y) {
 }
 
 function on_mouse_wheel(step) {
-	if (!ppt.panelActive) return;
 	txt.deactivateTooltip();
 	switch (panel.zoom()) {
 		case false:
@@ -392,10 +378,6 @@ function on_notify_data(name, info) {
 				}
 			}
 			break;*/
-		case 'bio_status':
-			ppt.panelActive = info;
-			window.Reload();
-			break;
 		case 'bio_syncTags':
 			if ($.server) {
 				tag.force = true;
@@ -453,10 +435,6 @@ function on_notify_data(name, info) {
 function on_paint(gr) {
 	if (ui.pss.checkOnSize) on_size();
 	ui.draw(gr);
-	if (!ppt.panelActive) {
-		panel.draw(gr);
-		return;
-	}
 	img.draw(gr);
 	seeker.draw(gr);
 	txt.draw(gr);
@@ -468,7 +446,6 @@ function on_paint(gr) {
 }
 
 function on_playback_dynamic_info_track() {
-	if (!ppt.panelActive) return;
 	txt.rev.amFallback = true;
 	txt.rev.wikiFallback = true;
 	if ($.server) server.downloadDynamic();
@@ -480,7 +457,6 @@ function on_playback_dynamic_info_track() {
 }
 
 function on_playback_new_track() {
-	if (!ppt.panelActive) return;
 	if ($.server) server.call();
 	if (panel.id.focus) return;
 	txt.rev.amFallback = true;
@@ -516,7 +492,6 @@ function on_playback_time() {
 }
 
 function on_playback_stop(reason) {
-	if (!ppt.panelActive) return;
 	const n = ppt.artistView ? 'bio' : 'rev';
     if (reason != 2 && txt[n].loaded.txt && txt.reader[n].lyrics) txt.getText();
 	if (panel.id.lyricsSource) lyrics.clear();
@@ -525,23 +500,15 @@ function on_playback_stop(reason) {
 }
 
 function on_playlist_items_added() {
-	if (!ppt.panelActive) return;
 	on_item_focus_change();
 }
 
 function on_playlist_items_removed() {
-	if (!ppt.panelActive) return;
 	on_item_focus_change();
 }
 
 function on_playlist_switch() {
-	if (!ppt.panelActive) return;
 	on_item_focus_change();
-}
-
-function on_playlists_changed() {
-	if (!ppt.panelActive) return;
-	men.playlists_changed();
 }
 
 function on_script_unload() {
@@ -568,7 +535,6 @@ function on_size() {
 	if (!panel.w || !panel.h) return;
 	ui.getParams();
 
-	if (!ppt.panelActive) return;
 	txt.deactivateTooltip();
 	panel.calcText = true;
 	txt.on_size();

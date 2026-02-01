@@ -158,16 +158,6 @@ class Text {
 				rev: 20
 			}
 		}
-		
-		this.logo = {
-			fonts: ['Arial Black', 'Comic Sans MS', 'Ink Free', 'MV Boli', 'Segoe Print', 'Segoe Script', 'Segoe UI Black'],
-			id: '',
-			img: null,
-			show: false,
-			x: 20,
-			y: 20
-		}
-		this.logo.fonts = this.logo.fonts.filter(v => utils.CheckFont(v));
 
 		this.lyrics = {
 			ESLyricInstalled: utils.CheckComponent('foo_uie_eslyric'),
@@ -852,7 +842,6 @@ class Text {
 				const b = Math.max(Math.round(art_scrollbar.delta / this.line.h.bio + 0.4), 0);
 				const f = Math.min(b + this.line.drawn.bio, this.bio.arr.length);
 				this.bio.drawn = 0;
-				if (this.logo.show && this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, this.logo.y, this.logo.img.Width, this.logo.img.Height, 0, 0, this.logo.img.Width, this.logo.img.Height, 0, 16);
 				for (let i = b; i < f; i++) {
 					const item = this.bio.arr[i];
 					const item_y = item.h1 * i + item.y - art_scrollbar.delta;
@@ -892,7 +881,6 @@ class Text {
 				const b = Math.max(Math.round(alb_scrollbar.delta / this.line.h.rev + 0.4), 0);
 				const f = Math.min(b + this.line.drawn.rev, this.rev.arr.length);
 				this.rev.drawn = 0;
-				if (this.logo.show && this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, this.logo.y, this.logo.img.Width, this.logo.img.Height, 0, 0, this.logo.img.Width, this.logo.img.Height, 0, 16);
 				for (let i = b; i < f; i++) {
 					const item = this.rev.arr[i];
 					const item_y = item.h1 * i + item.y - alb_scrollbar.delta;
@@ -1500,53 +1488,6 @@ class Text {
 		return sub + (suffix ? end : '');
 	}
 
-	getLogo(artist, n) { // experimental feature: disabled in release version: best in large panel
-		if (this[n].loaded.txt && this.reader[n].props && this.local && window.Name == 'Details' && panel.text.w && panel.text.h) {
-			const a = $.clean(artist);
-			const path = `D:\\artistlogos\\${a}.png`;
-			const id = `${a}-${panel.text.t}-${panel.text.l}-${panel.text.h}-${panel.text.w}`;
-			if ($.file(path)) {
-				if (a && this.logo.id != id) {
-					this.logo.img = gdi.Image(path);
-					const sc = Math.min(panel.text.h / this.logo.img.Height, panel.text.w / this.logo.img.Width);
-					const w = Math.round(this.logo.img.Width * sc);
-					const h = Math.round(this.logo.img.Height * sc);
-					this.logo.x = panel.text.l + (panel.text.w - w) / 2;
-					this.logo.y = panel.text.t + (panel.text.h - h) / 2;
-					this.logo.img = this.logo.img.Resize(w, h, 2);
-					this.logo.id = id;
-				}
-				this.logo.show = true;
-				return
-			} else {
-				if (artist && this.logo.id != id) {
-					const ix = Math.floor(Math.random() * this.logo.fonts.length);
-					const size = Math.max(Math.round(Math.min(panel.text.w, panel.text.h) / 4),10);
-					const font = gdi.Font(this.logo.fonts[ix], size, 1);
-					let htFull = 0;
-					let htSingle = 0;
-					$.gr(1, 1, false, g => {
-						htFull = g.MeasureString(artist, font, 0, 0, panel.text.w, 5000, StringFormat(1, 1)).Height;
-						htSingle = g.CalcTextHeight('String', font);
-					});
-					const offset = Math.max(htSingle * 0.01, 1);
-					const ht = Math.min(panel.text.h, htFull);
-					this.logo.img = $.gr(panel.text.w, ht, true, g => {
-						g.GdiDrawText(artist, font, RGB(0, 0, 0), 0, 0, panel.text.w, ht, htFull - htSingle < panel.text.h ? this.ncc : this.tc)
-						g.GdiDrawText(artist, font, RGB(0, 0, 0), offset * 2, offset * 2, panel.text.w, ht, htFull - htSingle < panel.text.h ? this.ncc : this.tc)
-						g.GdiDrawText(artist, font, RGB(255, 255, 255), offset, offset, panel.text.w, ht, htFull - htSingle < panel.text.h ? this.ncc : this.tc)
-					});
-					this.logo.x = panel.text.l;
-					this.logo.y = panel.text.t + (panel.text.h - ht) / 2;
-					this.logo.id = id;
-				}
-				this.logo.show = true;
-				return;
-			}
-		}
-		this.logo.show = false;
-	}
-
 	getNowplaying(item, n) {
 		if (!item || typeof item !== 'string') return;
 		const focus = fb.IsPlaying ? false : panel.id.focus;
@@ -1848,7 +1789,6 @@ class Text {
 		const lyrPropsNowp = this[n].loaded.txt && (this.reader[n].lyrics || this.reader[n].props || this.reader[n].nowplaying);
 		const artist = ppt.artistView ? (!lyrPropsNowp ? this.artist : name.artist(panel.id.focus)) : (!lyrPropsNowp ? this.albumartist : name.albumArtist(panel.id.focus));
 		this.getFlag(artist, n);
-		this.getLogo(artist, n);
 		if (!ppt.heading) {
 			this.newText = false;
 			return;

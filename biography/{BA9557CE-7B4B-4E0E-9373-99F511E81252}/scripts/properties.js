@@ -251,9 +251,7 @@ let properties = [
 	['Lock Bio', false, 'lockBio'],
 	['Lock Auto', false, 'autoLock'],
 
-	['Menu Show Inactivate', 0, 'menuShowInactivate'],
 	['Menu Show Paste', 1, 'menuShowPaste'],
-	['Menu Show Playlists', 0, 'menuShowPlaylists'],
 	['Menu Show Missing Data', 0, 'menuShowMissingData'],
 	['Menu Show Tagger', 1, 'menuShowTagger'],
 	['Multi Server', false, 'multiServer'],
@@ -274,7 +272,6 @@ let properties = [
 	['Overlay Strength (%)', 84.5, 'overlayStrength'],
 	['Overlay Type', 0, 'typeOverlay'],
 
-	['Panel Active', true, 'panelActive'],
 	['Panel Focus Load Immediate', false, 'focusLoadImmediate'],
 	['Panel Focus Load Refresh Rate 200-3000 msec (Max)', 250, 'focusLoadRate'],
 	['Panel Focus Server Refresh Rate 1500-15000 msec (Max)', 5000, 'focusServerRate'],

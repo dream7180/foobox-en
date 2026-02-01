@@ -134,7 +134,7 @@ function on_notify_data(name, info) {
 				window.Repaint();
 			}
 		}
-		if(_swesl) eslPanels.SetTextHighlightColor(g_color_highlight);
+		if(eslPanels && sw_eslcolor) eslPanels.SetTextHighlightColor(g_color_highlight);
 		break;
 	case "foobox_bgcolor_bycover":
 		cbkg_bycover = info;

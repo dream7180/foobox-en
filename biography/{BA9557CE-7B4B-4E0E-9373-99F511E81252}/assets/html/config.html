@@ -1169,7 +1169,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 
 				var imgTable1 = ['artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'];
 				var imgTable2 = [['artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', '', 'Reflection'], ['artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', '', 'Border'], ['artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly', '', 'Shadow']];
-				var menuTable = ['menuShowPaste', 'menuShowPlaylists', 'menuShowTagger', 'menuShowMissingData', 'menuShowInactivate'];
+				var menuTable = ['menuShowPaste', 'menuShowTagger', 'menuShowMissingData'];
 
 				isTransparent = parsed_args[3];
 				callback = parsed_args[4];
@@ -1250,7 +1250,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				}
 				box.all = box.behaviour.concat(box.display, box.headings, box.image, box.textreader, box.custom, box.advanced, box.title_format, box.download, box.photo, box.cover, box.tagger, box.misc);
 				var radio = {
-					behaviour: ['lookUp', 'menuShowPaste', 'menuShowPlaylists', 'menuShowTagger', 'menuShowMissingData', 'menuShowInactivate'],
+					behaviour: ['lookUp', 'menuShowPaste', 'menuShowTagger', 'menuShowMissingData'],
 					display: ['star'],
 					headings: ['hdPos', 'hdShowBtnLabel', 'hdLine'],
 					image: ['imgSeekerDots', 'artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'],
@@ -1307,7 +1307,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 						break;
 
 						case 'menu':
-							headers = ['Paste', 'Playlists', 'Tagger', 'Missing data', 'Inactivate', ''];
+							headers = ['Paste', 'Tagger', 'Missing data', ''];
 							cells.push(headers);
 							var labels = ['Hide', 'Require&nbspShift&nbsp', 'Show'];
 							var items = [];
@@ -1318,13 +1318,13 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 									var n = menuTable[i];
 									var id = n + j; 
 									items[j].push('<input id="'+id+'" name="'+n+'" style="'+cbox+'" type="radio" />');
-									if (i == 4) {
+									if (i == 2) {
 										items[j].push('<div style="padding-left:0.46em; text-align:left">'+labels[j]+'</div>');
 										cells.push(items[j]);
 									}
 								}
 							}
-							columnCount = 6;
+							columnCount = 4;
 							break;
 
 						case 'imageMarginTable':

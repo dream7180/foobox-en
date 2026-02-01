@@ -664,7 +664,6 @@ class UserInterface {
 
 		if (!panel.lock) panel.getList(true, true);
 
-		men.playlists_changed();
 		panel.checkNumServers();
 
 		if (ppt.showFilmStrip && ppt.autoFilm) txt.getScrollPos();

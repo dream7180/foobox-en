@@ -24,7 +24,14 @@ var LIST, BRW, VIS, BIO, VIDEO, active_p, active_pid;
 var p_tips = ['Playlist', 'Browser'];
 var show_status = true;
 var openhacks = utils.CheckComponent("foo_openhacks");
-if(openhacks) show_status = fb.IsMainMenuCommandChecked("View/Show status bar");
+if(openhacks){
+	try{
+		show_status = fb.IsMainMenuCommandChecked("View/Show status bar");
+	} catch(e){
+		show_status = true;
+		fb.ShowPopupMessage("foobox English, shall match with English version of openhacks and foobar2000, otherwise some functions will be limited!", "openhacks not matched");
+	}
+}
 var cbkg_chroma = window.GetProperty("foobox.bgcolor.chroma", 4);
 
 //=====================================================

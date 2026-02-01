@@ -127,10 +127,6 @@ class Panel {
 			l: 20
 		}
 
-		this.logo = {
-			img: my_utils.getImageAsset('Logo.png')
-		}
-
 		this.repaint = {
 			x: 0,
 			y: 0,
@@ -602,46 +598,6 @@ class Panel {
 		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 	}
 
-	draw(gr) {
-		let font = ui.font.main;
-		let str = 'POWERED by allmusic, last.fm & Wikipedia.\r\n\r\nShift+middle click to activate / inactivate.';
-		let textHeight2;
-		
-		const textHeight1 = Math.round(gr.MeasureString(str, font, 10, 0, this.w - 20, 1000, StringFormat(1, 1)).Height);
-		const version = `  ${window.ScriptInfo.Name}: v${window.ScriptInfo.Version}`;
-		const versionHeight = gr.CalcTextHeight(version, ui.font.small);
-		const txtSp = this.h * 0.37;
-		
-		if (textHeight1 > txtSp) {
-			str = str.replace('\r\n\r\n', ' ');
-			textHeight2 = Math.round(gr.MeasureString(str, font, 10, 0, this.w - 20, 1000, StringFormat(1, 1)).Height);
-			if (textHeight2 > txtSp) font = ui.font.small;
-		}
-
-		const textHeight3 = Math.round(gr.MeasureString(str, font, 10, 0, this.w - 20, 1000, StringFormat(1, 1)).Height);
-		if (textHeight3 > txtSp) str = 'Shift+middle click to activate.';
-
-		let textCol = ui.col.text;
-		let textCol_h = ui.col.text_h;
-		if (ppt.theme > 0) {
-			textCol = ui.dui ? window.GetColourDUI(0) : window.GetColourCUI(0);
-			textCol_h = ui.dui ? window.GetColourDUI(2) : window.GetColourCUI(2);
-		}
-		const hAvail = (this.h - txtSp - versionHeight) * 0.9;
-		const wAvail = this.w * 0.9;
-		let scale = this.getScale(this.logo.img, wAvail, hAvail);
-		this.logo.w = scale[0];
-		this.logo.h = scale[1];
-		this.logo.x = (this.w - this.logo.w) / 2;
-		this.logo.y =  hAvail - this.logo.h + versionHeight + hAvail * 0.145;
-
-		gr.SetInterpolationMode(7);
-		if (this.logo.img) gr.DrawImage(this.logo.img, this.logo.x, this.logo.y, this.logo.w, this.logo.h, 0, 0, this.logo.img.Width, this.logo.img.Height);
-		gr.SetInterpolationMode(0);
-		gr.GdiDrawText(version, ui.font.small, textCol_h, 0, 0, this.w, this.h, 0x00000800);
-		gr.GdiDrawText(str, font, textCol, 10, this.h - txtSp, this.w - 20, txtSp, txt.ncc);
-	}
-
 	exportStyle(n) {
 		const continue_confirmation = (status, confirmed) => {
 			if (confirmed) {
@@ -966,12 +922,6 @@ class Panel {
 					return x > this.img.l && x < this.img.l + this.style.imgSize;
 			}
 		} else return y > this.ibox.t && y < this.ibox.t + this.ibox.h && x > this.ibox.l && x < this.ibox.l + this.ibox.w;
-	}
-
-	inactivate() {
-		ppt.toggle('panelActive');
-		window.NotifyOthers('bio_status', ppt.panelActive);
-		window.Reload();
 	}
 
 	isRadio(focus) {

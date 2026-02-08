@@ -452,24 +452,29 @@ oBrowser = function(name) {
 PL_Menu = function(x, y) {
 	var PLmenu = window.CreatePopupMenu();
 	var total = plman.PlaylistCount;
+	const pl_no = Math.ceil(total / 30);
 	if (!total) PLmenu.AppendMenuItem(MF_DISABLED, 0, "No playlist");
-	else {
+	else if(total < 31) {
 		for (var i = 0; i < total; i++) {
-			if(fb.IsPlaying && i == plman.PlayingPlaylist) PLmenu.AppendMenuItem(MF_STRING, 100+i, plman.GetPlaylistName(i) + " >>>");
-			else PLmenu.AppendMenuItem(MF_STRING, 100+i, plman.GetPlaylistName(i));
+			if(fb.IsPlaying && i == plman.PlayingPlaylist) PLmenu.AppendMenuItem(MF_STRING, i, plman.GetPlaylistName(i) + " ►");
+			else PLmenu.AppendMenuItem(MF_STRING, i, plman.GetPlaylistName(i));
 		}
-		PLmenu.CheckMenuRadioItem(100, 100 + total, 100 + plman.ActivePlaylist);
+		PLmenu.CheckMenuRadioItem(0, total - 1, plman.ActivePlaylist);
+	} else {
+		for (let j = 0; j < pl_no; j++) {
+				const n = '# ' + (j * 30 + 1 + ' - ' + Math.min(total, 30 + j * 30) + (30 + j * 30 > plman.ActivePlaylist && ((j * 30) - 1) < plman.ActivePlaylist ? ' ▪' : ''));
+				var child1 = window.CreatePopupMenu();
+				child1.AppendTo(PLmenu, MF_STRING | MF_POPUP, n);
+				for (let i = j * 30; i < Math.min(total, 30 + j * 30); i++) {
+					if(fb.IsPlaying && i == plman.PlayingPlaylist) child1.AppendMenuItem(MF_STRING, i, plman.GetPlaylistName(i) + " ►");
+					else child1.AppendMenuItem(MF_STRING, i, plman.GetPlaylistName(i));
+					if(i == plman.ActivePlaylist) child1.CheckMenuRadioItem(i, i, i);
+			}
+		}
 	}
 	var ret = PLmenu.TrackPopupMenu(x, y);
-	if (ret) {
-		switch (ret) {
-		default:
-			plman.ActivePlaylist = ret - 100;
-			pidx = ret;
-			PLmenu.CheckMenuRadioItem(100, 100 + total, ret);
-			break;
-		}
-	}
+	plman.ActivePlaylist = ret;
+	pidx = ret;
 }
 //=================================== Main ================================================================
 function init_btn(){
@@ -622,7 +627,7 @@ function on_mouse_lbtn_up(x, y) {
 		};
 	};
 	if (btn_clicked && btn_sw.checkstate("up", x, y) == ButtonStates.hover) {
-		if(plman.PlaylistCount < 51) PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
+		if(plman.PlaylistCount < 901) PL_Menu(ww-btn_w-4*zdpi, btn_h+2*zdpi);
 		else fb.RunMainMenuCommand("View/Playlist Manager");
 		btn_sw.state = ButtonStates.normal;
 		btn_sw.repaint();

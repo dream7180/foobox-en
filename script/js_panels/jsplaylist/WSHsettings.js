@@ -45,12 +45,8 @@ function settings_checkboxes_action(id, status, parentId) {
 				show_menu = false;
 			}
 			if(show_menu != _showmenu){
-				if(openhacks) {
-					fb.RunMainMenuCommand("View/Show main menu");
-				} else {
-					window.NotifyOthers("Show_menubar", show_menu);
-					window.SetProperty("foobox.Show.menu.bar", show_menu);
-				}
+				window.NotifyOthers("Show_menubar", show_menu);
+				window.SetProperty("foobox.Show.menu.bar", show_menu);
 				p.settings.pages[parentId].elements[id].repaint();
 			}
 			break;
@@ -139,19 +135,6 @@ function settings_checkboxes_action(id, status, parentId) {
 			window.NotifyOthers("foobox_infoArt_followcursor", follow_cursor);
 			window.SetProperty("foobox.infoArt.follow.cursor", follow_cursor);
 			p.settings.pages[parentId].elements[id].repaint();
-			break;
-		case 18:
-			let _showstatus = show_status;
-			if (status) {
-				show_status = true;
-			} else {
-				show_status = false;
-			}
-			if(show_status != _showstatus){
-				fb.RunMainMenuCommand("View/Show status bar");
-				window.NotifyOthers("Show_statusbar", show_status);
-				p.settings.pages[parentId].elements[id].repaint();
-			}
 			break;
 		}
 		break;
@@ -1730,7 +1713,7 @@ oPage = function(id, objectName, label, nbrows) {
 		case 3:
 			//foobox options
 			var rh = cSettings.rowHeight;
-			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.5, "Show main menu bar", "show_menu ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.5, "Show pseudo main menu bar", "show_menu ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 4.5, "System", (sys_scrollbar == true), "settings_radioboxes_action", this.id));
 			this.elements.push(new oRadioButton(2, z(120), cSettings.topBarHeight + rh * 4.5, "Narrow", (sys_scrollbar == false), "settings_radioboxes_action", this.id));
 			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
@@ -1748,7 +1731,6 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 25, "Right side cover/info and properties panels follow cursor, not follow playback  (will disable UI color following cover)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
 			this.elements.push(new oTextBox(17, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 28), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar (for 32 bit foobox theme only) |", title_add, "settings_textboxes_action", this.id));
-			if(openhacks) this.elements.push(new oCheckBox(18, z(180), cSettings.topBarHeight + rh * 2.5, "Show status bar", "show_status ? true : false", "settings_checkboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -2586,6 +2568,7 @@ oSettings = function() {
 				this.closebutton.state = ButtonStates.normal;
 				resize_panels();
 				update_playlist(layout.collapseGroupsByDefault);
+				window.NotifyOthers("panel_switch", false);
 				full_repaint();
 			};
 			break;

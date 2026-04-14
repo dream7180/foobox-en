@@ -53,8 +53,8 @@ oSwitchbar = function() {
 	this.get_customimg = function() {
 		if(!custom_panel) return img_settings;
 		else{
-			if(p_tips[3] == "可视化") return img_vis;
-			if(p_tips[3] == "视频") return img_video;
+			if(p_tips[3] == "Visualization") return img_vis;
+			if(p_tips[3] == "Video") return img_video;
 			return img_settings;
 		}
 	}

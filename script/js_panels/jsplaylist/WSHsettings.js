@@ -623,16 +623,16 @@ function settings_textboxes_action(pageId, elementId) {
 			if(!cList.scrollstep) cList.scrollstep = org_scrollstep;
 			else if(cList.scrollstep < 0) cList.scrollstep = 1;
 			else if(cList.scrollstep > 20) cList.scrollstep = 20;
-			window.SetProperty("SYSTEM.Playlist Scroll Step", cList.scrollstep);
+			save_misccfg();
 			window.NotifyOthers("ScrollStep", cList.scrollstep);
 			break;
 		case 3:
-			var org_scrollstep = cList.scrollstep;
+			var org_touchstep = cList.touchstep;
 			cList.touchstep = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
-			if(!cList.scrollstep) cList.scrollstep = org_scrollstep;
+			if(!cList.touchstep) cList.touchstep = org_touchstep;
 			else if(cList.touchstep < 0) cList.touchstep = 1;
 			else if(cList.touchstep > 20) cList.touchstep = 20;
-			window.SetProperty("SYSTEM.Playlist Touch Step", cList.touchstep);
+			save_misccfg();
 			break;
 		case 6:
 			let org_default_playlist_h = cRow.default_playlist_h;
@@ -641,7 +641,7 @@ function settings_textboxes_action(pageId, elementId) {
 			else if(cRow.default_playlist_h < 15) cRow.default_playlist_h = 15;
 			else if(cRow.default_playlist_h > 100) cRow.default_playlist_h = 100;
 			if(cRow.default_playlist_h != org_default_playlist_h) {
-				window.SetProperty("SYSTEM.Playlist Row Height in Pixel", cRow.default_playlist_h);
+				save_misccfg();
 				resize_panels();
 				get_grprow_minimum(p.headerBar.columns[0].w);
 				update_playlist(layout.collapseGroupsByDefault, 2);
@@ -823,14 +823,6 @@ function settings_textboxes_action(pageId, elementId) {
 			window.NotifyOthers("set_cache_size", cache_size);
 			break;
 		case 16:
-			var new_m3u = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_m3u != radiom3u){
-				radiom3u = new_m3u;
-				save_misccfg();
-				window.NotifyOthers("Radio_list", radiom3u);
-			}
-			break;
-		case 17:
 			var new_titleadd = p.settings.pages[pageId].elements[elementId].inputbox.text;
 			if (new_titleadd != title_add){
 				title_add = new_titleadd;
@@ -854,7 +846,7 @@ oTextBtn = function(text){
 	var pic = gdi.CreateImage(100, 20);
 	gpic = pic.GetGraphics();
 	this.w = gpic.CalcTextWidth(this.text, g_font);
-	this.xoffset = gpic.CalcTextWidth("Show more track info on titlebar (for 32 bit foobox theme only) | ", g_font_b);
+	this.xoffset = gpic.CalcTextWidth("Show more track info on titlebar | ", g_font_b);
 	pic.ReleaseGraphics(gpic);
 	
 	this.draw = function(gr, x, y){
@@ -885,8 +877,8 @@ oTextBtn = function(text){
 			break;
 		case "up":
 			if (this.ishover){
-				p.settings.pages[3].elements[17].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
-				var new_titleadd = p.settings.pages[3].elements[17].inputbox.text;
+				p.settings.pages[3].elements[16].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
+				var new_titleadd = p.settings.pages[3].elements[16].inputbox.text;
 				if (new_titleadd != title_add){
 					full_repaint();
 					title_add = new_titleadd;
@@ -1729,8 +1721,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(13, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 20.25), oTextBox_4, cHeaderBar.height, "Cover cache dimension (pixel, 100-600, larger dimension result in more resource consumption)", cache_size.toString(), "settings_textboxes_action", this.id));			
 			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 24, "Write rating data to file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 25, "Right side cover/info and properties panels follow cursor, not follow playback  (will disable UI color following cover)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Extra URL of Internet Radio playlist for Playlist Manager Panel menu (put ';' between URLs)", radiom3u, "settings_textboxes_action", this.id));
-			this.elements.push(new oTextBox(17, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 28), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar (for 32 bit foobox theme only) |", title_add, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(17, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1871,8 +1862,8 @@ oPage = function(id, objectName, label, nbrows) {
 			gr.GdiDrawText("Interface color changing", g_font_b, p.settings.color1, txtbox_x, dy + rh * 9.75, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("** Music art **", p.settings.font_title, p.settings.color1, txtbox_x, dy + rh * 16.25, txt_width, p.settings.lineHeight, lc_txt);
 			gr.GdiDrawText("** Miscellaneous **", p.settings.font_title, p.settings.color1, txtbox_x, dy + rh * 23, txt_width, p.settings.lineHeight, lc_txt);
-			p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, Math.ceil(dy + rh * 28));
-			p.settings.g_link.draw(gr, txtbox_x, dy + rh * 31);
+			p.settings.textBtn1.draw(gr, txtbox_x + p.settings.textBtn1.xoffset, Math.ceil(dy + rh * 26));
+			p.settings.g_link.draw(gr, txtbox_x, dy + rh * 29);
 			break;
 		case 4:
 			var listBoxWidth = z(175);
@@ -2489,7 +2480,7 @@ oSettings = function() {
 			this.pages.push(new oPage(0, "p.settings.pages[0]", "Playlist View", 18));
 			this.pages.push(new oPage(1, "p.settings.pages[1]", "Columns", 16));
 			this.pages.push(new oPage(2, "p.settings.pages[2]", "Groups", 22));
-			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 32));
+			this.pages.push(new oPage(3, "p.settings.pages[3]", "foobox", 30));
 			this.pages.push(new oPage(4, "p.settings.pages[4]", "Playlist layouts", 15));
 		};
 		var fin = this.pages.length;
@@ -2640,7 +2631,6 @@ oSettings = function() {
 				this.pages[this.currentPageId].elements[12].inputbox.on_focus(is_focused, true);
 				this.pages[this.currentPageId].elements[13].inputbox.on_focus(is_focused, true);
 				this.pages[this.currentPageId].elements[16].inputbox.on_focus(is_focused, true);
-				this.pages[this.currentPageId].elements[17].inputbox.on_focus(is_focused, true);
 				break;
 		}
 	};

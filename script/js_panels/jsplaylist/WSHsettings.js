@@ -1721,7 +1721,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oTextBox(13, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 20.25), oTextBox_4, cHeaderBar.height, "Cover cache dimension (pixel, 100-600, larger dimension result in more resource consumption)", cache_size.toString(), "settings_textboxes_action", this.id));			
 			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 24, "Write rating data to file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 25, "Right side cover/info and properties panels follow cursor, not follow playback  (will disable UI color following cover)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(17, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];

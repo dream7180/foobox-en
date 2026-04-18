@@ -887,12 +887,17 @@ oBrowser = function() {
 				SearchOptionMenu.CheckMenuRadioItem(2, 9, ppts.scope + 2);
 
 			} else if (ppts.source == 2) {
-				var now_playing_track = fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem();
+				var now_playing_track = ppts.followcursor ? fb.GetFocusItem() : (fb.IsPlaying ? fb.GetNowPlaying() : fb.GetFocusItem());
 				var quickSearchMenu = window.CreatePopupMenu();
+				quickSearchMenu.AppendMenuItem(MF_STRING, 35, "Same title");
 				quickSearchMenu.AppendMenuItem(MF_STRING, 36, "Same artist");
 				quickSearchMenu.AppendMenuItem(MF_STRING, 37, "Same album");
 				quickSearchMenu.AppendMenuItem(MF_STRING, 38, "Same genre");
 				quickSearchMenu.AppendMenuItem(MF_STRING, 39, "Same date");
+				quickSearchMenu.AppendMenuSeparator();
+				quickSearchMenu.AppendMenuItem(MF_STRING, 30, "Follows playback");
+				quickSearchMenu.AppendMenuItem(MF_STRING, 31, "Follows cursor");
+				quickSearchMenu.CheckMenuRadioItem(30, 31, ppts.followcursor + 30);
 				quickSearchMenu.AppendTo(_menu, MF_STRING, "Quick search...");
 				_menu.AppendMenuItem(MF_STRING, 27, "Keep previous search playlist");
 				_menu.CheckMenuItem(27, ppts.multiple ? 1 : 0);
@@ -951,7 +956,7 @@ oBrowser = function() {
 		_autoplaylist.AppendMenuItem(MF_STRING, 221, "Tracks rated 1");
 		_autoplaylist.AppendMenuItem(MF_STRING, 220, "Tracks unrated");
 		_radiolist.AppendTo(_newplaylist, MF_STRING, "Internet radio");
-		_radiolist.AppendMenuItem(MF_STRING, 30, "Edit radio list");
+		_radiolist.AppendMenuItem(MF_STRING, 29, "Edit radio list");
 		_radiolist.AppendMenuSeparator();
 		if(radioname.length > 0){
 			for(var i = 0; i < radioname.length; i++){
@@ -1013,6 +1018,17 @@ oBrowser = function() {
 			g_searchbox.inputbox.empty_text = (ppts.source == 1) ? "Search in playlist" : "Search in library";
 			g_searchbox.repaint();
 			break;
+		case (idx == 30):
+			ppts.followcursor = 0;
+			window.SetProperty("Quick Search: Follow Cursor", ppts.followcursor);
+			break;
+		case (idx == 31):
+			ppts.followcursor = 1;
+			window.SetProperty("Quick Search: Follow Cursor", ppts.followcursor);
+			break;
+		case (idx == 35):
+			quickSearch(now_playing_track, "title");
+			break;
 		case (idx == 36):
 			quickSearch(now_playing_track, "artist");
 			break;
@@ -1033,7 +1049,7 @@ oBrowser = function() {
 		case (idx == ppts.historymaxitems + 60):
 			g_searchbox.historyreset();
 			break;
-		case (idx == 30):
+		case (idx == 29):
 			utils.EditTextFile(radiolist);
 			break;
 		case (idx >= 300 && idx < 300 + radiom3u.length):

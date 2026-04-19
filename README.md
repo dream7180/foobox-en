@@ -3,6 +3,7 @@ foobox is a DUI (Default User Interface) theme for [foobar2000](https://www.foob
 ## [Develop]
 The following third-party component are required:   
 * [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378) based on [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel);  
+* [openhacks_mod](https://github.com/simear2004/foo_openhacks_mod) based on [openhacks](https://github.com/ttsping/foo_openhacks);  
 * [ESLyric](https://github.com/ESLyric/release) by ttsping;  
 * [foo_enhanced_spectrum_analyzer](https://hydrogenaud.io/index.php/topic,116014.0.html).  
 

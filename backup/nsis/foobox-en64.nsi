@@ -1,4 +1,4 @@
-Unicode true
+﻿Unicode true
 
 # Include
 !include "MUI2.nsh"
@@ -7,16 +7,16 @@ Unicode true
 
 #Var
 Var ProfileDir
-Var CfgCheckbox
-Var ESLCheckbox
+;Var CfgCheckbox
+;Var ESLCheckbox
 Var noAdmin
-Var noConfig
+;Var noConfig
 Var initDestination
 Var FontDir
-Var winLegacy
+Var FontDir2
 
 #APP
-!define FBOX_VER "8.9"
+!define FBOX_VER "8.11"
 !define BUILD_NUM "1"
 
 # Setup
@@ -35,6 +35,7 @@ SetCompressor /SOLID lzma
 SetCompressorDictSize 32
 SetDatablockOptimize on
 SetOverwrite try
+;SetFont "Microsoft Yahei" 9
 
 # Runtime
 Caption "foobox theme v${FBOX_VER} setup for foobar2000 (x64)"
@@ -60,9 +61,9 @@ ReserveFile ".\common\installer\foobox8.bmp"
 !define MUI_ABORTWARNING
 
 !define MUI_WELCOMEPAGE_TEXT "\
-foobox is a feature-rich Default User Interface (DUI) theme for foobar2000 audio player based on JSplitter (Spider Monkey Panel version). It is user-friendly, powerful and runs in high efficiency.$\n$\n\
+foobox is a feature-rich Default User Interface (DUI) theme for foobar2000 audio player based on JSplitter. It is user-friendly, powerful and runs in high efficiency.$\n$\n\
 You should have foobar2000 (64-bit vresion) installed in your computer before extracting foobox theme into it.$\n$\n\
-Note: Windows 8 or later version OS is Required."
+Note: Win10 1607 or later version OS is Required."
 
 !define MUI_WELCOMEPAGE_LINK "Download the latest release of foobar2000"
 !define MUI_WELCOMEPAGE_LINK_LOCATION "https://www.foobar2000.org"
@@ -90,53 +91,49 @@ Page Custom OptionsPageCreate OptionsPageLeave
 Section "foobox theme and required components" fooboxCore
     SectionIn RO
 	
-	Delete "$INSTDIR\themes\foobox8 + biograph.fth"
+	Delete "$INSTDIR\themes\foobox*.fth"
 	Delete "$ProfileDir\user-components-x64\foo_uie_jsplitter\mozjs-lur-102.dll"
-	Delete "$ProfileDir\foobox\script\html\styles10.css"
-	Delete "$ProfileDir\foobox\script\html\styles7.css"
+	Delete "$ProfileDir\user-components-x64\foo_uie_jsplitter\mozjs-lur-128.dll"
+	RmDir /r "$ProfileDir\foobox\script"
+	RmDir /r "$ProfileDir\user-components-x64\foo_uie_jsplitter\samples\packages\{BA9557CE-7B4B-4E0E-9373-99F511E81252}"
+	RmDir /r "$ProfileDir\user-components-x64\foo_openhacks"
+	Delete "$ProfileDir\configuration\foo_openhacks.dll.cfg"
+	RmDir /r "$ProfileDir\user-components-x64\foo_enhanced_spectrum_analyzer"
+	Delete "$ProfileDir\user-components-x64\foo_uie_eslyric\enable_script_control"
 	
 	SetOutPath "$INSTDIR\themes"
-	File ".\en\xcommon\themes\*.*"
-	File ".\en\x64\themes\*.*"
+	File ".\cn\xcommon\themes_colors\*.*"
+	File ".\cn\x64\themes\*.*"
+	
 	
 	SetOutPath "$ProfileDir\foobox"
-	File /r ".\en\xcommon\foobox\*.*"
+	File /r ".\cn\xcommon\foobox\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64"
-	File /r ".\en\x64\profile\user-components-x64\*.*"
+	File /r ".\cn\x64\user-components-x64\*.*"
 	
+	SetOutPath "$ProfileDir\configuration"
+	File ".\cn\xcommon\configuration\foo_openhacks_mod.dll.cfg"
+
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"
 	
-	${If} $winLegacy = 0
-		Delete "$ProfileDir\user-components-x64\foo_uie_eslyric\enable_script_control"
-		SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
-		File ".\common\eslyric\x64\foo_uie_eslyric.dll"
-		SetOutPath "$ProfileDir\eslyric-data\layout"
-		File /r ".\common\eslyric\layout\*.*"
-		SetOutPath "$ProfileDir\eslyric-data\skins"
-		File /r ".\en\xcommon\eslyric_skins\*.*"
-	${Else}
-		SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
-		File ".\common\eslyric\x64\legacy\foo_uie_eslyric.dll"
-		File ".\common\eslyric\enable_script_control"
-		SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric\skins"
-		File /r ".\en\xcommon\eslyric_skins\*.*"
-		SetOutPath "$ProfileDir\foobox\script\js_common"
-		File ".\common\scriptWin7\splitterve.js"
-	${EndIf}
-	
-	SetOutPath "$ProfileDir\configuration"
-	File ".\common\foo_openhacks\x64\foo_openhacks.dll.cfg"
+	SetOutPath "$ProfileDir\user-components-x64\foo_uie_eslyric"
+	File ".\common\eslyric\x64\foo_uie_eslyric.dll"
+	SetOutPath "$ProfileDir\eslyric-data\layout"
+	File /r ".\common\eslyric\layout\*.*"
+	SetOutPath "$ProfileDir\eslyric-data\skins"
+	File /r ".\cn\xcommon\eslyric_skins\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter\samples\packages"
-	File /r ".\en\xcommon\biography-package\*.*"
+	File /r ".\cn\xcommon\biography-package\*.*"
 	
-	${If} $noConfig = 0
-		SetOutPath "$ProfileDir"
-		File ".\en\x64\profile\theme.fth"
-	${EndIf}
-	; install font
+	;${If} $noConfig == 0
+	SetOutPath "$ProfileDir"
+	File ".\cn\x64\theme.fth"
+	;${EndIf}
+	
+	; install font - fontawesome
 	Call CheckFontA
 	${If} $FontDir != "NOINST"
 		Call CheckFontU
@@ -153,7 +150,7 @@ Section "foobox theme and required components" fooboxCore
 		Pop $R0
 
 		${If} $R0 != 'error'
-			${If} $noAdmin = 0
+			${If} $noAdmin == 0
 				WriteRegStr HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" '$R0 (TrueType)' 'fontawesome-webfont.ttf'
 			${Else}
 				WriteRegStr HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" '$R0 (TrueType)' '$FontDir\fontawesome-webfont.ttf'
@@ -162,6 +159,40 @@ Section "foobox theme and required components" fooboxCore
 			System::Call "gdi32::RemoveFontResource(t '$FontDir\fontawesome-webfont.ttf')"
 		${EndIf} 
 	${EndIf}
+	
+	; install font - remixicon
+	Call CheckFontA2
+	${If} $FontDir2 != "NOINST"
+		Call CheckFontU2
+	${EndIf}
+	;MessageBox MB_OK "Fontdir is $FontDir."
+	${If} $FontDir2 != "NOINST"
+		SetOutPath "$FontDir2"
+		File ".\common\remixicon.ttf"
+	
+		System::Call "gdi32::AddFontResource(t '$FontDir2\remixicon.ttf')"
+
+		Push '$FontDir2\remixicon.ttf'
+		Call GetFontName
+		Pop $R0
+
+		${If} $R0 != 'error'
+			${If} $noAdmin == 0
+				WriteRegStr HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" '$R0 (TrueType)' 'remixicon.ttf'
+			${Else}
+				WriteRegStr HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" '$R0 (TrueType)' '$FontDir2\remixicon.ttf'
+			${EndIf}
+		${Else}
+			System::Call "gdi32::RemoveFontResource(t '$FontDir2\remixicon.ttf')"
+		${EndIf} 
+	${EndIf}
+SectionEnd
+
+Section "Enhanced spectrum analyzer" Spectrum
+	SetOutPath "$ProfileDir\user-components-x64\foo_enhanced_spectrum_analyzer"
+	File ".\cn\x64\optional-components\foo_enhanced_spectrum_analyzer\foo_enhanced_spectrum_analyzer.dll"
+	SetOutPath "$INSTDIR\themes"
+	File ".\cn\x64\themes-vis\*.*"
 SectionEnd
 
 Section "File format icons" Icons
@@ -169,9 +200,16 @@ Section "File format icons" Icons
 	File /r ".\common\icons\*.*"
 SectionEnd
 
+;Section /o "写入 Last.fm 到 hosts" LastfmHosts
+;	SetOutPath "$INSTDIR"
+;	File ".\common\lastfmhosts.bat"
+;	nsExec::Exec "$INSTDIR\lastfmhosts.bat"
+;SectionEnd
+
 Section -Post
     # 获取安装目录读写权限
     AccessControl::GrantOnFile "$INSTDIR" "(BU)" "FullAccess"
+;	Delete "$INSTDIR\lastfmhosts.bat"
 SectionEnd
 
 Function .onInit
@@ -191,7 +229,7 @@ Function .onVerifyInstDir
     Abort
 	PathGood:
 	IfFileExists $INSTDIR\vcruntime140_1.dll +3 0
-	MessageBox MB_OK|MB_ICONEXCLAMATION "32 bit foobar2000 detected, please choose 64 bit instead."
+	MessageBox MB_OK|MB_ICONEXCLAMATION "32 bit foobar2000 detected, please choose 64 bit instead!"
 	Abort
 FunctionEnd
 
@@ -223,35 +261,29 @@ IfFileExists $INSTDIR\icons\*.* +3 0
 	SectionSetFlags ${Icons} 0
 	SectionSetText ${Icons} ""
 	
-${NSD_CreateCheckbox} 10u 30u 90% 10u "Do not install theme configure files"
-Pop $CfgCheckbox
-${If} $noConfig = 1
-	${NSD_Check} $CfgCheckbox
-${EndIf}
-${NSD_CreateLabel} 20u 40u 90% 20u "If checked, theme.fth will not be copied. Caution: keep unchecked if unsure!"
-${If} $winLegacy = 0
-	${NSD_CreateCheckbox} 10u 65u 90% 10u "Install legacy version of ESLyric (0.5.4.1028) instead"
-	Pop $ESLCheckbox
-${EndIf}
-;EnableWindow $CfgCheckbox 0
+;${If} $noAdmin == 1
+;	SectionSetFlags ${LastfmHosts} 0
+;	SectionSetText ${LastfmHosts} ""
+;${EndIf}
+;${NSD_CreateCheckbox} 10u 65u 90% 10u "不安装主题配置文件"
+;Pop $CfgCheckbox
+;${If} $noConfig == 1
+;	${NSD_Check} $CfgCheckbox
+;${EndIf}
+;${NSD_CreateLabel} 20u 75u 90% 20u "如果勾选, theme.fth 文件将不会安装. 谨慎, 不确定勿勾选!"
+;EnableWindow $CfgCheckbox 0 ; change to 1 to enable noconfig option
+;StrCpy $noConfig 0 ; comment this if noconfig option enabled
+
 nsDialogs::Show
 FunctionEnd
 
 Function OptionsPageLeave
-${NSD_GetState} $CfgCheckbox $0
-${If} $0 = ${BST_CHECKED}
-    StrCpy $noConfig 1
-${Else}
-	StrCpy $noConfig 0
-${EndIf}
-${If} $winLegacy = 0
-	${NSD_GetState} $ESLCheckbox $0
-	${If} $0 = ${BST_CHECKED}
-		StrCpy $winLegacy 1
-	${Else}
-		StrCpy $winLegacy 0
-	${EndIf}
-${EndIf}
+;${NSD_GetState} $CfgCheckbox $0
+;${If} $0 == ${BST_CHECKED}
+;    StrCpy $noConfig 1
+;${Else}
+;	StrCpy $noConfig 0
+;${EndIf}
 FunctionEnd
 
 Function Inst_pre
@@ -266,25 +298,25 @@ ${GetUserLevel} $0 $R0
 ${If} $0 != 2
 	StrCpy $noAdmin 1
 	StrCpy $FontDir "$PROFILE\AppData\Local\Microsoft\Windows\Fonts"
+	StrCpy $FontDir2 "$PROFILE\AppData\Local\Microsoft\Windows\Fonts"
 ${Else}
 	StrCpy $noAdmin 0
 	StrCpy $FontDir "$FONTS"
+	StrCpy $FontDir2 "$FONTS"
 ${EndIf}
 FunctionEnd
 
 Function CheckWinver
-StrCpy $winLegacy 1
 GetWinVer $0 Major
-GetWinVer $1 Minor
-StrCpy $3 "$0.$1"
-${If} $3 < 6.2
-	MessageBox MB_OK|MB_ICONSTOP 'Requires Windows 8 or newer，installer will abort. Please download other release suitable for Win7!'
+GetWinVer $2 Build
+${If} $0 < 10
+	MessageBox MB_OK|MB_ICONSTOP 'Requires Windows 10 1607 or newer，installer will abort!'
     Quit
 ${EndIf}
-GetWinVer $2 Build
-${If} $0 >= 10
-${ANDIF} $2 >= 14393
-	StrCpy $winLegacy 0
+${If} $0 == 10
+${ANDIF} $2 < 14393
+	MessageBox MB_OK|MB_ICONSTOP 'Requires Windows 10 1607 or newer，installer will abort!'
+    Quit
 ${EndIf}
 FunctionEnd
 
@@ -306,6 +338,28 @@ ReadRegStr $0 HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" "FontAwe
 IfErrors INSTOK 0
 ${IF} $0 != ""
 	StrCpy $FontDir "NOINST"
+${ENDIF}
+INSTOK:
+FunctionEnd
+
+Function CheckFontA2
+Pop $0
+ClearErrors
+ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" "remixicon (TrueType)"
+IfErrors INSTOK 0
+${IF} $0 != ""
+	StrCpy $FontDir2 "NOINST"
+${ENDIF}
+INSTOK:
+FunctionEnd
+
+Function CheckFontU2
+Pop $0
+ClearErrors
+ReadRegStr $0 HKCU "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" "remixicon (TrueType)"
+IfErrors INSTOK 0
+${IF} $0 != ""
+	StrCpy $FontDir2 "NOINST"
 ${ENDIF}
 INSTOK:
 FunctionEnd
@@ -334,5 +388,7 @@ FunctionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${fooboxCore} "Files and components required by foobox DUI theme."
+	!insertmacro MUI_DESCRIPTION_TEXT ${Spectrum} "Enhanced Spectrum Analyzer and related layouts."
 	!insertmacro MUI_DESCRIPTION_TEXT ${Icons} "Replacing the icons for file format associations with foobox themed icons."
+	;!insertmacro MUI_DESCRIPTION_TEXT ${LastfmHosts} "把 Last.fm 地址写入 hosts, 让简介面板能下载图片 (可用性不确定)."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

@@ -4,18 +4,22 @@ foobox is a DUI (Default User Interface) theme for [foobar2000](https://www.foob
 The following third-party component are required:   
 * [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378) based on [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel);  
 * [openhacks_mod](https://github.com/simear2004/foo_openhacks_mod) based on [openhacks](https://github.com/ttsping/foo_openhacks);  
-* [ESLyric](https://github.com/ESLyric/release) by ttsping;  
+* [ESLyric](https://github.com/ESLyric/release);  
 * [foo_enhanced_spectrum_analyzer](https://hydrogenaud.io/index.php/topic,116014.0.html).  
 
 The following excellent codes are modified and used:  
 * JS Smooth Playlist Manager，WSH Pplaylist View，JS Smooth Browser by br3tt;  
 * WSH Cover Panel by Jensen;  
 * Search box by Asion;  
-* [Biography](https://github.com/Wil-B/Biography) by Wil-B;  
-* Web Radio Lists collected from [Fanmingming](https://github.com/fanmingming) and [Kimentanm](https://github.com/Kimentanm).  
+* [Biography](https://github.com/Wil-B/Biography) by Wil-B;    
+  
+## [Requirements]  
+* Windows 10 1607+  
+* foobar2000 v1.5+ (x86)  
+* foobar2000 v2.0+ (x86 / x64)  
   
 ## [Installation]   
-* Installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org), both 32-bit and 64-bit foobar2000 are supported.  
+* Installer contains foobox and required components only. You should have foobar2000 installed with official release on [foobar2000.org](https://www.foobar2000.org).  
 
 * Extra video panel is optional (play video with fb2k is not recommended). foobox-video could be downloaded from [github](https://github.com/dream7180/foobox-en/releases/tag/video8) or [gitee](https://gitee.com/dream7180/foobox-en/releases/tag/video8).     
 

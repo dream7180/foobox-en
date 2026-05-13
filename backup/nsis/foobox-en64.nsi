@@ -16,7 +16,7 @@ Var FontDir
 Var FontDir2
 
 #APP
-!define FBOX_VER "8.11"
+!define FBOX_VER "8.12"
 !define BUILD_NUM "1"
 
 # Setup
@@ -102,18 +102,18 @@ Section "foobox theme and required components" fooboxCore
 	Delete "$ProfileDir\user-components-x64\foo_uie_eslyric\enable_script_control"
 	
 	SetOutPath "$INSTDIR\themes"
-	File ".\cn\xcommon\themes_colors\*.*"
-	File ".\cn\x64\themes\*.*"
+	File ".\en\xcommon\themes_colors\*.*"
+	File ".\en\x64\themes\*.*"
 	
 	
 	SetOutPath "$ProfileDir\foobox"
-	File /r ".\cn\xcommon\foobox\*.*"
+	File /r ".\en\xcommon\foobox\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64"
-	File /r ".\cn\x64\user-components-x64\*.*"
+	File /r ".\en\x64\user-components-x64\*.*"
 	
 	SetOutPath "$ProfileDir\configuration"
-	File ".\cn\xcommon\configuration\foo_openhacks_mod.dll.cfg"
+	File ".\en\xcommon\configuration\foo_openhacks_mod.dll.cfg"
 
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter"
 	File /r ".\common\foo_uie_jsplitter\*.*"
@@ -123,14 +123,14 @@ Section "foobox theme and required components" fooboxCore
 	SetOutPath "$ProfileDir\eslyric-data\layout"
 	File /r ".\common\eslyric\layout\*.*"
 	SetOutPath "$ProfileDir\eslyric-data\skins"
-	File /r ".\cn\xcommon\eslyric_skins\*.*"
+	File /r ".\en\xcommon\eslyric_skins\*.*"
 	
 	SetOutPath "$ProfileDir\user-components-x64\foo_uie_jsplitter\samples\packages"
-	File /r ".\cn\xcommon\biography-package\*.*"
+	File /r ".\en\xcommon\biography-package\*.*"
 	
 	;${If} $noConfig == 0
 	SetOutPath "$ProfileDir"
-	File ".\cn\x64\theme.fth"
+	File ".\en\x64\theme.fth"
 	;${EndIf}
 	
 	; install font - fontawesome
@@ -190,9 +190,9 @@ SectionEnd
 
 Section "Enhanced spectrum analyzer" Spectrum
 	SetOutPath "$ProfileDir\user-components-x64\foo_enhanced_spectrum_analyzer"
-	File ".\cn\x64\optional-components\foo_enhanced_spectrum_analyzer\foo_enhanced_spectrum_analyzer.dll"
+	File ".\en\x64\optional-components\foo_enhanced_spectrum_analyzer\foo_enhanced_spectrum_analyzer.dll"
 	SetOutPath "$INSTDIR\themes"
-	File ".\cn\x64\themes-vis\*.*"
+	File ".\en\x64\themes-vis\*.*"
 SectionEnd
 
 Section "File format icons" Icons

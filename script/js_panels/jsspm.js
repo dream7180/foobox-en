@@ -58,6 +58,7 @@ ppt = {
 	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	showFilter: window.GetProperty("_DISPLAY: Show Filter", true),
+	showTotalDuration: window.GetProperty("_DISPLAY: Show Total Duration instead of Count", false),
 	lockReservedPlaylist: window.GetProperty("_PROPERTY: Lock Reserved Playlist", false),
 	SearchBarHeight: 28,
 	headerBarHeight: 28,
@@ -449,7 +450,9 @@ oBrowser = function() {
 							var track_color = track_color_txt;
 						};
 						// fields
-						var track_total = plman.PlaylistItemCount(this.rows[i].idx);
+						var track_total = ppt.showTotalDuration ?
+							utils.FormatDuration(plman.GetPlaylistItems(this.rows[i].idx).CalcTotalDuration())
+							: plman.PlaylistItemCount(this.rows[i].idx);
 						var track_total_w = gr.CalcTextWidth(track_total, font);
 						var tx = ax + rh + this.paddingLeft + 4;
 						gr.GdiDrawText(playlist_icon, g_fnico1, name_color, this.paddingLeft, ay, rh, ah, cc_txt);
@@ -990,6 +993,8 @@ oBrowser = function() {
 			_options.AppendMenuSeparator();
 			_options.AppendMenuItem(MF_STRING, 24, "Show filter");
 			_options.CheckMenuItem(24, ppt.showFilter);
+			_options.AppendMenuItem(MF_STRING, 28, "Show total duration instead of track count");
+			_options.CheckMenuItem(28, ppt.showTotalDuration);
 			_options.AppendMenuItem(MF_STRING, 25, "Show grids");
 			_options.CheckMenuItem(25, ppt.showGrid);
 			_options.AppendMenuItem(MF_STRING, 26, "Panel properties");
@@ -1131,6 +1136,11 @@ oBrowser = function() {
 		case (idx == 25):
 			ppt.showGrid = !ppt.showGrid;
 			window.SetProperty("_PROPERTY: Show Grid", ppt.showGrid);
+			brw.repaint();
+			break;
+		case (idx == 28):
+			ppt.showTotalDuration = !ppt.showTotalDuration;
+			window.SetProperty("_DISPLAY: Show Total Duration instead of Count", ppt.showTotalDuration);
 			brw.repaint();
 			break;
 		case (idx == 200):

@@ -1734,9 +1734,7 @@ function Controller(imgArray, imgDisplay, prop) {
 	}
 
 	this.OpenContainingFolder = function() {
-		//utils.Run("explorer", ["/select,"+currentPathItem.path], "", "open", 1);
-		let shellObj = new ActiveXObject("Shell.Application");
-		shellObj.ShellExecute("explorer", '/select,\"' + currentPathItem.path + '\"', "", "open", 1);
+		utils.Run("explorer.exe", ["/select,", currentPathItem.path]);
 	}
 
 	this.ClearCache = function() {

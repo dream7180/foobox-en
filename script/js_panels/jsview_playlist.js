@@ -493,7 +493,7 @@ function check_pidx() {
 	else {
 		var total = plman.PlaylistCount;
 		for (var i = 0; i < total; i++) {
-			if (plman.GetPlaylistName(i) == "Library View") {
+			if (plman.GetPlaylistName(i) == "Library view") {
 				pidx = i;
 			}
 		}

@@ -1124,11 +1124,11 @@ oBrowser = function() {
 		pidx = (plman.GetPlaylistName(0) == "Library") ? 1 : 0;
 		var pidx_playing = -1;
 		for (var i = 0; i < plman.PlaylistCount; i++) {
-			if (!pfound && plman.GetPlaylistName(i) == "Library View") {
+			if (!pfound && plman.GetPlaylistName(i) == "Library view") {
 				pidx = i;
 				pfound = true;
 			};
-			if (!pfound_playing && plman.GetPlaylistName(i) == "Library View (playing)") {
+			if (!pfound_playing && plman.GetPlaylistName(i) == "Library view (playing)") {
 				pidx_playing = i;
 				pfound_playing = true;
 			};
@@ -1140,7 +1140,7 @@ oBrowser = function() {
 			if (pfound) {
 				var from = plman.PlaylistItemCount(pidx);
 			} else {
-				plman.CreatePlaylist(pidx, "Library View");
+				plman.CreatePlaylist(pidx, "Library view");
 				var from = 0;
 			};
 			// *** insert tracks into pidx playlist
@@ -1148,9 +1148,9 @@ oBrowser = function() {
 		} else {
 			if (fb.IsPlaying && plman.PlayingPlaylist == pidx) {
 				if (plman.PlayingPlaylist == pidx) { // playing playlist is "Library selection"
-					plman.RenamePlaylist(pidx, "Library View (playing)");
+					plman.RenamePlaylist(pidx, "Library view (playing)");
 					if (pfound_playing) {
-						plman.RenamePlaylist(pidx_playing, "Library View");
+						plman.RenamePlaylist(pidx_playing, "Library view");
 						var tot = plman.PlaylistItemCount(pidx_playing);
 						affectedItems.splice(0, affectedItems.length);
 						for (var i = 0; i < tot; i++) {
@@ -1160,7 +1160,7 @@ oBrowser = function() {
 						plman.RemovePlaylistSelection(pidx_playing, false);
 					} else {
 						pidx_playing = pidx + 1;
-						plman.CreatePlaylist(pidx_playing, "Library View");
+						plman.CreatePlaylist(pidx_playing, "Library view");
 					};
 					plman.InsertPlaylistItems(pidx_playing, 0, brw.groups[index].pl, false);
 					plman.MovePlaylist(pidx_playing, pidx);
@@ -1176,7 +1176,7 @@ oBrowser = function() {
 						plman.SetPlaylistSelection(pidx, affectedItems, true);
 						plman.RemovePlaylistSelection(pidx, false);
 					} else {
-						plman.CreatePlaylist(pidx, "Library View");
+						plman.CreatePlaylist(pidx, "Library view");
 					};
 					plman.InsertPlaylistItems(pidx, 0, brw.groups[index].pl, false);
 				};
@@ -1189,7 +1189,7 @@ oBrowser = function() {
 					plman.SetPlaylistSelection(pidx, affectedItems, true);
 					plman.RemovePlaylistSelection(pidx, false);
 				} else {
-					plman.CreatePlaylist(pidx, "Library View");
+					plman.CreatePlaylist(pidx, "Library view");
 				};
 				plman.InsertPlaylistItems(pidx, 0, brw.groups[index].pl, false);
 			};

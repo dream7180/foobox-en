@@ -290,8 +290,10 @@ class Images {
 	blacklist(clean_artist) {
 		let black_list = [];
 		if (!$.file(this.blackList.file)) return black_list;
-		const list = $.jsonParse(this.blackList.file, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-		return list.blacklist[clean_artist] || black_list;
+		const list = $.jsonParse(this.blackList.file, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		return typeof list === 'object' && !Array.isArray(list) // Regorxxx <- Safecheck against corrupt files ->
+			? list.blacklist[clean_artist] || black_list
+			: black_list;
 	}
 
 	blackListed(v) {
@@ -300,7 +302,11 @@ class Images {
 		if (this.blackList.artist && this.blackList.artist != img.blackList.cur) {
 			img.blackList.item = this.blacklist($.clean(this.blackList.artist).toLowerCase());
 		}
-		return img.blackList.item.includes(v.slice(v.lastIndexOf('_') + 1));
+		// Regorxxx <- Cut default download paths to avoid +256 chars (fix '_' char in folder paths) ->
+		const imgName = v.lastIndexOf('\\') < v.lastIndexOf('_')
+			? v.slice(v.lastIndexOf('_') + 1)
+			: v.slice(v.lastIndexOf('\\') + 1);
+		return img.blackList.item.includes(imgName);
 	}
 
 	blurCheck() {
@@ -1275,7 +1281,7 @@ class Images {
 		if (caller.cov_id === this.cov.ix) {
 			if (!txt.rev.lookUp && !this.cov.cycle) this.clearCovCache();
 			if (!image) return;
-			if (this.filter.size && this.cov.folderSameAsArt && this.cov.images.includes(image_path) && (!ppt.imgFilterBothPx ? image.Width < this.filter.minPx && image.Height < this.filter.minPx : image.Width < this.filter.minPx || image.Height < this.filter.minPx) && this.cov.images.length > this.filter.minNo) {
+			if (this.filter.size && this.cov.folderSameAsArt && this.cov.images.includes(image_path) && (ppt.imgFilterBothPx ? image.Width < this.filter.minPx || image.Height < this.filter.minPx : image.Width < this.filter.minPx && image.Height < this.filter.minPx) && this.cov.images.length > this.filter.minNo) {
 				this.cov.list.splice(this.cov.ix, 1);
 				this.cov.images.splice(this.cov.ix, 1);
 				seeker.upd(false, false, true);
@@ -1291,7 +1297,7 @@ class Images {
 	processArtImg(image, image_path) {
 		const caller = this.getCallerId(image_path);
 		if (caller.art_id === this.art.ix) {
-			if (this.filter.size && (!ppt.imgFilterBothPx ? image.Width < this.filter.minPx && image.Height < this.filter.minPx : image.Width < this.filter.minPx || image.Height < this.filter.minPx) && this.art.images.length > this.filter.minNo) {
+			if (this.filter.size && (ppt.imgFilterBothPx ? image.Width < this.filter.minPx || image.Height < this.filter.minPx : image.Width < this.filter.minPx && image.Height < this.filter.minPx) && this.art.images.length > this.filter.minNo) {
 				this.art.images.splice(this.art.ix, 1);
 				seeker.upd(false, false, true);
 				if (ppt.showFilmStrip) filmStrip.trimCache(image_path);

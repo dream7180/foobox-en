@@ -2087,6 +2087,8 @@ oList = function(object_name, playlist) {
 		if(properties.selectionmenu){
 			var pl_count = plman.PlaylistCount;
 			_child01.AppendTo(_menu, MF_STRING, "Selection...");
+			_child01.AppendMenuItem(MF_STRING, 1200, "Reset cover cache");
+			_child01.AppendMenuSeparator();
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "Crop");
 			if(pl_count > 1 && pl_count < 51){
@@ -2137,6 +2139,10 @@ oList = function(object_name, playlist) {
 					var obj_file = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
 				}
 				utils.Run(_apps[ret - 1012], [obj_file]);
+				break;
+			case (ret == 1200):
+				// Refresh cover cache of the groups the selected tracks belong to (deduped, supports multi-group selection)
+				reset_cover_from_selection(this.metadblist_selection);
 				break;
 			case (ret == 4000):
 				fb.RunMainMenuCommand("File/New playlist");

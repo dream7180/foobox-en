@@ -332,7 +332,7 @@ class Tagger {
 			}
 		}
 
-		for (let j = 0; j < 8; j++) this[`tagName${j}`] = !notify ? cfg[`tagName${j}`] : cfg[`tagName${j}_internal`].default_value;
+		for (let j = 0; j < 8; j++) this[`tagName${j}`] = !notify ? cfg[`tagName${j}`] : (cfg[`tagName${j}_internal`] ? cfg[`tagName${j}_internal`].default_value : cfg[`tagName${j}`]);
 
 		for (let i = 0; i < handles.Count; i++) {
 			if (!cue[i] && (albTags[i] || albListeners[i] || artTags[i] || artListeners[i] || locale[i] || similarArtists[i] || albGenre_w[i] || artGenre_w[i])) {
@@ -349,17 +349,15 @@ class Tagger {
 			} else rem.push(i);
 		}
 		let i = rem.length;
+		const firstHandle = handles.Count ? handles[0] : null; // keep first handle before removal (index shifts after RemoveById)
 		while (i--) handles.RemoveById(rem[i]);
-		if (handles.Count && tags.length && notify) {
-			window.NotifyOthers('biographyTags', {
-				artist: artists[0],
-				album: albums[0],
-				handle: handles[0],
-				selectionMode: !panel.id.focus ? 'Prefer nowplaying' : 'Follow selected track (playlist)', // Regorxxx <- Fix bugged notification of selection mode ->
-				tags: tags[0]
-			});
-		}
 		if (notify) return;
-		if (handles.Count) handles.UpdateFileInfoFromJSON(JSON.stringify(tags));
+		if (handles.Count && tags.length) {
+			try {
+				handles.UpdateFileInfoFromJSON(JSON.stringify(tags));
+			} catch (e) {
+				console.log('Biography tagger: failed to write tags (' + e.message + ')');
+			}
+		}
 	}
 }

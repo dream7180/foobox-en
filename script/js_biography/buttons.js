@@ -12,7 +12,8 @@ class Buttons {
 		
 		this.flag = {
 			x: panel.heading.x,
-			h: Math.round(ui.font.heading_h * 0.56)
+			h: Math.round(ui.font.heading_h * 0.56),
+			sp: 0 // heading offset; keep numeric when no flag is available (otherwise h_x/h_w become NaN)
 		}
 		this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
 
@@ -166,9 +167,11 @@ class Buttons {
 	checkScrollBtns(x, y, hover_btn) {
 		const arr = alb_scrollbar.timer_but ? this.scr.albBtns : art_scrollbar.timer_but ? this.scr.artBtns : false;
 		if (arr) {
-			if ((this.btns[arr[0]].down || this.btns[arr[1]].down) && !this.btns[arr[0]].trace(x, y) && !this.btns[arr[1]].trace(x, y)) {
-				this.btns[arr[0]].cs('normal');
-				this.btns[arr[1]].cs('normal');
+			const btn0 = this.btns[arr[0]];
+			const btn1 = this.btns[arr[1]];
+			if (btn0 && btn1 && (btn0.down || btn1.down) && !btn0.trace(x, y) && !btn1.trace(x, y)) {
+				btn0.cs('normal');
+				btn1.cs('normal');
 				if (alb_scrollbar.timer_but) {
 					clearTimeout(alb_scrollbar.timer_but);
 					alb_scrollbar.timer_but = null;
@@ -194,8 +197,9 @@ class Buttons {
 	}
 
 	clearTooltip() {
-		if (!tooltip.Text || !this.btns['lookUp'].tt) return;
-		this.btns['lookUp'].tt.stop();
+		const lb = this.btns['lookUp'];
+		if (!tooltip.Text || !lb || !lb.tt) return;
+		lb.tt.stop();
 	}
 
 	createImages(n) {
@@ -447,7 +451,8 @@ class Buttons {
 			if (!ppt.hdPos) {
 				this.flag = {
 					x: panel.heading.x,
-					h: Math.round(ui.font.heading_h * 0.56)
+					h: Math.round(ui.font.heading_h * 0.56),
+					sp: 0 // heading offset; keep numeric when no flag is available (otherwise h_x/h_w become NaN)
 				}
 				this.flag.y = panel.text.t - ui.heading.h + Math.round((ui.font.heading_h - this.flag.h) / 2);
 				if (ui.font.heading_h >= 28 && ui.font.heading_h % 2 == 0) this.flag.y++;

@@ -24,7 +24,6 @@ class Text {
 		this.font = {main: ''}
 		this.get = 1;
 		this.heading = '';
-		this.local = $.file('C:\\check_local\\1450343922.txt');
 		this.l = DT_NOPREFIX;
 		this.lc = DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_WORD_ELLIPSIS;
 		this.lp = DT_SINGLELINE | DT_NOPREFIX | DT_WORD_ELLIPSIS;
@@ -274,19 +273,6 @@ class Text {
 			txt: ['textreader', 'textreader']
 		}
 
-		this.currentTrackTags = $.debounce(() => {
-			if (!$.server) return;
-			const handle1 = $.handle(panel.id.focus);
-			if (handle1) tag.write(new FbMetadbHandleList([handle1]), true, panel.id.focus);
-			if (tag.force) {
-				const handle2 = $.handle(!panel.id.focus);
-				const handlesSame = handle1 && handle2 && handle1.Compare(handle2);
-				if (handle2 && !handlesSame) tag.write(new FbMetadbHandleList([handle2]), true, !panel.id.focus);
-			}	
-		}, 2000, {
-			'leading': true,
-			'trailing': true
-		});
 		this.loadReader();
 	}
 
@@ -1089,12 +1075,15 @@ class Text {
 				country = FbTitleFormat('[$meta(locale last.fm,$sub($meta_num(locale last.fm),1))]').EvalWithMetadb(handle);
 				code = countryToCode[$.strip(country)];
 			}
-			const path = `${my_utils.packageInfo.Directories.Assets}/images/flags/${code}.png`;
-			if ($.file(path)) {
-				if (code && this[n].flagCode != code) {
-					this[n].flag = my_utils.getFlagAsset(`${code}.png`);
-					this[n].flagCode = code;
-					this[n].flagCountry = country;
+			const path = code ? `${fb.ProfilePath}foobox\\js_biography\\flags\\${code.toLowerCase()}.png` : '';
+			if (path && $.file(path)) {
+				if (this[n].flagCode != code) {
+					const flag = gdi.Image(path);
+					if (flag) {
+						this[n].flag = flag;
+						this[n].flagCode = code;
+						this[n].flagCountry = country;
+					}
 				}
 				return;
 			}
@@ -1180,22 +1169,6 @@ class Text {
 						if (value && /like count|dislike count|view count/i.test(w.name)) {
 							value = parseInt(value);
 							value = !isNaN(value) ? value.toLocaleString() : '';
-						}
-						if (w.name == 'Rating' && this.local) {
-							w.name = 'Dynamic rating';
-							value = this.formatValue($.eval(`[%play_count%]|%added%|$if($strstr(%path%,'://'),1,0)`, panel.id.focus));
-							const i = value.split('|');
-							if (!i[0] || i[2] == 1) value = 0;
-							else {
-								const now_d = Math.max(Math.floor((Date.now() - Date.parse(i[1])) / 86400000), 365);
-								const sensitivity = 1;
-								const kr = 469 * 1 / sensitivity;
-								const ka = 171429 * 1 / sensitivity;
-								const ppd = Math.floor(i[0] * 100000 / now_d);
-								const score1 = Math.floor(i[0] *10000000 / (ka * 2 + (i[0] * 100000)));
-								const score2 = Math.floor((Math.floor(100 * ppd / (kr + ppd)) + Math.floor(i[0] *10000000 / (ka + (i[0] * 100000)))) / 2);
-								value = Math.max(score1, score2);
-							}
 						}
 						if (showEmpty || value) arr.push({text: '', name: w.name, value: value, property: true});
 					});
@@ -1640,7 +1613,6 @@ class Text {
 
 	grab() {
 		this.textUpdate = 1;
-		this.notifyTags();
 		if (panel.block()) return;
 		this.updText();
 	}
@@ -1938,14 +1910,8 @@ class Text {
 		return arr;
 	}
 
-	notifyTags() {
-		if (!cfg.notifyTags && !tag.force) return;
-		this.currentTrackTags();
-	}
-
 	on_playback_new_track(force) {
 		if (panel.lock) panel.getList();
-		this.notifyTags();
 		if (!panel.updateNeeded() && !force) return;
 		if (panel.block()) {
 			this.get = 1;
@@ -1970,7 +1936,6 @@ class Text {
 		this.getText(false);
 		panel.getList(true);
 		but.refresh(true);
-		this.notifyTags();
 	}
 
 	paint() {

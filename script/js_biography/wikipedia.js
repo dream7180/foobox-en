@@ -604,7 +604,6 @@ class DldWikipedia {
 
 	get(URL, force) {
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.artist + this.title + this.type + this.pth + cfg.partialMatch + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_yttm (https://hydrogenaud.io/index.php/topic,111059.0.html)');

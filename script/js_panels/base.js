@@ -1,13 +1,14 @@
 ﻿//foobox https://github.com/dream7180
 window.DefinePanel('foobox base panel', {author: 'dreamawake'});
-include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\guiext.js');
+include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\guiext.js');
 
 var time_length = 0;
 var zdpi, dark_mode;
 var c_background, c_btmbg, c_font, c_seekoverlay, c_default_hl, c_shadow, c_shadow_h, c_tip_bg, c_seek_bg;
 var img_play;
+var seek_frame, tip_bg, btn_img, img_pbcontrol, playing_ico;
 
 //play back order
 var PBOTips = new Array("Default", "Repeat (playlist)", "Repeat (track)", "Random", "Shuffle (tracks)", "Shuffle (albums)", "Shuffle (folders)");
@@ -19,8 +20,10 @@ var g_seconds = 0;
 var seek_len, seek_start,seek_h, vol_start, vol_len, btn_y, win_y, topbarh, topbtnw, menuicow, menulibw, menupbw, menubtnw, leftbarw, title_w, captionw, z4, z5, z8;
 var PBOpen, PBPrevious, PBPlay, PBNext, PBStop;
 var track_len = 0, PlaybackTimeText, PlaybackLengthText, TopTitle, TopSubTitle, top_addtext = "", RBtnTips, RTips_timer;
-var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, DSPBtn, OutBtn, LibBtn, MenubarBtn = [];
-var img_ico = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\foobar2000.png");
+var tf_length, tf_title, tf_subtitle, tf_addtext, title_w_text = "";
+var VolumeBar, seekbar, TimeTip, VolumeTip, MuteBtn, PBOBtn, DSPBtn, OutBtn, LibBtn, MenubarBtn = [], g_switchbar;
+var img_ico_org = gdi.Image(fb.ProfilePath + "foobox\\images\\foobar2000.png");
+var img_ico = img_ico_org;
 var show_menu = 1, colorful_seek = 1, show_extrabtn = 1, show_dsp = false;
 var btnall = true;
 var fbver = Number(fb.Version.substr(0, 1));
@@ -28,7 +31,7 @@ var lib_albumlist = 1;
 var lib_tooltip = "Album List";
 var active_p, active_pid;
 var allpanels = ['list', 'brw', 'bio', 'vis', 'video'];
-panel = {
+var panel = {
 	p: [],
 	ico: [],
 	tip: [],
@@ -72,6 +75,12 @@ function UiCompSetCaption(){
 function GetOutput(){
 	let outdev = fb.GetOutputDevices();
 	devarr = JSON.parse(outdev);
+	if(!devarr || !devarr.length){
+		devarr = [];
+		devOrder = 0;
+		devico = "\uF1C5";
+		return;
+	}
 	for(let i = 0; i < devarr.length; i++){
 		let _name = devarr[i].name.split(" : ");
 		if (_name.length > 1 && _name[0] == "Default") devarr[i].name = _name[1];
@@ -102,7 +111,7 @@ function GetDSP(){
 }
 
 //=====================================================
-oSwitchbar = function() {
+var oSwitchbar = function() {
 	this.btw = z(28);
 	this.h_space = z(38);
 	this.x = 5;
@@ -120,7 +129,7 @@ oSwitchbar = function() {
 		this.y = y;
 		this.w = w;
 		this.h = h;
-		if(winFrame) panel.tipx = x + w;
+		if(cfg_map.winFrame) panel.tipx = x + w;
 		else panel.tipx = x + w + this.h_space;
 	}
 	this._isHover = function(x, y) {
@@ -160,8 +169,8 @@ oSwitchbar = function() {
 		case "lbtn_up":
 			if (this.hover_tab > 0 && this.hover_tab-1 != active_pid){
 				this.switch_panel(this.hover_tab);
-				this.down = 0;
 			}
+			this.down = 0;
 			break;
 		case "lbtn_down":
 			if (this.hover_tab > 0 && this.hover_tab-1 != active_pid){
@@ -176,7 +185,7 @@ oSwitchbar = function() {
 		if(this.hover_tab != this.tab_old || this.down != down_old) this.repaint();
 	}
 	this.deactivate_timer = function(){
-		g_switchbar.tip_timer && window.ClearInterval(g_switchbar.tip_timer);
+		g_switchbar.tip_timer && window.ClearTimeout(g_switchbar.tip_timer);
 		g_switchbar.tip_timer = false;
 	}
 	this.switch_panel = function(id) {
@@ -254,8 +263,9 @@ function TimeFmt(t) {
 		}
 	var h = Math.floor(t / 3600);
 	t -= h * 3600;
-	m = Math.floor(t / 60);
-	t -= m * 60, s = Math.floor(t);
+	var m = Math.floor(t / 60);
+	t -= m * 60;
+	var s = Math.floor(t);
 	return zpad(h) + ":" + zpad(m) + ":" + zpad(s);
 }
 
@@ -297,7 +307,8 @@ function get_font() {
 	g_fsize = g_font.Size;
 	g_font_b = GdiFont(g_font.Name, g_fsize, 1);
 	z20 = z(20);
-	img_ico = img_ico.Resize(18*zdpi, 18*zdpi, 2);
+	if(img_ico_org) img_ico = img_ico_org.Resize(18*zdpi, 18*zdpi, 2);
+	title_w_text = "";
 	g_fnico1 = GdiFont("remixicon", z20, 0);
 	g_fnico2 = GdiFont("remixicon", z(22), 0);
 	g_fnico3 = GdiFont("remixicon", z(12), 0);
@@ -310,7 +321,7 @@ function get_font() {
 }
 
 function topbar_size() {
-	if(winFrame){
+	if(cfg_map.winFrame){
 		topbarh = z(26) + 2;
 		topbtnw = z(46);
 		menuicow = z(28);
@@ -354,7 +365,7 @@ function get_color() {
 	c_seekoverlay = c_default_hl;
 }
 
-PBO_Menu = function(x, y) {
+var PBO_Menu = function(x, y) {
 	var PBOmenu = window.CreatePopupMenu();
 	var menu_item_count = 0;
 	for (var i = 0; i < PBOTips.length; i++)
@@ -372,7 +383,7 @@ PBO_Menu = function(x, y) {
 	}
 }
 
-Out_Menu = function(x, y) {
+var Out_Menu = function(x, y) {
 	let Outmenu = window.CreatePopupMenu();
 	var menu_item_count = 0;
 	for (var i = 0; i < devarr.length; i++)
@@ -389,7 +400,7 @@ Out_Menu = function(x, y) {
 	}
 }
 
-DSP_Menu = function(x, y) {
+var DSP_Menu = function(x, y) {
 	let DSPmenu = window.CreatePopupMenu();
 	var menu_item_count = 0;
 	for (var i = 0; i < dsparr.length; i++)
@@ -408,7 +419,7 @@ DSP_Menu = function(x, y) {
 	}
 }
 
-recheckDSP = function() {
+var recheckDSP = function() {
 	GetDSP();
 	initbuttons();
 	init_obj();
@@ -418,7 +429,7 @@ recheckDSP = function() {
 
 function initbuttons(){
 	if(fb.IsPlaying) {
-		track_len = fb.TitleFormat("%length%").EvalWithMetadb(fb.GetNowPlaying());
+		track_len = tf_length.EvalWithMetadb(fb.GetNowPlaying());
 		track_len = Format_hms(track_len);
 		var track_time = TimeFmt(fb.PlaybackTime);
 	}else{
@@ -441,7 +452,7 @@ function initbuttons(){
 	if(show_dsp) DSPBtn = new ButtonUI(btn_img);
 	OutBtn = new ButtonUI(btn_img);
 	g_switchbar = new oSwitchbar();
-	if(winFrame){
+	if(cfg_map.winFrame){
 		CloseBtn = new ButtonUI(img_close);
 		MaxBtn = new ButtonUI(img_winbtn);
 		MinBtn = new ButtonUI(img_winbtn);
@@ -478,7 +489,7 @@ function init_overlay_obj() {
 		seekbar = new UISlider(seek_frame, seek_time, seeker);
 	}
 	
-	imgh = z(32);
+	let imgh = z(32);
 	let imgh2 = imgh * 2;
 	let ecr = imgh - 2;
 	img_play = gdi.CreateImage(imgh, imgh * 3);
@@ -518,7 +529,7 @@ function init_obj() {
 	PlaybackLengthText.SetSize(seek_len + seek_start + btn_space, win_y2, time_length, seek_h);
 	TimeTip = new UITooltip(seek_start + z(12), win_y2, "", g_font, c_font, tip_bg);
 	let Rbtntipx = btn_end_x + imgh + btn_space;
-	if(winFrame){
+	if(cfg_map.winFrame){
 		CloseBtn.SetXY(ww - topbtnw, 0);
 		MaxBtn.SetXY(ww - 2*topbtnw, 0);
 		MinBtn.SetXY(ww - 3*topbtnw, 0);
@@ -543,7 +554,7 @@ function init_obj() {
 		VolumeTip = new UITooltip(ww - seek_start + z5 - 1, btn_y + z(2), "", g_font, c_font, false);
 		MuteBtn.SetXY(vol_start - MuteBtn.width - z5, btn_y);
 		OutBtn.SetXY(MuteBtn.x - btn_img.Width - z5, btn_y);
-		if(!winFrame) BtmMenuBtn.SetXY(g_switchbar.x+g_switchbar.w+z4+z5, btn_y);
+		if(!cfg_map.winFrame) BtmMenuBtn.SetXY(g_switchbar.x+g_switchbar.w+z4+z5, btn_y);
 		if(show_dsp) {
 			DSPBtn.SetXY(OutBtn.x - btn_img.Width - z5, btn_y);
 			PBOBtn.SetXY(DSPBtn.x - btn_img.Width - z5, btn_y);
@@ -568,11 +579,11 @@ function RTips_switch(tiptext){
 	var tip_old = RBtnTips.Text;
 	RBtnTips.Text = tiptext;
 	if(RBtnTips.Text == tip_old) return;
+	RTips_timer && window.ClearTimeout(RTips_timer);
+	RTips_timer = false;
 	if(tiptext == ""){
-		RTips_timer && window.ClearTimeout(RTips_timer);
-		RTips_timer = false;
 		RBtnTips.Repaint();
-	} else if(!RTips_timer){
+	} else {
 		RTips_timer = window.SetTimeout(function() {
 			RBtnTips.Text = tiptext;
 			RBtnTips.Repaint();
@@ -603,7 +614,7 @@ function repaintWin(section){
 function main_Menu(x, y, btm) {
 	var basemenu = window.CreatePopupMenu();
 	let main = false;
-	if(!btm || (!winFrame && btm)){
+	if(!btm || (!cfg_map.winFrame && btm)){
 		main = true;
 		var child1 = window.CreatePopupMenu(); //File
 		var child2 = window.CreatePopupMenu(); //Edit
@@ -793,7 +804,7 @@ function get_images() {
 	gb.SetSmoothingMode(0);
 	btn_img.ReleaseGraphics(gb);
 	
-	if(winFrame){
+	if(cfg_map.winFrame){
 		imgh = topbarh - 1;
 		imgh2 = imgh*2;
 		img_close = gdi.CreateImage(topbtnw, imgh*3);
@@ -854,17 +865,21 @@ function get_images() {
 
 function on_init(){
 	let _addtext;
-	show_menu = Number(common_cfg_map.show_menu);
-	show_extrabtn = Number(common_cfg_map.show_extrabtn);
+	show_menu = Number(cfg_map.show_menu);
+	show_extrabtn = Number(cfg_map.show_extrabtn);
 	if(fbver > 1){
-		lib_albumlist = Number(common_cfg_map.libbtn_fuc);
+		lib_albumlist = Number(cfg_map.libbtn_fuc);
 		lib_tooltip = lib_albumlist ? "Album List" : "ReFacets";
 	}
-	_addtext = common_cfg_map.title_add;
-	colorful_seek = common_cfg_map.colorful_seek;
+	_addtext = cfg_map.title_add;
+	colorful_seek = Number(cfg_map.colorful_seek);
 	if(_addtext && _addtext != "null") {
 		top_addtext = _addtext;
 	}
+	tf_length = fb.TitleFormat("%length%");
+	tf_title = fb.TitleFormat("%title%");
+	tf_subtitle = fb.TitleFormat("$if2( - %artist%,)$if2(\xa0 | \xa0%album%,)");
+	if(top_addtext != "") tf_addtext = fb.TitleFormat(top_addtext);
 	get_font();
 	get_color();
 	get_images();
@@ -888,12 +903,13 @@ function on_size() {
 	init_obj();
 	setSize();
 	set_panel();
-	if(winFrame) UiCompSetCaption();
+	if(cfg_map.winFrame) UiCompSetCaption();
 }
 
 function on_paint(gr) {
+	if(!ww || !wh) return;
 	gr.FillSolidRect(0, 0, ww, wh, c_background);
-	if(winFrame){
+	if(cfg_map.winFrame){
 		gr.FillGradRect(0, 0, ww, 1, 0, c_background, c_background, 1);//bug of win10 border
 		gr.FillGradRect(0, 0, 1, topbarh, 0, c_background, c_background, 1);//bug of win10 border
 		gr.FillGradRect(ww-1, 0, 1, topbarh, 0, c_background, c_background, 1);//bug of win10 border
@@ -902,10 +918,13 @@ function on_paint(gr) {
 		CloseBtn.Paint(gr);
 		MaxBtn.Paint(gr);
 		MinBtn.Paint(gr);
-		title_w = gr.CalcTextWidth(TopTitle.Text+" ", g_font);
+		if(TopTitle.Text != title_w_text){
+			title_w_text = TopTitle.Text;
+			title_w = gr.CalcTextWidth(TopTitle.Text+" ", g_font);
+		}
 		if(show_menu) {
 			gr.FillSolidRect(0, 0, leftbarw, topbarh - 1, c_menubar);
-			gr.DrawImage(img_ico, Math.round((menuicow - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
+			if(img_ico) gr.DrawImage(img_ico, Math.round((menuicow - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
 			for(var i = 0; i < MenubarBtn.length; i++){
 				MenubarBtn[i].Paint(gr);
 			}
@@ -928,7 +947,7 @@ function on_paint(gr) {
 			TopTitle.SetSize(leftbarw + space_1 + space_2, 0, title_w, topbarh);
 			TopSubTitle.SetSize(leftbarw + title_w + space_1 + space_2, 0, ww - leftbarw - title_w - 3*topbtnw - g_fsize, topbarh);
 		} else {
-			gr.DrawImage(img_ico, Math.round((menubtnw - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
+			if(img_ico) gr.DrawImage(img_ico, Math.round((menubtnw - img_ico.Width)/2), Math.round((topbarh-img_ico.Height)/2), img_ico.Width, img_ico.Height, 0, 0, img_ico.Width, img_ico.Height);
 			MenuBtn.Paint(gr);
 			TopTitle.SetSize(leftbarw, 0, title_w, topbarh);
 			TopSubTitle.SetSize(leftbarw + title_w, 0, captionw - title_w - g_fsize, topbarh);
@@ -981,7 +1000,7 @@ function on_paint(gr) {
 		gr.GdiDrawText(PBOIcos[plman.PlaybackOrder], g_fnico1, c_normal, PBOBtn.x, PBOBtn.y, PBOBtn.width-2, PBOBtn.height-2, cc_txt);
 		gr.GdiDrawText("\uF44B", g_fnico1, c_normal, LibBtn.x, LibBtn.y, LibBtn.width-2, LibBtn.height-2, cc_txt);
 		g_switchbar.draw(gr);
-		if(!winFrame){
+		if(!cfg_map.winFrame){
 			BtmMenuBtn.Paint(gr);
 			gr.GdiDrawText("\uEF78", g_fnico1, c_normal, BtmMenuBtn.x, BtmMenuBtn.y, BtmMenuBtn.width-2, BtmMenuBtn.height-4, cc_txt);
 		}
@@ -1005,7 +1024,7 @@ function on_mouse_move(x, y) {
 		TimeTip.X = (x > seek_start + seek_len - TimeTip.Width - 12) ? _x - TimeTip.Width - 12 : _x + 6;
 		TimeTip.Repaint();
 	}
-	if(winFrame && y < topbarh + 1) {
+	if(cfg_map.winFrame && y < topbarh + 1) {
 		if (CloseBtn.MouseMove(x, y)) hbtn = true;
 		if (MaxBtn.MouseMove(x, y)) hbtn = true;
 		if (MinBtn.MouseMove(x, y)) hbtn = true;
@@ -1039,10 +1058,10 @@ function on_mouse_move(x, y) {
 				RTips_switch(lib_tooltip);
 			} else if (OutBtn.MouseMove(x, y)) {
 				hbtn = true;
-				RTips_switch(devarr[devOrder].name);
+				devarr[devOrder] && RTips_switch(devarr[devOrder].name);
 			} else if (show_dsp && DSPBtn.MouseMove(x, y)) {
 				hbtn = true;
-				RTips_switch(dsparr[dspOrder].name);
+				dsparr[dspOrder] && RTips_switch(dsparr[dspOrder].name);
 			} else RTips_switch("");
 			if (MuteBtn.MouseMove(x, y)) hbtn = true;
 			g_switchbar.on_mouse("move", x, y);
@@ -1058,7 +1077,7 @@ function on_mouse_move(x, y) {
 }
 
 function on_mouse_lbtn_down(x, y) {
-	if(winFrame && y < topbarh + 1) {
+	if(cfg_map.winFrame && y < topbarh + 1) {
 		CloseBtn.MouseDown(x, y);
 		MaxBtn.MouseDown(x, y);
 		MinBtn.MouseDown(x, y);
@@ -1077,7 +1096,7 @@ function on_mouse_lbtn_down(x, y) {
 		}
 	} else if(y > win_y - 1){
 		var _x = 0;
-		if(!winFrame || !btnall){
+		if(!cfg_map.winFrame || !btnall){
 			if(BtmMenuBtn.MouseDown(x, y)){
 				hbtn = false;
 				main_Menu(BtmMenuBtn.x, BtmMenuBtn.y, true);
@@ -1133,7 +1152,7 @@ function on_mouse_lbtn_up(x, y) {
 		TimeTip.Deactivate();
 	}
 	if(btnall) VolumeBar.MouseUp();
-	if(winFrame && y < topbarh + 1) {
+	if(cfg_map.winFrame && y < topbarh + 1) {
 		if (CloseBtn.MouseUp()) fb.Window.Close();
 		if (MaxBtn.MouseUp()) {
 			//if(UIComp.WindowState != 2) UIComp.WindowState = 2;//maximized
@@ -1150,7 +1169,7 @@ function on_mouse_lbtn_up(x, y) {
 		}
 	} else if(y > win_y - 1){
 		PBOBtn.MouseUp();
-		if(!winFrame) BtmMenuBtn.MouseUp();
+		if(!cfg_map.winFrame) BtmMenuBtn.MouseUp();
 		if(show_extrabtn){
 			if (PBOpen.MouseUp()) fb.RunMainMenuCommand("Open...");
 			if (PBStop.MouseUp()) fb.Stop();
@@ -1195,7 +1214,7 @@ function on_mouse_leave() {
 			OutBtn.Reset();
 			if(show_dsp) DSPBtn.Reset();
 		}
-		if(winFrame){
+		if(cfg_map.winFrame){
 			CloseBtn.Reset();
 			MaxBtn.Reset();
 			MinBtn.Reset();
@@ -1231,24 +1250,24 @@ function on_playback_new_track(info) {
 	seekbar.MaxValue = Math.max(0, fb.PlaybackLength);
 	seekbar.ChangeValue(0);
 	if(info){
-		track_len = fb.TitleFormat("%length%").EvalWithMetadb(info);
+		track_len = tf_length.EvalWithMetadb(info);
 		track_len = Format_hms(track_len);
 		if(track_len) PlaybackLengthText.ChangeText(track_len);
+		TopTitle.Text = tf_title.EvalWithMetadb(info);
+		TopSubTitle.Text = tf_subtitle.EvalWithMetadb(info);
+		if(top_addtext != "" && tf_addtext) TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + tf_addtext.EvalWithMetadb(info);
 	}
 	
-	TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(info);
-	TopSubTitle.Text = fb.TitleFormat("$if2( - %artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(info);
-	if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(info);
 	repaintWin("TX");
 }
 
 function on_metadb_changed(handles, fromhook) {
 	if(!fromhook && fb.IsPlaying) {
-		metadb = fb.GetNowPlaying();
+		var metadb = fb.GetNowPlaying();
 		if(metadb && handles.Find(metadb) > -1){
-			TopTitle.Text = fb.TitleFormat("%title%").EvalWithMetadb(metadb);
-			TopSubTitle.Text = fb.TitleFormat("$if2( - %artist%,)$if2(\xa0 | \xa0%album%,)").EvalWithMetadb(metadb);
-			if(top_addtext != "") TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + fb.TitleFormat(top_addtext).EvalWithMetadb(metadb);
+			TopTitle.Text = tf_title.EvalWithMetadb(metadb);
+			TopSubTitle.Text = tf_subtitle.EvalWithMetadb(metadb);
+			if(top_addtext != "" && tf_addtext) TopSubTitle.Text = TopSubTitle.Text + "\xa0 | \xa0" + tf_addtext.EvalWithMetadb(metadb);
 			repaintWin("TX");
 		}
 	}
@@ -1383,7 +1402,7 @@ function on_notify_data(name, info) {
 		repaintWin("B");
 		break;
 	case "foobox.winFrame":
-		winFrame = info;
+		cfg_map.winFrame = info;
 		topbar_size();
 		get_images();
 		initbuttons();

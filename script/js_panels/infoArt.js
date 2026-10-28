@@ -1,29 +1,23 @@
 ﻿//Jensen (jensen-yg@163.com)
 //foobox https://github.com/dream7180
 window.DefinePanel('Albumart & Info panel', {author: 'Jensen, dreamawake(MOD)'});
-include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
-include(fb.ProfilePath + 'foobox\\script\\js_panels\\properties.js');
+include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\js_common\\Genre.js');
+include(fb.ProfilePath + 'foobox\\js_panels\\properties.js');
 var zdpi = 1;
 var menubutton_w, menubutton_h;
-var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
+var genre_cover_dir = fb.ProfilePath + "foobox\\images\\genre";
 var upperRatio = window.GetProperty("Upper panel ratio", 0.5);
 var upperh = 0;
 var currentMetadb = null, l_mood;
 var get_imgCol = false;
+var getColorSchemeFromImage, on_colorscheme_update, reset_background; // declare color scheme functions, avoid implicit globals
 var dark_mode = false;
 var timer_cycle = null;
 var info_cycle = window.GetProperty("Info: Circle enable", true);
-var color_bycover = Number(common_cfg_map.color_bycover);
-var color_bycover_default = color_bycover;
-var cbkg_bycover = Number(common_cfg_map.cbkg_bycover);
-var sw_noesl = Number(common_cfg_map.color_noesl);
-var color_threshold = Number(common_cfg_map.color_threshold);
-var cbkg_chroma = Number(common_cfg_map.cbkg_chroma);
-var rating_to_tag =  Number(common_cfg_map.rating2tag);
-common_cfg_map = {};
+var color_bycover = cfg_map.color_bycover;
 var auto_eslprop = window.GetProperty("Auto.switch.esl.prop", true);
 var eslCtrl = null, eslPanels = null;
 var isFollowingCursor;
@@ -47,7 +41,6 @@ var show_rating = window.GetProperty("Info.Rating", true);
 var is_mood = window.GetProperty("Info.Mood", false);
 if(!show_rating) is_mood = false;
 var g_font, g_font2;
-var currentMetadb;
 var rating_x, imgh, infobar_h, line2_h, infobar_y = 0;
 var rating, txt_title, txt_info, txt_profile, main_info = true;
 var time_circle = Number(window.GetProperty("Info: Circle time, 3000~60000ms", 12000));
@@ -227,7 +220,7 @@ function initMetadb(){
 }
 
 function set_getcolor_state(){
-	if(color_bycover_default){
+	if(cfg_map.color_bycover){
 		if(MainController.Properties.FollowCursor) color_bycover = false;
 		else color_bycover = true;
 	}
@@ -578,7 +571,7 @@ function PathChecker(supportedTypes, singleImageMode, cycleInWildCard, maxCacheC
 	this.Glob = function(pathitem, ignoreCache) {
 		var resultArr = (!maxCacheCapacity || ignoreCache) ? null : SearchCache(pathitem);
 		if (!resultArr){
-			paths = utils.Glob(pathitem.path);
+			var paths = utils.Glob(pathitem.path);
 			resultArr = [];
 			var p, ext;
 			for (var k = 0; k < paths.length; k++) {
@@ -960,6 +953,7 @@ function Display(x, y, w, h, prop) {
 		timer && window.ClearInterval(timer);
 		timer = null;
 	}
+	this.StopTimer = KillTimer; // for on_script_unload to kill the animation timer
 
 	//-----------------------------------------------
 
@@ -1027,7 +1021,7 @@ function Display(x, y, w, h, prop) {
 		this.opacity += this.faddingStep;
 		if (this.opacity <= 0 || this.opacity >= 255) {
 			this.opacity = Math.max(Math.min(this.opacity, 255), 0);
-			this.faddingOn = true;
+			this.faddingOn = false; // fade finished, stop animating (Show() re-activates)
 			return false;
 		} else return true;
 	}
@@ -1202,8 +1196,8 @@ function Display(x, y, w, h, prop) {
 		// Draw default cover ----------------
 		cover_default = gdi.CreateImage(w, h);
 		var g = cover_default.GetGraphics();
-		if(w/(h-infobar_h) > 1.5) var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\cover_w.jpg");
-		else var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\script\\images\\cover_default.jpg");
+		if(w/(h-infobar_h) > 1.5) var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\images\\cover_w.jpg");
+		else var cover_img_default = gdi.Image(fb.ProfilePath + "foobox\\images\\cover_default.jpg");
 		var ratio = Math.min(w/cover_img_default.Width, h/cover_img_default.Height);
 		var img_ww = Math.round(ratio * cover_img_default.Width), img_hh = Math.round(ratio * cover_img_default.Height);
 		g.DrawImage(cover_img_default, Math.round((w-img_ww)/2), Math.round((h-img_hh)/2), img_ww, img_hh, 0, 0, cover_img_default.Width, cover_img_default.Height);
@@ -1831,8 +1825,10 @@ function Controller(imgArray, imgDisplay, prop) {
 		let c_blend = null;
 		if(currentImage){
 			let c_dev = -1, cv_max;
-			let ColorData = JSON.parse(currentImage.GetColourSchemeJSONV2(color_threshold));
-			for(let i = 0; i < color_threshold; i++){
+			let ColorData = null;
+			try { ColorData = JSON.parse(currentImage.GetColourSchemeJSONV2(cfg_map.color_threshold)); } catch (e) {}
+			let n = (ColorData && ColorData.length) ? Math.min(cfg_map.color_threshold, ColorData.length) : 0;
+			for(let i = 0; i < n; i++){
 				let c_img = toRGB(ColorData[i].col);
 				let cv_max_tmp = Math.max(...c_img);
 				let c_dev_tmp = cv_max_tmp - Math.min(...c_img);
@@ -1842,24 +1838,26 @@ function Controller(imgArray, imgDisplay, prop) {
 					cv_max = cv_max_tmp;
 				}
 			}
-			if(cbkg_bycover){
-				c_blend[3] = c_blend[0];
-				c_blend[4] = c_blend[1];
-				c_blend[5] = c_blend[2];
-			}
-			let c_aggr = c_blend[0] + c_blend[1] + c_blend[2];
-			if(c_dev < 16) {
-				c_blend = false;
-			} else if(c_aggr > 450){
-				let reduction = Math.round((c_aggr - 450) / 3);
-				c_blend[0] = Math.max(c_blend[0]-reduction, 0);
-				c_blend[1] = Math.max(c_blend[1]-reduction, 0);
-				c_blend[2] = Math.max(c_blend[2]-reduction, 0);
-			}else if(cv_max < 90){
-				let reduction = Math.round((270-c_aggr) / 3);
-				c_blend[0] = c_blend[0]+reduction;
-				c_blend[1] = c_blend[1]+reduction;
-				c_blend[2] = c_blend[2]+reduction;
+			if(c_blend){
+				if(cfg_map.cbkg_bycover){
+					c_blend[3] = c_blend[0];
+					c_blend[4] = c_blend[1];
+					c_blend[5] = c_blend[2];
+				}
+				let c_aggr = c_blend[0] + c_blend[1] + c_blend[2];
+				if(c_dev < 16) {
+					c_blend = false;
+				} else if(c_aggr > 450){
+					let reduction = Math.round((c_aggr - 450) / 3);
+					c_blend[0] = Math.max(c_blend[0]-reduction, 0);
+					c_blend[1] = Math.max(c_blend[1]-reduction, 0);
+					c_blend[2] = Math.max(c_blend[2]-reduction, 0);
+				}else if(cv_max < 90){
+					let reduction = Math.round((270-c_aggr) / 3);
+					c_blend[0] = c_blend[0]+reduction;
+					c_blend[1] = c_blend[1]+reduction;
+					c_blend[2] = c_blend[2]+reduction;
+				}
 			}
 		}
 		get_imgCol = false;
@@ -1879,9 +1877,9 @@ function Controller(imgArray, imgDisplay, prop) {
 		}
 		c_rating_h = c_highlight;
 		if(c_highlight != c_hl_tmp){
-			if(cbkg_bycover && c_blend){
-				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
-				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cbkg_chroma);
+			if(cfg_map.cbkg_bycover && c_blend){
+				c_background = blendColors(c_background_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cfg_map.cbkg_chroma);
+				var c_selected_bg = blendColors(g_color_selected_bg_default, RGB(c_blend[3], c_blend[4], c_blend[5]), 0.06 * cfg_map.cbkg_chroma);
 				var c_bkg = toRGB(c_background).concat(toRGB(c_selected_bg));
 				c_arr = c_arr.concat(c_bkg);
 				fontcolor2 = blendColors(c_background, fontcolor, 0.75);
@@ -1890,7 +1888,7 @@ function Controller(imgArray, imgDisplay, prop) {
 			sw_esl_color();
 			get_imgs();
 			if (is_mood && infofull) btn_mood.resetImg();
-			if(cbkg_bycover) window.Repaint();
+			if(cfg_map.cbkg_bycover) window.Repaint();
 			else window.RepaintRect(0, infobar_y, ww, infobar_h);
 		}
 	}
@@ -2079,17 +2077,11 @@ function reset_esl_color(reset_hl) {
 	eslPanels.SetBackgroundColor(c_background_default);
 }
 function sw_esl_color() {
-	let _swesl = eslPanels && cbkg_bycover;
+	let _swesl = eslPanels && cfg_map.cbkg_bycover;
 	if(_swesl) eslPanels.SetBackgroundColor(c_background);
-	if(eslPanels && !sw_noesl) eslPanels.SetTextHighlightColor(c_highlight);
+	if(eslPanels && !cfg_map.color_noesl) eslPanels.SetTextHighlightColor(c_highlight);
 }
 //===================================================
-for (var i = 0; i < SearchItems.length; i++) {
-	if (!SearchItems[i] instanceof SearchItem) {
-		SearchItems.splice(i, 1);
-		i--;
-	}
-}
 Properties.Controller.SearchScriptPresets = SearchItems;
 //====================================
 window.DlgCode = DLGC_WANTALLKEYS;
@@ -2100,7 +2092,7 @@ get_imgs();
 var Covers = new ImagesArray(Properties.Image);
 var CoverDisplay = new Display(0, 0, 0, 0, Properties.Display);
 var MainController = new Controller(Covers, CoverDisplay, Properties.Controller);
-if(MainController.Properties.FollowCursor && color_bycover_default) color_bycover = false;
+if(MainController.Properties.FollowCursor && cfg_map.color_bycover) color_bycover = false;
 
 // START ==============================================
 let splitv = new _splitv();
@@ -2113,17 +2105,18 @@ if(infofull){
 	}
 }
 TextBtn_info = new TextBtn();
-let ESL = window.GetPanel('ESLyric');
-ESL.ShowCaption = false;
+var ESL = null;
+try { ESL = window.GetPanel('ESLyric'); } catch (e) {}
+if (ESL) ESL.ShowCaption = false;
 initMetadb();
 if(infofull && info_cycle) activate_infotimer();
 if(fb.TitleFormat("%esl_expose_api%").Eval(true) === '1'){
 	eslCtrl = new ActiveXObject("eslyric");
 	eslPanels = eslCtrl.GetAll();
 }
-if(auto_eslprop && !ESL.Hidden && !fb.IsPlaying) ESL.Show(false);
+if(auto_eslprop && ESL && !ESL.Hidden && !fb.IsPlaying) ESL.Show(false);
 window.SetTimeout(function() {
-	reset_esl_color(!sw_noesl);
+	reset_esl_color(!cfg_map.color_noesl);
 }, 5);
 //-----------
 function on_paint(gr) {
@@ -2178,7 +2171,7 @@ function on_playback_new_track(metadb) {
 	if(color_bycover) get_imgCol = true;
 	MainController.OnPlaybackNewTrack(metadb);
 	OnMetadbChanged(metadb);
-	if(auto_eslprop) ESL.Show(true);
+	if(auto_eslprop && ESL) ESL.Show(true);
 }
 
 function on_playback_stop(reason) {
@@ -2189,7 +2182,7 @@ function on_playback_stop(reason) {
 		MainController.cycle.Lock(true);
 		MainController.OnSelectionChanged(metadb);
 		OnMetadbChanged(metadb);
-		if(auto_eslprop) ESL.Show(false);
+		if(auto_eslprop && ESL) ESL.Show(false);
 	}
 }
 
@@ -2225,6 +2218,7 @@ function on_mouse_lbtn_up(x, y) {
 }
 
 function on_mouse_mbtn_up(x, y, mask){
+	if(!ESL) return;
 	if(!ESL.Hidden) ESL.Show(false);
 	else ESL.Show(true);
 }
@@ -2376,29 +2370,28 @@ function on_notify_data(name, info) {
 		OnMetadbChanged();
 		break;
 	case "set_rating_2_tag":
-		rating_to_tag = info;
+		cfg_map.rating2tag = info;
 		break;
 	case "foobox_color_bycover":
-		color_bycover = info;
-		color_bycover_default = color_bycover;
+		cfg_map.color_bycover = info;
 		set_getcolor_state();
 		break;
 	case "set_corlor_threshold":
-		color_threshold = info;
+		cfg_map.color_threshold = info;
 		break;
 	case "set_bgcolor_chroma":
-		cbkg_chroma = info;
+		cfg_map.cbkg_chroma = info;
 		break;
 	case "foobox_bgcolor_bycover":
-		cbkg_bycover = info;
-		if(!cbkg_bycover){
+		cfg_map.cbkg_bycover = info;
+		if(!cfg_map.cbkg_bycover){
 			reset_background();
 			reset_esl_color(false);
 		}
 		break;
 	case "foobox_color_noesl":
-		sw_noesl = info;
-		if(eslPanels) eslPanels.SetTextHighlightColor(sw_noesl ? c_default_hl : c_highlight);
+		cfg_map.color_noesl = info;
+		if(eslPanels) eslPanels.SetTextHighlightColor(cfg_map.color_noesl ? c_default_hl : c_highlight);
 		break;
 	}
 }
@@ -2449,7 +2442,7 @@ function panel_setsize(){
 	panel.h = window.Height - upperh - 3;
 	list.size();
 	window.SetTimeout(function() {
-		ESL.Move(0, list.y, ww, panel.h);
+		if (ESL) ESL.Move(0, list.y, ww, panel.h);
 	}, 15);
 }
 
@@ -2484,17 +2477,15 @@ function ButtonUI_R() {
 	}
 
 	this.MouseUp = function(x, y, i) {
-		if (currentMetadb) {
+		if (currentMetadb && x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height) {
 			let handle_list = new FbMetadbHandleList(currentMetadb);
-			if (x > this.x && x < this.x + this.width && y > this.y && y < this.y + this.height) {
-				var derating_flag = (i == rating ? true : false);
-				if (derating_flag) {
-					if (rating_to_tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : ""}));
-					fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + "<not set>", currentMetadb);
-				} else {
-					if (rating_to_tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : i}));
-					fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + i, currentMetadb);
-				}
+			var derating_flag = (i == rating ? true : false);
+			if (derating_flag) {
+				if (cfg_map.rating2tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : ""}));
+				fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + "<not set>", currentMetadb);
+			} else {
+				if (cfg_map.rating2tag && tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : i}));
+				fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + i, currentMetadb);
 			}
 		}
 	}
@@ -2507,7 +2498,7 @@ function on_key_down(vkey) {
 		if(vkey == 115) fb.RunMainMenuCommand("File/Exit");
 		break;
 	case KMask.none:
-		if(vkey == 116) MainController.Refresh(true, currentMetadb);//F6
+		if(vkey == 116) MainController.Refresh(true, currentMetadb);//F5
 		break;
 	}
 	list.key_down(vkey);
@@ -2515,6 +2506,8 @@ function on_key_down(vkey) {
 
 function on_script_unload() {
 	deactivate_infotimer();
+	MainController && MainController.cycle.Stop();
+	CoverDisplay && CoverDisplay.StopTimer && CoverDisplay.StopTimer();
 	_tt('');
 	if (_bmp) {
 		_bmp.ReleaseGraphics(_gr);

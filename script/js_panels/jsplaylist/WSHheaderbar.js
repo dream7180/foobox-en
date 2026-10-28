@@ -63,6 +63,23 @@ oColumn = function() {
 	};
 };
 
+// Single entry for header/menu sorting: a locked playlist (a force-sorted autoplaylist, etc.) is silently
+// refused by the foobar2000 core - give visible feedback instead of "clicking does nothing"
+function sort_active_playlist(pattern, direction, quiet) {
+	var locked = plman.GetPlaylistLockedActions ? plman.GetPlaylistLockedActions(plman.ActivePlaylist) : [];
+	if (locked.indexOf("ReorderItems") >= 0) {
+		var plname = plman.GetPlaylistName(plman.ActivePlaylist);
+		console.log("WSHheaderbar: sorting refused (playlist locked): " + plname);
+		if (!quiet && !cHeaderBar.lock_hint_shown) {
+			cHeaderBar.lock_hint_shown = true;
+			fb.ShowPopupMessage("The playlist \"" + plname + "\" is locked: foobar2000 refuses to change its order.\r\n\r\nTypical cause: an autoplaylist created with \"Force-sorted\" enabled (e.g. the panel\'s History / Most played / Recently added lists).\r\n\r\nTo sort manually:\r\n\u00b7 Open the playlist manager, right-click the list > Autoplaylist properties..., and untick \"Force-sorted\";\r\n\u00b7 Or copy the tracks to a normal playlist and sort there.", "foobox playlist");
+		};
+		return;
+	};
+	if (typeof direction == "undefined") plman.SortByFormatV2(plman.ActivePlaylist, pattern);
+	else plman.SortByFormatV2(plman.ActivePlaylist, pattern, direction);
+};
+
 oHeaderBar = function() {
 	this.columns = [];
 	this.borders = [];
@@ -190,8 +207,8 @@ oHeaderBar = function() {
 					if (this.columns[j].tf != "null" || this.columns[j].sortOrder != "null") {
 						// draw sort indicator (direction)
 						if (j == this.sortedColumnId) {
-							sx = Math.floor(cx + this.columns[j].w / 2 - 3);
-							sh = cy + 1;
+							var sx = Math.floor(cx + this.columns[j].w / 2 - 3);
+							var sh = cy + 1;
 							images.sortdirection && gr.DrawImage(images.sortdirection, sx, sh, images.sortdirection.Width, images.sortdirection.Height, 0, 0, images.sortdirection.Width, images.sortdirection.Height, (this.sortedColumnDirection > 0 ? 180 : 0), 130);
 						};
 					};
@@ -223,8 +240,8 @@ oHeaderBar = function() {
 					if (this.columns[j].tf != "null" || this.columns[j].sortOrder != "null") {
 						// draw sort indicator (direction)
 						if (j == this.sortedColumnId) {
-							sx = Math.floor(cx + this.columns[j].w / 2 - 3);
-							sh = cy + 1;
+							var sx = Math.floor(cx + this.columns[j].w / 2 - 3);
+							var sh = cy + 1;
 							images.sortdirection && gr.DrawImage(images.sortdirection, sx, sh, images.sortdirection.Width, images.sortdirection.Height, 0, 0, images.sortdirection.Width, images.sortdirection.Height, (this.sortedColumnDirection > 0 ? 180 : 0), 130);
 						};
 					};
@@ -264,17 +281,17 @@ oHeaderBar = function() {
 	};
 
 	this.saveColumns = function(col_num_changed) {
-		var tmp;
 		this.writeColumnTable();
 		if(col_num_changed) {
-			tmp = "";
 			layout.columnWidth.splice(0, layout.columnWidth.length);
-			for (var j = 0; j < layout.ids.length - 1; j++){
+			// write one width string per layout (tmp must be reset per layout, otherwise it accumulates)
+			for (var j = 0; j < layout.ids.length; j++){
+				var tmp = "";
 				for (var i = 0; i < this.columns.length; i++) {
 					tmp = tmp + this.columns[i].percent;
-					if (i < this.columns.length - 1) tmp = tmp + "^^"
+					if (i < this.columns.length - 1) tmp = tmp + "^^";
 				}
-			layout.columnWidth.push(tmp);
+				layout.columnWidth.push(tmp);
 			}
 			save_layout();
 		}
@@ -519,10 +536,10 @@ oHeaderBar = function() {
 								this.columnDragged_saved = 3;
 								cHeaderBar.sortRequested = true;
 								if (this.columns[this.columnDraggedId].sortOrder != "null") {
-									plman.SortByFormatV2(plman.ActivePlaylist, this.columns[this.columnDraggedId].sortOrder, this.sortedColumnDirection);
+									sort_active_playlist(this.columns[this.columnDraggedId].sortOrder, this.sortedColumnDirection);
 								}
 								else {
-									plman.SortByFormatV2(plman.ActivePlaylist, this.columns[this.columnDraggedId].tf, this.sortedColumnDirection);
+									sort_active_playlist(this.columns[this.columnDraggedId].tf, this.sortedColumnDirection);
 								};
 								update_playlist(layout.collapseGroupsByDefault);
 							}
@@ -687,6 +704,8 @@ oHeaderBar = function() {
 			_groups.AppendMenuItem(p.list.totalRows > 0 && !layout.autocollapse && cGroup.expanded_height > 0 && cGroup.collapsed_height > 0 ? MF_STRING : MF_GRAYED | MF_DISABLED, 90, "Expand all");	
 		};
 		_sorting.AppendTo(_menu, MF_STRING, "Sort order");
+		_sorting.AppendMenuItem(MF_STRING, 204, "Restore default");
+		_sorting.AppendMenuSeparator();
 		_sorting.AppendMenuItem(MF_STRING, 205, "Album artist");
 		_sorting.AppendMenuItem(MF_STRING, 219, "Artist");
 		_sorting.AppendMenuItem(MF_STRING, 206, "Album");
@@ -732,7 +751,7 @@ oHeaderBar = function() {
 			this.saveColumnsWidth();
 			if(setting_init && p.settings.page_loaded[4]){
 				var arr = [];
-				fin = layout.ids.length;
+				var fin = layout.ids.length;
 				for (var i = 0; i < fin; i++) {
 					arr.push(layout.ids[i]);
 				};
@@ -757,7 +776,7 @@ oHeaderBar = function() {
 			layout.gopts[0] = layout.pattern_idx.toString();
 			save_layout();
 			get_covercahe_config();
-			plman.SortByFormatV2(plman.ActivePlaylist, p.list.groupby[layout.pattern_idx].sortOrder, 1);
+			sort_active_playlist(p.list.groupby[layout.pattern_idx].sortOrder, 1, true);
 			p.list.updateHandleList(plman.ActivePlaylist, false);
 			p.list.setItems(true);
 			p.scrollbar.setCursor(p.list.totalRowVisible, p.list.totalRows, p.list.offset);
@@ -858,44 +877,49 @@ oHeaderBar = function() {
 			get_grprow_minimum(this.columns[0].w);
 			update_playlist(layout.collapseGroupsByDefault, 2);
 			break;
+		case (idx == 204):
+			// Re-sort with the current grouping pattern's sort order (its default order)
+			var gbSort = p.list.groupby[layout.pattern_idx] ? p.list.groupby[layout.pattern_idx].sortOrder : "";
+			sort_active_playlist((gbSort && gbSort != "null") ? gbSort : sort_pattern_albumartist, 1);
+			break;
 		case (idx == 205):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_albumartist, 1);
+			sort_active_playlist(sort_pattern_albumartist, 1);
             break;
 		case (idx == 219):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_artist, 1);
+			sort_active_playlist(sort_pattern_artist, 1);
             break;
 		case (idx == 206):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_album, 1);
+			sort_active_playlist(sort_pattern_album, 1);
             break;
 		case (idx == 207):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_tracknumber);
+			sort_active_playlist(sort_pattern_tracknumber);
             break;
 		case (idx == 208):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_title, 1);
+			sort_active_playlist(sort_pattern_title, 1);
             break;
 		case (idx == 209):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_path, 1);
+			sort_active_playlist(sort_pattern_path, 1);
             break;
 		case (idx == 210):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_date, -1);
+			sort_active_playlist(sort_pattern_date, -1);
             break;
 		case (idx == 211):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_genre, 1);
+			sort_active_playlist(sort_pattern_genre, 1);
             break;
 		case (idx == 212):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_rating, -1);
+			sort_active_playlist(sort_pattern_rating, -1);
             break;
 		case (idx == 213):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_bitrate, -1);
+			sort_active_playlist(sort_pattern_bitrate, -1);
             break;
 		case (idx == 214):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_modified, -1);
+			sort_active_playlist(sort_pattern_modified, -1);
             break;
 		case (idx == 215):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_playcount, -1);
+			sort_active_playlist(sort_pattern_playcount, -1);
             break;
 		case (idx == 216):
-			plman.SortByFormatV2(plman.ActivePlaylist, sort_pattern_codec, 1);
+			sort_active_playlist(sort_pattern_codec, 1);
             break;
 		case (idx == 217):
 			plman.SortByFormat(plman.ActivePlaylist,"",false);

@@ -17,11 +17,11 @@ function settings_checkboxes_action(id, status, parentId) {
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("SYSTEM.Enable Touch Scrolling", status);
 			p.settings.pages[parentId].elements[id].repaint();
+			break;
 		case 7:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
 			window.SetProperty("CUSTOM Enable Selection Menu", status);
 			p.settings.pages[parentId].elements[id].repaint();
-			break;
 			break;
 		case 8:
 			eval(p.settings.pages[parentId].elements[id].linkedVariable + " = " + status);
@@ -38,38 +38,38 @@ function settings_checkboxes_action(id, status, parentId) {
 	case 3:
 		switch (id) {
 		case 0:
-			let _showmenu = show_menu;
+			let _showmenu = cfg_map.show_menu;
 			if (status) {
-				show_menu = 1;
+				cfg_map.show_menu = 1;
 			} else {
-				show_menu = 0;
+				cfg_map.show_menu = 0;
 			}
-			if(show_menu != _showmenu){
-				window.NotifyOthers("Show_menubar", show_menu);
-				save_config("show_menu", show_menu);
+			if(cfg_map.show_menu != _showmenu){
+				window.NotifyOthers("Show_menubar", cfg_map.show_menu);
+				save_config("show_menu", cfg_map.show_menu);
 				p.settings.pages[parentId].elements[id].repaint();
 			}
 			break;
 		case 3:
 			if (status) {
-				show_extrabtn = 1;
+				cfg_map.show_extrabtn = 1;
 			}
 			else {
-				show_extrabtn = 0;
+				cfg_map.show_extrabtn = 0;
 			}
-			window.NotifyOthers("Show_open_stop_buttons", show_extrabtn);
-			save_config("show_extrabtn", show_extrabtn);
+			window.NotifyOthers("Show_open_stop_buttons", cfg_map.show_extrabtn);
+			save_config("show_extrabtn", cfg_map.show_extrabtn);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 6:
 			if (status) {
-				color_bycover = 1;
+				cfg_map.color_bycover = 1;
 			}
 			else {
-				color_bycover = 0;
+				cfg_map.color_bycover = 0;
 			}
-			window.NotifyOthers("foobox_color_bycover", color_bycover);
-			if(!color_bycover) {
+			window.NotifyOthers("foobox_color_bycover", cfg_map.color_bycover);
+			if(!cfg_map.color_bycover) {
 				window.NotifyOthers("color_scheme_updated", null);
 				if(g_color_highlight != c_default_hl){
 					g_color_highlight = c_default_hl;
@@ -77,52 +77,52 @@ function settings_checkboxes_action(id, status, parentId) {
 					full_repaint();
 				}
 			}
-			save_config("color_bycover", color_bycover);
+			save_config("color_bycover", cfg_map.color_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 7:
 			if (status) {
-				cbkg_bycover = 0;
+				cfg_map.cbkg_bycover = 0;
 			}
 			else {
-				cbkg_bycover = 1;
+				cfg_map.cbkg_bycover = 1;
 			}
-			window.NotifyOthers("foobox_bgcolor_bycover", cbkg_bycover);
-			save_config("cbkg_bycover", cbkg_bycover);
+			window.NotifyOthers("foobox_bgcolor_bycover", cfg_map.cbkg_bycover);
+			save_config("cbkg_bycover", cfg_map.cbkg_bycover);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 8:
 			if (status) {
-				color_noesl = 1;
+				cfg_map.color_noesl = 1;
 			}
 			else {
-				color_noesl = 0;
+				cfg_map.color_noesl = 0;
 			}
-			window.NotifyOthers("foobox_color_noesl", color_noesl);
-			save_config("color_noesl", color_noesl);
+			window.NotifyOthers("foobox_color_noesl", cfg_map.color_noesl);
+			save_config("color_noesl", cfg_map.color_noesl);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 11:
 			if (status) {
-				colorful_seek = 1;
+				cfg_map.colorful_seek = 1;
 			}
 			else {
-				colorful_seek = 0;
+				cfg_map.colorful_seek = 0;
 			}
 			get_covercahe_config();
-			window.NotifyOthers("colorful_seekbar", colorful_seek);
-			save_config("colorful_seek", colorful_seek);
+			window.NotifyOthers("colorful_seekbar", cfg_map.colorful_seek);
+			save_config("colorful_seek", cfg_map.colorful_seek);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 14:
 			if (status) {
-				rating2tag = 1;
+				cfg_map.rating2tag = 1;
 			}
 			else {
-				rating2tag = 0;
+				cfg_map.rating2tag = 0;
 			}
-			window.NotifyOthers("set_rating_2_tag", rating2tag);
-			save_config("rating2tag", rating2tag);
+			window.NotifyOthers("set_rating_2_tag", cfg_map.rating2tag);
+			save_config("rating2tag", cfg_map.rating2tag);
 			p.settings.pages[parentId].elements[id].repaint();
 			break;
 		case 15:
@@ -138,15 +138,15 @@ function settings_checkboxes_action(id, status, parentId) {
 			break;
 		case 17:
 			if (status) {
-				winFrame = 0;
+				cfg_map.winFrame = 0;
 			}
 			else {
-				winFrame = 2;
+				cfg_map.winFrame = 2;
 			}
-			save_config("winFrame", winFrame);
+			save_config("winFrame", cfg_map.winFrame);
 			p.settings.pages[parentId].elements[id].repaint();
-			if(winFrame != fb.Window.FrameStyle) fb.Window.FrameStyle = winFrame;
-			window.NotifyOthers("foobox.winFrame", winFrame);
+			if(cfg_map.winFrame != fb.Window.FrameStyle) fb.Window.FrameStyle = cfg_map.winFrame;
+			window.NotifyOthers("foobox.winFrame", cfg_map.winFrame);
 			break;
 		}
 		break;
@@ -234,9 +234,9 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 1:
 			p.settings.pages[pid].elements[1].status = true;
 			p.settings.pages[pid].elements[2].status = false;
-			sys_scrollbar = 1;
-			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			save_config("sys_scrollbar", sys_scrollbar);
+			cfg_map.sys_scrollbar = 1;
+			window.NotifyOthers("scrollbar_width", cfg_map.sys_scrollbar);
+			save_config("sys_scrollbar", cfg_map.sys_scrollbar);
 			cScrollBar.width = get_system_scrollbar_width();
 			properties.cursor_max = 125*zdpi;
 			p.headerBar && p.headerBar.setButtons();
@@ -245,9 +245,9 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 2:
 			p.settings.pages[pid].elements[1].status = false;
 			p.settings.pages[pid].elements[2].status = true;
-			sys_scrollbar = 0;
-			window.NotifyOthers("scrollbar_width", sys_scrollbar);
-			save_config("sys_scrollbar", sys_scrollbar);
+			cfg_map.sys_scrollbar = 0;
+			window.NotifyOthers("scrollbar_width", cfg_map.sys_scrollbar);
+			save_config("sys_scrollbar", cfg_map.sys_scrollbar);
 			cScrollBar.width = z(12);
 			properties.cursor_max = 110*zdpi;
 			p.headerBar && p.headerBar.setButtons();
@@ -256,16 +256,16 @@ function settings_radioboxes_action(id, status, parentId) {
 		case 4:
 			p.settings.pages[pid].elements[4].status = true;
 			p.settings.pages[pid].elements[5].status = false;
-			libbtn_fuc = 1;
-			window.NotifyOthers("Lib_button_function", libbtn_fuc);
-			save_config("libbtn_fuc", libbtn_fuc);
+			cfg_map.libbtn_fuc = 1;
+			window.NotifyOthers("Lib_button_function", cfg_map.libbtn_fuc);
+			save_config("libbtn_fuc", cfg_map.libbtn_fuc);
 			break;
 		case 5:
 			p.settings.pages[pid].elements[4].status = false;
 			p.settings.pages[pid].elements[5].status = true;
-			libbtn_fuc = 0;
-			window.NotifyOthers("Lib_button_function", libbtn_fuc);
-			save_config("libbtn_fuc", libbtn_fuc);
+			cfg_map.libbtn_fuc = 0;
+			window.NotifyOthers("Lib_button_function", cfg_map.libbtn_fuc);
+			save_config("libbtn_fuc", cfg_map.libbtn_fuc);
 			break;
 		};
 		full_repaint();
@@ -662,8 +662,8 @@ function settings_textboxes_action(pageId, elementId) {
 			}
 			break;
 		case 10:
-			track_edit_app = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			save_config("track_edit_app",track_edit_app);
+			cfg_map.track_edit_app = p.settings.pages[pageId].elements[elementId].inputbox.text;
+			save_config("track_edit_app",cfg_map.track_edit_app);
 			break;
 		}
 		break;
@@ -791,22 +791,22 @@ function settings_textboxes_action(pageId, elementId) {
 	case 3:
 		switch (elementId) {
 		case 9:
-			var org_threshold = color_threshold;
-			color_threshold = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
-			if(!color_threshold) color_threshold = org_threshold;
-			else if(color_threshold < 1) color_threshold = 1;
-			else if(color_threshold > 10) color_threshold = 10;
-			save_config("color_threshold", color_threshold);
-			window.NotifyOthers("set_corlor_threshold", color_threshold);
+			var org_threshold = cfg_map.color_threshold;
+			cfg_map.color_threshold = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!cfg_map.color_threshold) cfg_map.color_threshold = org_threshold;
+			else if(cfg_map.color_threshold < 1) cfg_map.color_threshold = 1;
+			else if(cfg_map.color_threshold > 10) cfg_map.color_threshold = 10;
+			save_config("color_threshold", cfg_map.color_threshold);
+			window.NotifyOthers("set_corlor_threshold", cfg_map.color_threshold);
 			break;
 		case 10:
-			var org_chroma = cbkg_chroma;
-			cbkg_chroma = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
-			if(!cbkg_chroma) cbkg_chroma = org_chroma;
-			else if(cbkg_chroma < 1) cbkg_chroma = 1;
-			else if(cbkg_chroma > 10) cbkg_chroma = 10;
-			save_config("cbkg_chroma", cbkg_chroma);
-			window.NotifyOthers("set_bgcolor_chroma", cbkg_chroma);
+			var org_chroma = cfg_map.cbkg_chroma;
+			cfg_map.cbkg_chroma = Math.floor(p.settings.pages[pageId].elements[elementId].inputbox.text);
+			if(!cfg_map.cbkg_chroma) cfg_map.cbkg_chroma = org_chroma;
+			else if(cfg_map.cbkg_chroma < 1) cfg_map.cbkg_chroma = 1;
+			else if(cfg_map.cbkg_chroma > 10) cfg_map.cbkg_chroma = 10;
+			save_config("cbkg_chroma", cfg_map.cbkg_chroma);
+			window.NotifyOthers("set_bgcolor_chroma", cfg_map.cbkg_chroma);
 			break;
 		case 12:
 			var _dir = dir_cover_name;
@@ -829,10 +829,10 @@ function settings_textboxes_action(pageId, elementId) {
 			break;
 		case 16:
 			var new_titleadd = p.settings.pages[pageId].elements[elementId].inputbox.text;
-			if (new_titleadd != title_add){
-				title_add = new_titleadd;
-				save_config("title_add", title_add);
-				window.NotifyOthers("titlebar_addinfo", title_add);
+			if (new_titleadd != cfg_map.title_add){
+				cfg_map.title_add = new_titleadd;
+				save_config("title_add", cfg_map.title_add);
+				window.NotifyOthers("titlebar_addinfo", cfg_map.title_add);
 			}
 			break;
 		}
@@ -884,11 +884,11 @@ oTextBtn = function(text){
 			if (this.ishover){
 				p.settings.pages[3].elements[16].inputbox.text = "%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz";
 				var new_titleadd = p.settings.pages[3].elements[16].inputbox.text;
-				if (new_titleadd != title_add){
+				if (new_titleadd != cfg_map.title_add){
 					full_repaint();
-					title_add = new_titleadd;
-					save_config("title_add", title_add);
-					window.NotifyOthers("titlebar_addinfo", title_add);
+					cfg_map.title_add = new_titleadd;
+					save_config("title_add", cfg_map.title_add);
+					window.NotifyOthers("titlebar_addinfo", cfg_map.title_add);
 				}
 			}
 			break;
@@ -1637,7 +1637,7 @@ oPage = function(id, objectName, label, nbrows) {
 			this.elements.push(new oCheckBox(7, 20, cSettings.topBarHeight + rh * 11.5, "Append \"Selection\" sub-contextmenu", "properties.selectionmenu", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(8, 20, cSettings.topBarHeight + rh * 12.5, "Play next playlist automatically (for default playback order only).", "repeat_pls", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(9, 20, cSettings.topBarHeight + rh * 13.5, "Create Queue Content playlist automatically when playback queue is not empty", "queue_pl_on", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15), oTextBox_2, cHeaderBar.height, "External applications (Multiple items can be added)", track_edit_app, "settings_textboxes_action", this.id));
+			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 15), oTextBox_2, cHeaderBar.height, "External applications (Multiple items can be added)", cfg_map.track_edit_app, "settings_textboxes_action", this.id));
 			break;
 		case 1:
 			// Columns
@@ -1705,24 +1705,24 @@ oPage = function(id, objectName, label, nbrows) {
 			//foobox options
 			let checkbox2x = z(260);
 			var rh = cSettings.rowHeight;
-			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.5, "Show pseudo main menu bar", "show_menu ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 4.5, "System", (sys_scrollbar == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(2, z(120), cSettings.topBarHeight + rh * 4.5, "Narrow", (sys_scrollbar == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.5, "Show 'Open' and 'Stop' buttons", "show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oRadioButton(4, 20, cSettings.topBarHeight + rh * 8.25, "Album List", (libbtn_fuc == 1), "settings_radioboxes_action", this.id));
-			this.elements.push(new oRadioButton(5, z(120), cSettings.topBarHeight + rh * 8.25, "ReFacets", (libbtn_fuc == 0), "settings_radioboxes_action", this.id));
-			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 10.5, "Interface color follows vivid cover", "color_bycover ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(7, checkbox2x, cSettings.topBarHeight + rh * 10.5, "Except background", "cbkg_bycover ? false : true", "settings_checkboxes_action", this.id));
-			this.elements.push(new oCheckBox(8, z(420), cSettings.topBarHeight + rh * 10.5, "Except ESLyric highlight color", "color_noesl ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(9, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 11.5), oTextBox_4, cHeaderBar.height, "Threshold when getting color scheme from cover, 1-10 (1-best speed, 10-best accuracy)", color_threshold.toString(), "settings_textboxes_action", this.id));	
-			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 13.5), oTextBox_4, cHeaderBar.height, "Chroma of background color changed following cover，1-10", cbkg_chroma.toString(), "settings_textboxes_action", this.id));	
-			this.elements.push(new oCheckBox(11, checkbox2x, cSettings.topBarHeight + rh * 6.5, "Colorful seek bar", "colorful_seek ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(0, 20, cSettings.topBarHeight + rh * 2.5, "Show pseudo main menu bar", "cfg_map.show_menu ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(1, 20, cSettings.topBarHeight + rh * 4.5, "System", (cfg_map.sys_scrollbar == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(2, z(120), cSettings.topBarHeight + rh * 4.5, "Narrow", (cfg_map.sys_scrollbar == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oCheckBox(3, 20, cSettings.topBarHeight + rh * 6.5, "Show 'Open' and 'Stop' buttons", "cfg_map.show_extrabtn ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oRadioButton(4, 20, cSettings.topBarHeight + rh * 8.25, "Album List", (cfg_map.libbtn_fuc == 1), "settings_radioboxes_action", this.id));
+			this.elements.push(new oRadioButton(5, z(120), cSettings.topBarHeight + rh * 8.25, "ReFacets", (cfg_map.libbtn_fuc == 0), "settings_radioboxes_action", this.id));
+			this.elements.push(new oCheckBox(6, 20, cSettings.topBarHeight + rh * 10.5, "Interface color follows vivid cover", "cfg_map.color_bycover ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(7, checkbox2x, cSettings.topBarHeight + rh * 10.5, "Except background", "cfg_map.cbkg_bycover ? false : true", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(8, z(420), cSettings.topBarHeight + rh * 10.5, "Except ESLyric highlight color", "cfg_map.color_noesl ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(9, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 11.5), oTextBox_4, cHeaderBar.height, "Threshold when getting color scheme from cover, 1-10 (1-best speed, 10-best accuracy)", cfg_map.color_threshold.toString(), "settings_textboxes_action", this.id));	
+			this.elements.push(new oTextBox(10, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 13.5), oTextBox_4, cHeaderBar.height, "Chroma of background color changed following cover，1-10", cfg_map.cbkg_chroma.toString(), "settings_textboxes_action", this.id));	
+			this.elements.push(new oCheckBox(11, checkbox2x, cSettings.topBarHeight + rh * 6.5, "Colorful seek bar", "cfg_map.colorful_seek ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oTextBox(12, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 18.25), oTextBox_3, cHeaderBar.height, "Cover filenames for groups by directory, put ';' between filenames", dir_cover_name, "settings_textboxes_action", this.id));			
 			this.elements.push(new oTextBox(13, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 20.25), oTextBox_4, cHeaderBar.height, "Cover cache dimension (pixel, 100-600, larger dimension result in more resource consumption)", cache_size.toString(), "settings_textboxes_action", this.id));			
-			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 24, "Write rating data to file tag filed", "rating2tag ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oCheckBox(14, 20, cSettings.topBarHeight + rh * 24, "Write rating data to file tag filed", "cfg_map.rating2tag ? true : false", "settings_checkboxes_action", this.id));
 			this.elements.push(new oCheckBox(15, 20, cSettings.topBarHeight + rh * 25, "Right side cover/info and properties panels follow cursor, not follow playback  (will disable UI color following cover)", "follow_cursor ? true : false", "settings_checkboxes_action", this.id));
-			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", title_add, "settings_textboxes_action", this.id));
-			this.elements.push(new oCheckBox(17, checkbox2x, cSettings.topBarHeight + rh * 2.5, "Use system title bar and frame", "winFrame == 0 ? true : false", "settings_checkboxes_action", this.id));
+			this.elements.push(new oTextBox(16, txtbox_x, Math.ceil(cSettings.topBarHeight + rh * 26), oTextBox_1, cHeaderBar.height, "Show more track info on titlebar |", cfg_map.title_add, "settings_textboxes_action", this.id));
+			this.elements.push(new oCheckBox(17, checkbox2x, cSettings.topBarHeight + rh * 2.5, "Use system title bar and frame", "cfg_map.winFrame == 0 ? true : false", "settings_checkboxes_action", this.id));
 			break;
 		case 4:
 			var arr = [];
@@ -1829,7 +1829,7 @@ oPage = function(id, objectName, label, nbrows) {
 			// new pattern button
 			var nx = 20 + listBoxWidth + g_z30;
 			var ny = Math.floor(cSettings.topBarHeight + rh * 2.1) - (this.offset * cSettings.rowHeight);
-			if (p.headerBar.columns.length < properties.max_columns) {
+			if (p.list.groupby.length < properties.max_patterns) {
 				p.settings.newbuttonPattern.draw(gr, nx, ny, 255);
 				gr.GdiDrawText("New", g_font_b, p.settings.color2, nx, ny, p.settings.btn_off.Width, p.settings.btn_off.Height, cc_txt);
 			}
@@ -2048,7 +2048,7 @@ oPage = function(id, objectName, label, nbrows) {
 	};
 
 	this.delButtonPatternCheck = function(event, x, y) {
-		if (p.headerBar.columns.length <= 2) return;
+		if (p.list.groupby.length <= 1) return;
 		var fin;
 		var state = p.settings.delbuttonPattern.checkstate(event, x, y);
 		switch (event) {
@@ -2108,11 +2108,14 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				var idx = p.settings.pages[4].elements[0].selectedId;
+				var del_current = (idx == layout.index);
 				layout.ids.splice(idx, 1);
 				layout.config.splice(idx, 1);
 				layout.columnWidth.splice(idx, 1);
+				// deleting a layout before the active one shifts the active index
+				if (idx < layout.index) layout.index--;
 				save_layout();
-				if(idx == layout.index){
+				if(del_current){
 					get_layout_cache(layout.playlistName);
 					p.headerBar.initColumns();
 					get_grprow_minimum(p.headerBar.columns[0].w);
@@ -2141,10 +2144,11 @@ oPage = function(id, objectName, label, nbrows) {
 		case "up":
 			if (state == ButtonStates.hover) {
 				if (layout.ids.length == 1) return state;
-				var todelete = [];
-				var found = false;
 				var old_len = layout.ids.length;
-				for (var i = 1; i < layout.ids.length; i++){
+				var del_current = false;
+				// iterate backwards so splice() does not shift the remaining indices
+				for (var i = layout.ids.length - 1; i >= 1; i--){
+					var found = false;
 					for (var j = 0; j < plman.PlaylistCount; j++){
 						if(layout.ids[i] == plman.GetPlaylistName(j)) {
 							found = true;
@@ -2155,10 +2159,17 @@ oPage = function(id, objectName, label, nbrows) {
 						layout.ids.splice(i, 1);
 						layout.config.splice(i, 1);
 						layout.columnWidth.splice(i, 1);
+						if(i < layout.index) layout.index--;
+						else if(i == layout.index) del_current = true;
 					}
-					found = false;
 				}
 				if(old_len != layout.ids.length) {
+					// re-resolve the active layout (falls back to the default one)
+					if(del_current || layout.index >= layout.ids.length) {
+						get_layout_cache(layout.playlistName);
+						p.headerBar.initColumns();
+						get_grprow_minimum(p.headerBar.columns[0].w);
+					}
 					save_layout();
 					var arr = [];
 					for (var i = 0; i < layout.ids.length; i++) {
@@ -2180,14 +2191,14 @@ oPage = function(id, objectName, label, nbrows) {
 			if (state == ButtonStates.hover) {
 				_app = utils.FilePicker("Add an external application", "", "Excutable file (*.exe)|*.exe|All files (*.*)|*.*", 0);
 				if(_app) {
-					if(track_edit_app == "") {
+					if(cfg_map.track_edit_app == "") {
 						p.settings.pages[0].elements[10].inputbox.text = _app;
-						track_edit_app = _app;
+						cfg_map.track_edit_app = _app;
 					}else{
-						track_edit_app += "; " + _app;
-						p.settings.pages[0].elements[10].inputbox.text = track_edit_app;
+						cfg_map.track_edit_app += "; " + _app;
+						p.settings.pages[0].elements[10].inputbox.text = cfg_map.track_edit_app;
 					}
-					save_config("track_edit_app", track_edit_app);
+					save_config("track_edit_app", cfg_map.track_edit_app);
 					full_repaint();
 				}
 			};

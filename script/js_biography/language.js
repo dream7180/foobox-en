@@ -430,4 +430,4 @@ const traditionalChinese = {
 	"Write existing file info to tags: ": "將現有文件信息寫入標籤："
 }
 
-const lg = [English, simplifiedChinese, traditionalChinese][ppt.menuLanguage];
+const lg = [English, simplifiedChinese, traditionalChinese][ppt.menuLanguage] || English; // fallback to English on invalid index

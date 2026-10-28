@@ -1,4 +1,4 @@
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0, wh = 0, minh = 50;
 let m_x = 0, m_y = 0;
@@ -41,13 +41,11 @@ function on_paint(gr) {
 function on_mouse_move(x, y) {
 	if(m_x == x && m_y == y) return;
 	if(x > 0 && y > minh && x < ww && y < wh - minh) {
-		window.SetCursor(32645);//IDC_SIZE
+		window.SetCursor(32645);//IDC_SIZENS
 		if(sp_drag){
 			PUpper.Move(0, 0, ww, y);
 			PLower.Move(splitter_vis, y + 2, ww - splitter_vis*2, wh - y - 2);
 			window.Repaint();
-			upperratio = PUpper.Height/(wh-2);
-			window.SetProperty("UpperPane.Ratio", Math.round(upperratio*100000)/100000);
 		}
 	}
 	m_x = x;
@@ -59,7 +57,15 @@ function on_mouse_lbtn_down(x, y) {
 }
 
 function on_mouse_lbtn_up(x, y) {
-	sp_drag = false;
+	if(sp_drag){
+		sp_drag = false;
+		upperratio = PUpper.Height/(wh - 2);
+		window.SetProperty("UpperPane.Ratio", Math.round(upperratio*100000)/100000); // write once on release, avoid disk write every frame while dragging
+	}
+}
+
+function on_mouse_leave() {
+	if(!sp_drag) window.SetCursor(32512);//IDC_ARROW
 }
 
 function on_mouse_rbtn_up() {

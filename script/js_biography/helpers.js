@@ -23,7 +23,6 @@ class Helpers {
 		this.key = ['t', 'r', 'b', 'l'];
 
 		this.scale = this.getDpi();
-		this.server = true;
 
 		this.source = {
 			lfmWiki: ['lfm', 'wiki'],

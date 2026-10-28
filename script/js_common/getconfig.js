@@ -1,24 +1,36 @@
 ﻿//common script
 window.DrawMode = 1;//1-D2D,0-GDI
 var cfgexist = 1;
-var common_cfg_map = {};
-function assignDefault() {
-	let common_cfg_keys = ["winFrame", "LineHeight", "ScrollStep", "sys_scrollbar", "color_bycover", "cbkg_bycover", "color_noesl", "color_threshold", "cbkg_chroma", "rating2tag", "show_menu", "show_extrabtn", "libbtn_fuc", "colorful_seek", "track_edit_app", "title_add"];
-	let common_cfg_defaults = [2, 33, 3, 0, 1, 1, 0, 5, 4, 0, 1, 1, 1, 1, "", "$if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz"];
-	for (var i = 0; i < common_cfg_keys.length; i++) common_cfg_map[common_cfg_keys[i]] = common_cfg_defaults[i];
-}
-assignDefault();
-try {
-	var db = utils.OpenDatabase(fb.ProfilePath + "foobox\\config\\config.db");
-	var rows = db.Query('SELECT name, value FROM "common"');
-	for (var k = 0; k < rows.length; k++) {
-		if (typeof common_cfg_map[rows[k].name] != 'undefined') common_cfg_map[rows[k].name] = rows[k].value;
+var cfg_map = { // 内置默认值（类型即归一化基准：数字键强制 Number，字符串键强制 String）
+	winFrame: 2,
+	LineHeight: 33,
+	ScrollStep: 3,
+	sys_scrollbar: 0,
+	color_bycover: 1,
+	cbkg_bycover: 1,
+	color_noesl: 0,
+	color_threshold: 5,
+	cbkg_chroma: 4,
+	rating2tag: 0,
+	show_menu: 1,
+	show_extrabtn: 1,
+	libbtn_fuc: 1,
+	colorful_seek: 1,
+	track_edit_app: "",
+	title_add: "$if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz"
+};
+(function read_common_cfg() { // common.cfg：JSON 文本，仅 jsplaylist 面板写入，其余面板只读
+	try {
+		var saved = JSON.parse(utils.ReadTextFile(fb.ProfilePath + "foobox\\data\\common.cfg").replace(/^\uFEFF/, ""));
+		for (var k in cfg_map) {
+			if (saved[k] !== undefined) {
+				cfg_map[k] = typeof cfg_map[k] == "number" ? Number(saved[k]) : String(saved[k]); // 防手改类型错乱
+			}
+		}
+	} catch (e) { // 文件不存在或损坏：由 jsplaylist 写入默认值
+		cfgexist = 0;
 	}
-} catch (e) {
-	console.log('foobox: read cofig failed, will try to create it: ' + e.message);
-	cfgexist = 0;
-}
-var winFrame = Number(common_cfg_map.winFrame);
-if(winFrame != fb.Window.FrameStyle) fb.Window.FrameStyle = winFrame;
-if(!fb.Window.MainMenuHidden) fb.Window.MainMenuHidden = true;
-if(!fb.Window.StatusBarHidden) fb.Window.StatusBarHidden = true;
+})();
+if (cfg_map.winFrame != fb.Window.FrameStyle) fb.Window.FrameStyle = cfg_map.winFrame;
+if (!fb.Window.MainMenuHidden) fb.Window.MainMenuHidden = true;
+if (!fb.Window.StatusBarHidden) fb.Window.StatusBarHidden = true;

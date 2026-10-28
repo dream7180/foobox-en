@@ -1,41 +1,28 @@
 ﻿//foobox https://github.com/dream7180; JSPlaylist http://br3tt.deviantart.com
 window.DefinePanel('JSPlaylist', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '1.3.2', features: {drag_n_drop: true} });
-include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
-include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHscrollbar.js');
-include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHheaderbar.js');
-include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHplaylist.js');
-include(fb.ProfilePath + 'foobox\\script\\js_panels\\jsplaylist\\WSHsettings.js');
+include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JSinputbox.js');
+include(fb.ProfilePath + 'foobox\\js_common\\Genre.js');
+include(fb.ProfilePath + 'foobox\\js_panels\\jsplaylist\\WSHscrollbar.js');
+include(fb.ProfilePath + 'foobox\\js_panels\\jsplaylist\\WSHheaderbar.js');
+include(fb.ProfilePath + 'foobox\\js_panels\\jsplaylist\\WSHplaylist.js');
+include(fb.ProfilePath + 'foobox\\js_panels\\jsplaylist\\WSHsettings.js');
 
 var zdpi = 1;
 var drawmode = window.DrawMode;
 var follow_cursor = window.GetProperty("foobox.infoArt.follow.cursor", false);
-var rating2tag = 0;
-var genre_cover_dir = fb.ProfilePath + "foobox\\genre";
-var config_dir = fb.ProfilePath + "foobox\\config\\";
+var genre_cover_dir = fb.ProfilePath + "foobox\\images\\genre";
+var config_dir = fb.ProfilePath + "foobox\\data\\";
 var pv_db_path = config_dir + "pv.db"; // 面板数据库（layout/group/column 表）
 function pv_db_open() {
 	if (!utils.IsDirectory(config_dir)) utils.CreateFolder(config_dir);
 	return utils.OpenDatabase(pv_db_path);
 }
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
-var sys_scrollbar = 0;
-var track_edit_app = "";
-var color_bycover = 1;
-var cbkg_bycover = 1;
-var color_noesl = 0;
-var color_threshold = 5;
-var cbkg_chroma = 4;
 var cache_size = window.GetProperty("foobox.cover.cache.size", 250);
-var colorful_seek = 1;
 var queue_pl_on = window.GetProperty("Playlist: Turn on queue playlist", false);
-var show_menu = 1;
-var show_extrabtn = 1;
-var libbtn_fuc = 1;
-var title_add = "";
 let dark_mode = 0;
 let tab_collapse;
 // GLOBALS
@@ -84,7 +71,7 @@ var g_avoid_on_item_focus_change = false;
 //albumart
 var albumart_id, cache_subdir, crclist = [];
 var cover_worker = null;
-var cover_cache_folder = fb.ProfilePath + "foobox\\covercache\\";
+var cover_cache_folder = fb.ProfilePath + "foobox\\data\\";
 
 function get_table_name(subdir) {
 	return subdir.replace(/\\/g, "");
@@ -94,20 +81,17 @@ var g_z2, g_z3, g_z4, g_z5, g_z6, g_z7, g_z8, g_z10, g_z16, g_z30;
 var ww = 0, wh = 0;
 var mouse_x = 0,
 	mouse_y = 0;
-clipboard = {
+var clipboard = {
 	selection: null
 };
 
 // WSH statistics globals
 var g_track_type;
+var g_group_id_focused = 0; // focused group id (shared with WSHplaylist.js)
 var repeat_pls = window.GetProperty("PLAYBACK: Repeat playlists", false);
-var tf_length_seconds = fb.TitleFormat("%length_seconds_fp%");
-var first_played = fb.TitleFormat("%first_played%");
-var last_played = fb.TitleFormat("%last_played%");
-var play_count = fb.TitleFormat("%play_count%");
 
 //=================================================// main properties / parameters
-properties = {
+var properties = {
 	enableTouchControl: window.GetProperty("SYSTEM.Enable Touch Scrolling", false),
 	defaultPlaylistItemAction: window.GetProperty("SYSTEM.Default Playlist Action", 1),
 	settingspanel: false,
@@ -120,7 +104,7 @@ properties = {
 	max_patterns: 25
 };
 
-layout = {
+var layout = {
 	ids: ["Default layout"],
 	uid: "Default layout",
 	playlistName: "",
@@ -140,7 +124,7 @@ layout = {
 }
 
 // Singleton for Images
-images = {
+var images = {
 	playing_ico: null,
 	selected_ico: null,
 	mood_ico: null,
@@ -150,6 +134,9 @@ images = {
 };
 
 // Fonts / Dpi / Colors / Images init
+var InfoPane = null; // info pane instance, created in on_init
+var g_font_2 = null; // secondary font, used by WSHplaylist.js
+var fn_ico1 = null, fn_ico2 = null; // FontAwesome icon fonts
 
 function system_init() {
 	get_font();
@@ -183,7 +170,7 @@ var sort_pattern_playcount = "$if2(%play_count%,0) | %album artist% | $if(%album
 var sort_pattern_codec = "%codec% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %tracknumber% | %title%";
 var sort_pattern_queue = "%queue_index% | %album artist% | $if(%album%,%date%,'9999') | %album% | %discnumber% | %title%";
 // Singletons
-cRow = {
+var cRow = {
 	default_playlist_h: 33,
 	playlist_h: 33,
 	extra_line_h: 16,
@@ -191,14 +178,14 @@ cRow = {
 };
 cRow.extra_line_h = Math.max(Math.round(cRow.playlist_h/2), 12);
 
-p = {
+var p = {
 	headerBar: null,
 	list: null,
 	settings: null,
 	timer_onKey: false
 };
 
-cTouch = {
+var cTouch = {
 	down: false,
 	y_start: 0,
 	y_end: 0,
@@ -206,7 +193,7 @@ cTouch = {
 	up_id: 0
 };
 
-cSettings = {
+var cSettings = {
 	visible: false,
 	topBarHeight: 50,
 	tabPaddingWidth: 2,
@@ -214,14 +201,15 @@ cSettings = {
 	wheel_timer: false
 };
 
-cHeaderBar = {
+var cHeaderBar = {
 	height: 26,
 	borderWidth: 2,
 	timerAutoHide: false,
-	sortRequested: false
+	sortRequested: false,
+	lock_hint_shown: false // 锁定列表排序提示：每次切换播放列表重置，避免重复弹窗
 };
 
-cScrollBar = {
+var cScrollBar = {
 	width: 12,
 	timerID: false,
 	parentObjectScrolling: null,
@@ -231,11 +219,11 @@ cScrollBar = {
 	timer_repaint: false
 };
 
-cTrack = {
+var cTrack = {
 	height: cRow.playlist_h
 };
 
-cGroup = {
+var cGroup = {
 	collapsed_height: 2,
 	expanded_height: 1,
 	default_count_minimum: window.GetProperty("*GROUP: Minimum number of rows in a group", 0),
@@ -243,7 +231,7 @@ cGroup = {
 	count_minimum_pre: 0
 };
 
-cover = {
+var cover = {
 	show: true,
 	keepaspectratio: window.GetProperty("CUSTOM.Cover keep ration aspect", true),
 	load_timer: false,
@@ -256,7 +244,7 @@ cover = {
 	resized: false
 };
 
-cList = {
+var cList = {
 	search_string: "",
 	incsearch_font: null,
 	inc_search_noresult: false,
@@ -277,7 +265,7 @@ cList = {
 };
 var scrollstep_org = cList.scrollstep;
 
-dragndrop = {
+var dragndrop = {
 	enabled: true,
 	contigus_sel: null,
 	drag_id: -1,
@@ -287,7 +275,7 @@ dragndrop = {
 	leave_flag: false
 };
 
-columns = {
+var columns = {
 	rating: false,
 	rating_x: 0,
 	rating_w: 0,
@@ -325,7 +313,7 @@ function set_scroll_delta() {
 };
 
 // ============================================================
-// Cover Worker (read-only): reads cache.db + loads cover images
+// Cover Worker (read-only): reads albumart.db + loads cover images
 // ============================================================
 var cover_worker_source = `
 var db = null;
@@ -497,7 +485,7 @@ function create_cover_worker() {
 	cover_worker.onerror = function (event) {
 		console.log('JSPlaylist cover worker error: ' + event.message);
 	};
-	cover_worker.postMessage({ cmd: 'init', dbPath: cover_cache_folder + 'cache.db' });
+	cover_worker.postMessage({ cmd: 'init', dbPath: cover_cache_folder + 'albumart.db' });
 }
 
 // Send a cover request to the worker (read-only: cache lookup + native art fetch, no save)
@@ -544,7 +532,7 @@ function get_cachekey_for_handle(handle) {
 }
 
 // Context menu "Refresh cover cache of selected": map selected tracks to their groups (deduped),
-// delete cached cover (file+cache.db row), then the worker re-fetches native art and saves it back
+// delete cached cover (file+albumart.db row), then the worker re-fetches native art and saves it back
 function reset_cover_from_selection(handleList) {
 	if (!cover_worker || !handleList || handleList.Count == 0) return;
 	var done = [];
@@ -640,15 +628,6 @@ image_cache = function() {
 var g_image_cache = new image_cache;
 
 //==================Cover tools
-function getdimension(imgw, imgh){
-	let s = Math.min(cache_size / imgw, cache_size / imgh);
-		if(s < 1){
-			imgw = Math.floor(imgw * s);
-			imgh = Math.floor(imgh * s);
-		}
-	return [imgw, imgh];
-}
-
 function reset_cover_timers() {
 	cover.load_timer && window.ClearTimeout(cover.load_timer);
 	cover.load_timer = false;
@@ -673,8 +652,10 @@ function resize_panels() {
 	cTrack.height = z(cRow.playlist_h);
 	var list_h = wh - cHeaderBar.height - cHeaderBar.borderWidth;
 	// set Size of Header Bar
-	p.headerBar && p.headerBar.setSize(0, 0, ww, cHeaderBar.height);
-	p.headerBar.calculateColumns();
+	if (p.headerBar) {
+		p.headerBar.setSize(0, 0, ww, cHeaderBar.height);
+		p.headerBar.calculateColumns();
+	}
 	// set Size of List
 	p.list.setSize(0, (wh - list_h), ww, list_h);
 	if (!g_init_window) {
@@ -699,12 +680,13 @@ function get_metrics() {
 	g_z16 = z(16);
 	g_z30 = z(30);
 	properties.cursor_min = 25*zdpi;
-	properties.cursor_max = sys_scrollbar ? 125*zdpi : 110*zdpi;
+	properties.cursor_max = cfg_map.sys_scrollbar ? 125*zdpi : 110*zdpi;
 	cSettings.topBarHeight = z(50);
+	// note: base value is z(30/14) ~ z(2); legacy expression, behaviour unchanged
 	cSettings.tabPaddingWidth = z(30/ 14);
 	cSettings.rowHeight = Math.round(cRow.settings_h * zdpi);
 	cHeaderBar.height = z(26);
-	cScrollBar.width = sys_scrollbar ? get_system_scrollbar_width() : z(12);
+	cScrollBar.width = cfg_map.sys_scrollbar ? get_system_scrollbar_width() : z(12);
 	cTrack.height = z(cRow.playlist_h);
 }
 
@@ -712,12 +694,14 @@ function get_metrics() {
 system_init();
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
-	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\config")) {
-		utils.CreateFolder(fb.ProfilePath + "foobox\\config");
+	window.MinWidth = cSettings.topBarHeight;
+	window.MinHeight = cSettings.topBarHeight;
+	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\data")) {
+		utils.CreateFolder(fb.ProfilePath + "foobox\\data");
 	}
-	// clear queue and queue playlist
-	plman.FlushPlaybackQueue();
-	ClearQueuePlaylist();
+	// The playback queue and its playlist are owned by foobar2000; on_init clears nothing:
+	// a panel reload (theme/layout/script) keeps the user's queue, and a leftover queue playlist
+	// after a restart is re-synced by on_playback_queue_changed on the next queue change
 
 	create_cover_worker();
 	get_misccfg();
@@ -732,6 +716,8 @@ function on_init() {
 	
 	InfoPane = new oInfoPane();
 	p.list = new oList("p.list", plman.ActivePlaylist);
+	// Sync queue count so that "Show playback queue" in the context menu works after a reload/rebuild
+	p.list.queue_total = plman.GetPlaybackQueueContents().length;
 	p.headerBar = new oHeaderBar();
 	p.headerBar.initColumns();
 	p.scrollbar = new oScrollbar( /*cScrollBar.themed*/ );
@@ -767,8 +753,6 @@ function on_size() {
 	ww = window.Width;
 	wh = window.Height;
 	if (!ww || !wh) return;
-	window.MinWidth = cSettings.topBarHeight;
-	window.MinHeight = cSettings.topBarHeight;
 	resize_panels();
 
 	// Set the empty rows count in playlist setup for cover column size!
@@ -860,7 +844,7 @@ function on_paint(gr) {
 				var ty = 0;
 				for (var lg_y = p.list.y; lg_y < p.list.y + p.list.h + segment_h; lg_y += segment_h + gap_h) {
 					ty = lg_y - segment_h + d;
-					th = segment_h;
+					var th = segment_h;
 					if (ty < p.list.y) {
 						th = th - Math.abs(p.list.y - ty);
 						ty = p.list.y;
@@ -1349,6 +1333,7 @@ function on_playlist_switch() {
 	};
 	update_playlist(layout.collapseGroupsByDefault);
 	p.headerBar.resetSortIndicators();
+	cHeaderBar.lock_hint_shown = false;
 	if(cSettings.visible && p.settings.currentPageId == 4) p.settings.pages[p.settings.currentPageId].elements[0].showSelected(layout.index);
 	full_repaint();
 };
@@ -1531,10 +1516,6 @@ function on_key_down(vkey) {
 			case VK_BACK:
 				if (cList.search_string.length > 0) {
 					cList.inc_search_noresult = false;
-					p.list.tt_x = ((p.list.w) / 2) - (((cList.search_string.length * z(13)) + (g_z10 * 2)) / 2);
-					p.list.tt_y = p.list.y + Math.floor((p.list.h / 2) - g_z30);
-					p.list.tt_w = ((cList.search_string.length * z(13)) + (g_z10 * 2));
-					p.list.tt_h = z(60);
 					cList.search_string = cList.search_string.substring(0, cList.search_string.length - 1);
 					full_repaint();
 					cList.clear_incsearch_timer && window.ClearTimeout(cList.clear_incsearch_timer);
@@ -1542,7 +1523,6 @@ function on_key_down(vkey) {
 					cList.incsearch_timer && window.ClearTimeout(cList.incsearch_timer);
 					cList.incsearch_timer = window.SetTimeout(function() {
 						p.list.incrementalSearch();
-						window.ClearTimeout(cList.incsearch_timer);
 						cList.incsearch_timer = false;
 						cList.inc_search_noresult = false;
 					}, 500);
@@ -1778,7 +1758,7 @@ function on_key_down(vkey) {
 						for (var k = 0; k < p.list.count; k++) {
 							if (plman.IsPlaylistItemSelected(act_pls, k)) {
 								affected_items.push(k);
-								if (first_focus_id == null) fist_focus_id = k;
+								if (first_focus_id == null) first_focus_id = k;
 								next_focus_id = k + 1;
 							};
 						};
@@ -1794,8 +1774,9 @@ function on_key_down(vkey) {
 					else {
 						plman.RemovePlaylistSelection(act_pls, false);
 					};
-					plman.RemovePlaylistSelection(act_pls, false);
-					plman.SetPlaylistSelectionSingle(act_pls, plman.GetPlaylistFocusItemIndex(act_pls), true);
+					// focus may be -1 after removal, only restore selection on a valid index
+					var del_focus = plman.GetPlaylistFocusItemIndex(act_pls);
+					if (del_focus > -1) plman.SetPlaylistSelectionSingle(act_pls, del_focus, true);
 				};
 				break;
 			};
@@ -1886,7 +1867,7 @@ function on_key_down(vkey) {
 							for (var k = 0; k < p.list.count; k++) {
 								if (plman.IsPlaylistItemSelected(act_pls, k)) {
 									affected_items.push(k);
-									if (first_focus_id == null) fist_focus_id = k;
+									if (first_focus_id == null) first_focus_id = k;
 									next_focus_id = k + 1;
 								};
 							};
@@ -1903,8 +1884,9 @@ function on_key_down(vkey) {
 							plman.RemovePlaylistSelection(act_pls, false);
 						};
 
-						plman.RemovePlaylistSelection(act_pls, false);
-						plman.SetPlaylistSelectionSingle(act_pls, plman.GetPlaylistFocusItemIndex(act_pls), true);
+						// focus may be -1 after removal, only restore selection on a valid index
+						var cut_focus = plman.GetPlaylistFocusItemIndex(act_pls);
+						if (cut_focus > -1) plman.SetPlaylistSelectionSingle(act_pls, cut_focus, true);
 					};
 				} else if (vkey == 67) { // CTRL+C
 					clipboard.selection = plman.GetPlaylistSelectedItems(plman.ActivePlaylist);
@@ -1967,7 +1949,6 @@ function on_char(code) {
 					cList.incsearch_timer && window.ClearTimeout(cList.incsearch_timer);
 					cList.incsearch_timer = window.SetTimeout(function() {
 						p.list.incrementalSearch();
-						window.ClearTimeout(cList.incsearch_timer);
 						cList.incsearch_timer = false;
 					}, 500);
 				};
@@ -1995,9 +1976,12 @@ function on_playback_stop(reason) { // reason: (integer, begin with 0): user, eo
 	case 1:
 		// eof (e.g. end of playlist)
 		if(repeat_pls && plman.PlaybackOrder == 0 && plman.PlaylistCount > 0){
-			var idx = plman.PlayingPlaylist;
-			plman.ActivePlaylist = get_next_nonempty(idx);
-			plman.ExecutePlaylistDefaultAction(plman.ActivePlaylist, 0);
+			var next_idx = get_next_nonempty(plman.PlayingPlaylist);
+			// the fallback index may point to an empty playlist: do nothing then
+			if (plman.PlaylistItemCount(next_idx) > 0) {
+				plman.ActivePlaylist = next_idx;
+				plman.ExecutePlaylistDefaultAction(next_idx, 0);
+			}
 		}
 		full_repaint();
 		break;
@@ -2191,7 +2175,8 @@ function get_images_color() {
 	g_color_infopanebg = blendColors(g_color_selected_bg, g_color_normal_bg, 0.5);
 	g_color_infopanebg = blendColors(g_color_infopanebg, g_color_highlight, 0.055);
 	
-	imgh = Math.floor(15*zdpi);
+	var imgh = Math.floor(15*zdpi);
+	var gb;
 	images.star = gdi.CreateImage(imgh, imgh);
 	gb = images.star.GetGraphics();
 	gb.SetTextRenderingHint(4);
@@ -2220,6 +2205,7 @@ function get_images_color() {
 function get_img_nocover() {
 	let color_ico = dark_mode ? RGBA(255,255,255,10) : RGBA(0,0,0,10);
 	let imgh = g_z16;
+	let gb;
 	
 	images.nocover = gdi.CreateImage(250, 250);
 	gb = images.nocover.GetGraphics();
@@ -2291,42 +2277,6 @@ function draw_beam_image() {
 	return beamB;
 };
 
-function draw_blurred_image(image, ix, iy, iw, ih, bx, by, bw, bh, blur_value, overlay_color) {
-	var blurValue = blur_value;
-	var imgA = image.Resize(iw * blurValue / 100, ih * blurValue / 100, 2);
-	var imgB = imgA.resize(iw, ih, 2);
-
-	var bbox = gdi.CreateImage(bw, bh);
-	// Get graphics interface like "gr" in on_paint
-	var gb = bbox.GetGraphics();
-	var offset = 90 - blurValue;
-	gb.DrawImage(imgB, 0 - offset, 0 - (ih - bh) - offset, iw + offset * 2, ih + offset * 2, 0, 0, imgB.Width, imgB.Height, 0, 255);
-	bbox.ReleaseGraphics(gb);
-
-	var newImg = gdi.CreateImage(iw, ih);
-	var gb = newImg.GetGraphics();
-
-	if (ix != bx || iy != by || iw != bw || ih != bh) {
-		gb.DrawImage(image, ix, iy, iw, ih, 0, 0, image.Width, image.Height, 0, 255);
-		gb.FillSolidRect(bx, by, bw, bh, 0xffffffff);
-	};
-	gb.DrawImage(bbox, bx, by, bw, bh, 0, 0, bbox.Width, bbox.Height, 0, 255);
-
-	// overlay
-	if (overlay_color != null) {
-		gb.FillSolidRect(bx, by, bw, bh, overlay_color);
-	};
-
-	// top border of blur area
-	if (ix != bx || iy != by || iw != bw || ih != bh) {
-		gb.FillSolidRect(bx, by, bw, 1, 0x22ffffff);
-		gb.FillSolidRect(bx, by - 1, bw, 1, 0x22000000);
-	};
-	newImg.ReleaseGraphics(gb);
-
-	return newImg;
-};
-
 function showhide_groupheader(){
 	if (layout.showgroupheaders) {
 		layout.showgroupheaders = 0;
@@ -2375,16 +2325,6 @@ function isQueuePlaylistPresent() {
 	return -1;
 };
 
-function ClearQueuePlaylist() {
-	var current_pl = plman.ActivePlaylist;
-	var queue_pl_idx = isQueuePlaylistPresent();
-	if (queue_pl_idx >= 0) {
-		plman.ActivePlaylist = queue_pl_idx;
-		plman.RemovePlaylist(queue_pl_idx);
-		plman.ActivePlaylist = current_pl < plman.PlaylistCount ? current_pl : current_pl - 1;
-	};
-};
-
 function CheckPlaylistQueue() {
 	var total_pl = plman.PlaylistCount;
 	var queue_pl_idx = isQueuePlaylistPresent();
@@ -2411,9 +2351,12 @@ function on_playback_queue_changed(origin) {
 			// changed_user_added
 			var total_pl = plman.PlaylistCount;
 			var queue_pl_idx = isQueuePlaylistPresent();
-			if (queue_pl_idx < 0 && queue_pl_on) {
-				plman.CreatePlaylist(total_pl, "Queue Content");
-				queue_pl_idx = total_pl;
+			if (queue_pl_idx < 0) {
+				// queue playlist missing: only create it when the option is enabled
+				if (queue_pl_on) {
+					plman.CreatePlaylist(total_pl, "Queue Content");
+					queue_pl_idx = total_pl;
+				}
 			} else {
 				plman.ClearPlaylist(queue_pl_idx);
 			};
@@ -2505,7 +2448,7 @@ function on_drag_over(action, x, y, mask) {
 				if (!cScrollBar.timerID1) {
 					cScrollBar.timerID1 = window.SetInterval(function() {
 					on_mouse_wheel(1);
-					}, 5);
+					}, 30);
 				};
 			} else {
 				full_repaint();
@@ -2532,13 +2475,13 @@ function on_drag_over(action, x, y, mask) {
 				dragndrop.timerID = false;
 				}, 50);
 			};
-			if (y > p.list.h && !g_dragndrop_bottom) {
+			if (y > p.list.y + p.list.h && !g_dragndrop_bottom) {
 				if (!p.list.buttonclicked) {
 					p.list.buttonclicked = true;
 					if (!cScrollBar.timerID1) {
 						cScrollBar.timerID1 = window.SetInterval(function() {
 						on_mouse_wheel(-1);
-						}, 5);
+						}, 30);
 					};
 				}
 			}
@@ -2608,59 +2551,24 @@ function refresh_cover(recache){
 }
 
 function get_misccfg(){
-	cRow.default_playlist_h = Number(common_cfg_map.LineHeight);
-	cList.scrollstep = Number(common_cfg_map.ScrollStep);
-	sys_scrollbar = Number(common_cfg_map.sys_scrollbar);
-	color_bycover = Number(common_cfg_map.color_bycover);
-	cbkg_bycover = Number(common_cfg_map.cbkg_bycover);
-	color_noesl = Number(common_cfg_map.color_noesl);
-	color_threshold = Number(common_cfg_map.color_threshold);
-	cbkg_chroma = Number(common_cfg_map.cbkg_chroma);
-	rating2tag = Number(common_cfg_map.rating2tag);
-	show_menu = Number(common_cfg_map.show_menu);
-	show_extrabtn = Number(common_cfg_map.show_extrabtn);
-	libbtn_fuc = Number(common_cfg_map.libbtn_fuc);
-	colorful_seek = Number(common_cfg_map.colorful_seek);
-	track_edit_app = common_cfg_map.track_edit_app;
-	title_add = common_cfg_map.title_add;
-	if(!cfgexist){ // 数据库不存在：创建并写入默认值
+	cRow.default_playlist_h = cfg_map.LineHeight;
+	cList.scrollstep = cfg_map.ScrollStep;
+	if(!cfgexist){ // common.cfg 不存在：写入默认值
 		save_defaultcfg();
 	}
 }
 
-function common_cfg_write_db(map) {
-	var db = utils.OpenDatabase(fb.ProfilePath + "foobox\\config\\config.db");
-	db.Exec('CREATE TABLE IF NOT EXISTS "common" (name TEXT PRIMARY KEY, value TEXT)');
-	for (var name in map) {
-		db.Exec('INSERT OR REPLACE INTO "common" (name, value) VALUES (?, ?)', [name, String(map[name])]);
-	}
+function common_cfg_write() { // common.cfg：JSON 文本，整文件覆盖（仅本面板写入，其余面板只读）
+	utils.WriteTextFile(fb.ProfilePath + "foobox\\data\\common.cfg", JSON.stringify(cfg_map, null, 3));
 }
 
 function save_defaultcfg(){
-	common_cfg_write_db({
-		"winFrame": winFrame,
-		"LineHeight": cRow.default_playlist_h,
-		"ScrollStep": cList.scrollstep,
-		"sys_scrollbar": sys_scrollbar,
-		"color_bycover": color_bycover,
-		"cbkg_bycover": cbkg_bycover,
-		"color_noesl": color_noesl,
-		"color_threshold": color_threshold,
-		"cbkg_chroma": cbkg_chroma,
-		"rating2tag": rating2tag,
-		"show_menu": show_menu,
-		"show_extrabtn": show_extrabtn,
-		"libbtn_fuc": libbtn_fuc,
-		"colorful_seek": colorful_seek,
-		"track_edit_app": track_edit_app,
-		"title_add": title_add
-	});
+	common_cfg_write();
 }
 
 function save_config(name, value) {
-    var map = {};
-    map[name] = value;
-    common_cfg_write_db(map);
+	cfg_map[name] = value;
+	common_cfg_write();
 }
 
 function get_layout(){
@@ -2801,7 +2709,7 @@ function get_covercahe_config(){
 			albumart_id = AlbumArtId.front;
 			cache_subdir = "album\\";
 	};
-	// Load cached cover keys from SQLite cache.db (worker)
+	// Load cached cover keys from SQLite albumart.db (worker)
 	crclist.length = 0;
 	if (cover_worker) {
 		cover_worker.postMessage({ cmd: 'load_keys', table: get_table_name(cache_subdir) });
@@ -2815,5 +2723,4 @@ function on_script_unload() {
 		cover_worker.terminate();
 		cover_worker = null;
 	}
-	ClearQueuePlaylist();
 };

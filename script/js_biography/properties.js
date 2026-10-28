@@ -250,7 +250,6 @@ let properties = [
 	['Menu Show Paste', 1, 'menuShowPaste'],
 	['Menu Show Missing Data', 0, 'menuShowMissingData'],
 	['Menu Show Tagger', 1, 'menuShowTagger'],
-	['Multi Server', false, 'multiServer'],
 
 	['Overlay', JSON.stringify({
 		'name': 'Overlay',
@@ -314,7 +313,6 @@ let properties = [
 	['Scrollbar Width Bar', 11, 'sbarBase_w'],
 	['Scrollbar Windows Metrics', false, 'sbarWinMetrics'],
 
-	['Server Name', 'biography', 'serverName'],
 
 	['Show More Tags', true, 'showMoreTags'],
 	['Show Similar Artists', true, 'showSimilarArtists'],
@@ -403,10 +401,6 @@ let properties = [
 	['Text Reader Synchronise With Lyrics Download', false, 'syncTxtReaderLyrics'],
 
 	['Theme', 0, 'theme'],
-	['Theme Background Image', false, 'themeBgImage'],
-	['Theme Colour', 3, 'themeColour'],
-	['Theme Light', false, 'themeLight'],
-	['Themed', false, 'themed'], // reserved: don't enable
 	['Touch Control', false, 'touchControl'],
 	['Track Review', 0, 'inclTrackRev'],
 	['Track Review Show Options', false, 'showTrackRevOptions'],
@@ -423,28 +417,4 @@ let properties = [
 const ppt = new PanelProperties;
 ppt.init('auto', properties);
 properties = undefined;
-/*
-if (ppt.get('Update Properties', true)) { // ~22.7.22
-	ppt.nmTxtReader7 = 'item properties';
-	ppt.pthTxtReader7 = '%storage_folder%\\item_properties.json';
-	//ppt.lyricsTxtReader7 = false;
-	if (ppt.summary == '128,228,0') ppt.summary = '128,228,27';
-	const oldProperties = ['Stub Path: Front [No Title Format Except %profile%]', 'Stub Path: Back [No Title Format Except %profile%]', 'Stub Path: Disc [No Title Format Except %profile%]', 'Stub Path: Icon [No Title Format Except %profile%]', 'Stub Path: Artist [No Title Format Except %profile%]'];
-	const props = ['panelFrontStub', 'panelBackStub', 'panelDiscStub', 'panelIconStub', 'panelArtStub'];
-	oldProperties.forEach((v, i) => {const value = window.GetProperty(v); if (value) ppt[props[i]] = value; window.SetProperty(v, null);});
-	window.SetProperty('Lock Rev', null);
-	ppt.set('Update Properties', false);
-}
-
-if (ppt.get('Remove Old Properties', true)) {
-	const oldProperties = ['Allmusic Alb', 'Allmusic Bio', 'Both Bio', 'Both Rev', 'Heading', 'Heading BtnName Biography [AllMusic]', 'Heading BtnName Biography [Last.fm]', 'Heading BtnName Biography [Wikipedia]', 'Heading BtnName Review [AllMusic]', 'Heading BtnName Review [Last.fm]', 'Heading BtnName Review [Wikipedia]', 'Heading Title Format Album Review [AllMusic]', 'Heading Title Format Album Review [Last.fm]', 'Heading Title Format Biography [AllMusic]', 'Heading Title Format Biography [Last.fm]', 'Heading Title Format Track Review [AllMusic]', 'Heading Title Format Track Review [Last.fm]', 'Layout Dual Image+Text', 'Image Seeker Dots', 'Subheading [Source] Text Biography [AllMusic]: Heading|No Heading', 'Subheading [Source] Text Biography [Last.fm]: Heading|No Heading', 'Subheading [Source] Text Biography [Wikipedia]: Heading|No Heading', 'Subheading [Source] Text Review [AllMusic]: Heading|No Heading', 'Subheading [Source] Text Review [Last.fm]: Heading|No Heading', 'Subheading Source Hide-0 Show-1', 'Subheading [Source] Text Review [Wikipedia]: Heading|No Heading', 'Subheading [Track Review] Title Format [AllMusic]', 'Subheading [Track Review] Title Format [Last.fm]', 'Summary First', 'Tagger Last.fm Genre Find>Replace', 'Tagger Last.fm Genre Number Clean Up', 'Tagger Last.fm Genre Run Find>Replace', 'Tagger Last.fm Genre Strip Artist+Album Names', 'Text Album + Track Auto Optimise', 'Text Reader Source 0 Name', 'Text Reader Source 1 Name', 'Text Reader Source 2 Name', 'Text Reader Source 3 Name', 'Text Reader Source 4 Name', 'Text Reader Source 5 Name', 'Text Reader Source 6 Name', 'Text Reader Source 7 Name', 'Text Reader Source 1 (field or full path)', 'Text Reader Source 2 (field or full path)', 'Text Reader Source 3 (field or full path)', 'Text Reader Source 4 (field or full path)', 'Text Reader Source 5 (field or full path)', 'Text Reader Source 6 (field or full path)', 'Text Reader Source 7 (field or full path)', 'Text Reader Source 8 (field or full path)', 'Text Reader Source 1 Lyrics', 'Text Reader Source 2 Lyrics', 'Text Reader Source 3 Lyrics', 'Text Reader Source 4 Lyrics', 'Text Reader Source 5 Lyrics', 'Text Reader Source 6 Lyrics','Text Reader Source 7 Lyrics', 'Text Reader Source 8 Lyrics'];
-	oldProperties.forEach(v => window.SetProperty(v, null));
-	ppt.set('Remove Old Properties', false);
-}
-
-if (ppt.get('Reset Track Review', true)) {
-	ppt.inclTrackRev = 0;
-	ppt.set('Reset Track Review', false);
-}
-*/
 window.SetProperty('Scrollbar Type Default-0 Styled-1 Windows-2', null);

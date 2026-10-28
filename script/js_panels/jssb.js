@@ -1,22 +1,22 @@
 ﻿// foobox https://github.com/dream7180; JSSB http://br3tt.deviantart.com
 window.DefinePanel('JS Smooth Browser', {author: 'Br3tt, dreamawake(MOD), always_beta(CN)', version: '20151114-1630-340', features: {drag_n_drop: true} });
-include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\Genre.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
+include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JSinputbox.js');
+include(fb.ProfilePath + 'foobox\\js_common\\Genre.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JScomponents.js');
 
 var zdpi = 1;
 var dark_mode = 0;
 //}
 var dir_cover_name = window.GetProperty("foobox.cover.folder.name", "cover.jpg;folder.jpg");
-var CACHE_FOLDER = fb.ProfilePath + "foobox\\covercache";
-var sys_scrollbar = Number(common_cfg_map.sys_scrollbar);
+var CACHE_FOLDER = fb.ProfilePath + "foobox\\data";
+var sys_scrollbar = cfg_map.sys_scrollbar;
+cfg_map = {};
 var g_fsize;
 var avoid_checkscroll = false;
 var pidx = -1; //libview playlist index
-var boxText_len = 0;
 var albumsource = 0;
 var g_color_line = RGBA(0, 0, 0, 45);
 var crclist = [];
@@ -178,13 +178,22 @@ function create_cover_worker() {
 			if (brw && brw.setList) brw.setList();
 			break;
 		case 'cached_image':
-			g_image_cache._cachelist[msg.crc] = msg.image;
-			// A preloaded cover may now be visible — set it and repaint
+			// Always keep the bitmap in the LRU, even if the row scrolled away meanwhile
+			g_image_cache.put(msg.crc, msg.image);
 			if (brw && brw.groups && msg.albumIndex >= 0 && msg.albumIndex < brw.groups.length) {
 				var grp2 = brw.groups[msg.albumIndex];
-				if (grp2 && grp2.cachekey == msg.crc && grp2.cover_img == null) {
-					grp2.cover_img = msg.image;
-					if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
+				if (grp2 && grp2.cachekey == msg.crc) {
+					if (in_preload_window(msg.albumIndex)) {
+						if (grp2.cover_img == null) {
+							grp2.cover_img = msg.image;
+							if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
+						}
+					} else {
+						// Row left the window before the reply arrived - allow a new request
+						// when it scrolls back into view
+						grp2.load_requested = 0;
+						grp2.preload_tried = 0;
+					}
 				}
 			}
 			break;
@@ -202,20 +211,29 @@ function create_cover_worker() {
 			break;
 		case 'cover_image':
 			var grp = brw && brw.groups ? brw.groups[msg.albumIndex] : null;
+			// Discard late replies: groups may have been rebuilt by a filter/view switch
+			if (grp && grp.cachekey != msg.crc) grp = null;
 			if (grp) {
 				if (msg.image) {
-					grp.cover_img = msg.image;
-					g_image_cache._cachelist[msg.crc] = msg.image;
+					g_image_cache.put(msg.crc, msg.image);
 					if (!msg.fromCache) {
 						if (crclist[crcidx] && crclist[crcidx].indexOf(msg.crc) < 0) {
 							crclist[crcidx].push(msg.crc);
 						}
 					}
+					if (in_preload_window(msg.albumIndex)) {
+						grp.cover_img = msg.image;
+						if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
+					} else {
+						// Scrolled out of the window: the LRU still has it, request again later
+						grp.load_requested = 0;
+						grp.preload_tried = 0;
+					}
 				} else {
-					// No cover found (cached or native) — show noart instead of loading forever
+					// No cover found (cached or native) - show noart instead of loading forever
 					grp.cover_img = images.noart;
+					if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
 				}
-				if (msg.albumIndex >= g_start_ && msg.albumIndex <= g_end_) brw.repaint();
 			}
 			break;
 		case 'cover_removed':
@@ -227,7 +245,7 @@ function create_cover_worker() {
 	cover_worker.onerror = function (event) {
 		console.log('Cover worker error: ' + event.message);
 	};
-	cover_worker.postMessage({ cmd: 'init', dbPath: CACHE_FOLDER + '\\cache.db', tables: cover_tables });
+	cover_worker.postMessage({ cmd: 'init', dbPath: CACHE_FOLDER + '\\albumart.db', tables: cover_tables });
 }
 
 images = {
@@ -386,7 +404,7 @@ function request_cover(albumIndex) {
 			msg.dirCoverName = dir_cover_name;
 		} else if (ppt.tagMode == 4) {
 			var genre = fb.TitleFormat("%genre%").EvalWithMetadb(grp.metadb);
-			msg.genreImagePath = fb.ProfilePath + "foobox\\genre\\" + GetGenre(genre) + ".jpg";
+			msg.genreImagePath = fb.ProfilePath + "foobox\\images\\genre\\" + GetGenre(genre) + ".jpg";
 		}
 	} else {
 		msg.mode = 'album';
@@ -396,29 +414,89 @@ function request_cover(albumIndex) {
 	cover_worker.postMessage(msg);
 }
 
+//===== Images cache (bounded LRU) =====
+// Decoded covers live in a bounded LRU: _cachelist maps crc -> bitmap and _keys
+// keeps the recency order (oldest first). One decoded cover costs roughly
+// cache_size x cache_size x 4 bytes, so an unbounded map leaks hundreds of MB
+// on a large library.
 image_cache = function() {
 	this._cachelist = {};
+	this._keys = [];
+	this._bytes = 0;
+	this.max_items = 400;
+	this.max_bytes = 96 * 1024 * 1024;
+
+	this._size = function(img) {
+		try { return img ? (img.Width * img.Height * 4) : 0; } catch (e) { return 0; }
+	};
+
+	// Cache keys are normalised to strings: a numeric CRC32 and the same value
+	// echoed back from the worker (or read from the DB) must hit one entry.
+	this._key = function(key) {
+		return (key === null || typeof key == "undefined") ? "" : "" + key;
+	};
+
+	this._touch = function(key) {
+		var i = this._keys.indexOf(key);
+		if (i >= 0) this._keys.splice(i, 1);
+		this._keys.push(key);
+	};
+
+	this._evict = function() {
+		while (this._keys.length > this.max_items || this._bytes > this.max_bytes) {
+			var key = this._keys.shift();
+			if (typeof key == "undefined") break;
+			var img = this._cachelist[key];
+			if (img) this._bytes -= this._size(img);
+			if (this._bytes < 0) this._bytes = 0;
+			delete this._cachelist[key];
+		};
+	};
+
+	this.put = function(key, img) {
+		key = this._key(key);
+		if (key == "" || !img) return;
+		var old = this._cachelist[key];
+		if (old) this._bytes -= this._size(old);
+		this._cachelist[key] = img;
+		this._bytes += this._size(img);
+		this._touch(key);
+		this._evict();
+	};
+
+	this.get = function(key) {
+		key = this._key(key);
+		var img = this._cachelist[key];
+		if (img) this._touch(key);
+		return img;
+	};
 
 	this.hit = function(albumIndex) {
 		var grp = brw.groups[albumIndex];
-		if (grp.load_requested) return;
+		if (!grp || grp.load_requested) return;
 		grp.load_requested = 1;
 		// Small delay to coalesce rapid draw passes; each cover gets its own
 		// timer so all visible covers are requested in parallel (worker queues them).
 		var _delay = (ppt.albumArtId == 5 ? 4 : 8);
+		var cachekey = grp.cachekey;
 		window.SetTimeout(function () {
+			// The list may have been rebuilt while this timer was pending: only request
+			// the cover if the slot still holds the very same album
+			var grp2 = brw && brw.groups ? brw.groups[albumIndex] : null;
+			if (!grp2 || grp2.cachekey != cachekey) return;
 			try { request_cover(albumIndex); } catch (e) {}
 		}, (isScrolling || cScrollBar.timerID ? _delay * 3 : _delay));
 	};
 
 	this.preload = function(albumIndex) {
 		var grp = brw.groups[albumIndex];
-		var img = this._cachelist[grp.cachekey];
+		if (!grp) return;
+		var img = this.get(grp.cachekey);
 		if (img) {
 			grp.load_requested = 1;
 			grp.cover_img = img;
 		} else if (crclist[crcidx] && crclist[crcidx].indexOf(grp.cachekey) >= 0) {
-			// Cover is cached on disk (in DB) but not yet in memory — load it
+			// Cover is cached on disk (in DB) but not yet in memory - load it
 			grp.load_requested = 1;
 			cover_worker.postMessage({
 				cmd: 'preload_cover',
@@ -427,26 +505,105 @@ image_cache = function() {
 				path: CACHE_FOLDER + ppt.cache_subdir + grp.cachekey + '.jpg'
 			});
 		}
-		// else: not cached on disk — leave load_requested=0 so hit() fetches
+		// else: not cached on disk - leave load_requested=0 so hit() fetches
 		// native art when the group becomes visible.
 	};
 
 	this.reset = function(key) {
-		this._cachelist[key] = null;
-	};
-
-	this.getit = function(albumId, image, savecache) {
-		if (image) {
-			let crc = brw.groups[albumId].cachekey;
-			this._cachelist[crc] = image;
-			if (crclist[crcidx] && crclist[crcidx].indexOf(crc) < 0) {
-				crclist[crcidx].push(crc);
-			}
-			return image;
-		} else return null;
+		key = this._key(key);
+		var img = this._cachelist[key];
+		if (img) this._bytes -= this._size(img);
+		delete this._cachelist[key];
+		var i = this._keys.indexOf(key);
+		if (i >= 0) this._keys.splice(i, 1);
 	};
 };
 var g_image_cache = new image_cache;
+
+//===== Cover preload window =====
+// Only the visible rows plus a small margin are warmed up, and covers scrolled
+// far away release their bitmap back to the LRU instead of being kept by the group.
+var PRELOAD_MARGIN_ROWS = 3;
+var g_preload = {
+	from: -1,
+	to: -1,
+	start: 0,
+	end: 0,
+	cursor: 0,
+	keep_start: -1,
+	keep_end: -1
+};
+
+function preload_view(from, to, force) {
+	if (!brw || !brw.groups || brw.groups.length == 0) return;
+	if (!force && from == g_preload.from && to == g_preload.to) return;
+	g_preload.from = from;
+	g_preload.to = to;
+
+	var cols = brw.totalColumns > 0 ? brw.totalColumns : 1;
+	var total = brw.groups.length;
+	if (!(to > from)) to = from + cols;
+	var first_row = Math.floor(from / cols) - PRELOAD_MARGIN_ROWS;
+	if (first_row < 0) first_row = 0;
+	var last_row = Math.floor((to - 1) / cols) + PRELOAD_MARGIN_ROWS;
+	var start = first_row * cols;
+	var end = (last_row + 1) * cols;
+	if (end > total) end = total;
+	if (ppt.showAllItem && start < 1) start = 1;
+
+	release_covers_outside(start, end);
+
+	g_preload.start = start;
+	g_preload.end = end;
+	g_preload.cursor = 0;
+
+	if (timers.preload) {
+		window.ClearInterval(timers.preload);
+		timers.preload = false;
+	}
+	if (end <= start) return;
+	timers.preload = window.SetInterval(function() {
+		var i = g_preload.start + g_preload.cursor++;
+		if (i >= g_preload.end) {
+			if (timers.preload) window.ClearInterval(timers.preload);
+			timers.preload = false;
+			return;
+		}
+		var grp = brw && brw.groups ? brw.groups[i] : null;
+		if (!grp || grp.cover_img != null || grp.load_requested != 0 || grp.preload_tried) return;
+		grp.preload_tried = 1;
+		try { g_image_cache.preload(i); } catch (e) {}
+	}, 2);
+}
+
+function in_preload_window(idx) {
+	var ks = g_preload.keep_start,
+		ke = g_preload.keep_end;
+	if (ks < 0) return true; // window not computed yet: behave as before
+	return idx >= ks && idx < ke;
+}
+
+function release_covers_outside(keep_start, keep_end) {
+	var prev_start = g_preload.keep_start;
+	var prev_end = g_preload.keep_end;
+	g_preload.keep_start = keep_start;
+	g_preload.keep_end = keep_end;
+	if (prev_start < 0 || !brw || !brw.groups) return;
+	var total = brw.groups.length;
+	var first = ppt.showAllItem ? 1 : 0;
+	var from = prev_start > first ? prev_start : first;
+	var to = prev_end < total ? prev_end : total;
+	for (var i = from; i < to; i++) {
+		if (i >= keep_start && i < keep_end) continue;
+		var grp = brw.groups[i];
+		if (!grp || grp.cover_img == null) continue;
+		// Drop the reference so the decoded bitmap can be collected; the LRU cache
+		// still answers instantly when the row scrolls back into view.
+		grp.cover_img = null;
+		grp.load_requested = 0;
+		grp.preload_tried = 0;
+	};
+}
 
 //============Objects=================
 oSwitchbar = function() {
@@ -665,6 +822,7 @@ oPlaylistManager = function() {
 
 			// ** items **
 			var rowIdx = 0;
+			var t = "", tw = 0, cy = 0, cy_ = 0;
 			var totalp = this.playlists.length;
 			var start_ = this.scroll;
 			var end_ = this.scroll + this.totalRows;
@@ -842,7 +1000,7 @@ oPlaylistManager = function() {
 									cPlaylistManager.blink_timer = false;
 									cPlaylistManager.blink_counter = -1;
 									cPlaylistManager.blink_id = null;
-									this.drop_done = false;
+									cPlaylistManager.drop_done = false;
 									// close pman
 									if (!timers.hidePlaylistManager) {
 										timers.hidePlaylistManager = window.SetInterval(pman.hidePanel, 30);
@@ -927,6 +1085,7 @@ oGroup = function(index, handle, groupkey) {
 	};
 	this.cover_img = null;
 	this.load_requested = 0;
+	this.preload_tried = 0;
 
 	this.finalize = function(count, tracks, handles) {
 		this.tra = tracks.slice(0);
@@ -947,7 +1106,7 @@ oBrowser = function() {
 			// populate browser with items
 			brw.populate();
 			// populate playlist popup panel list
-			pman.populate(exclude_active = false, reset_scroll = true);
+			pman.populate(false, true);
 			// kill Timeout
 			launch_timer && window.ClearTimeout(launch_timer);
 			launch_timer = false;
@@ -1030,28 +1189,11 @@ oBrowser = function() {
 	};
 
 	this.setList = function() {
-		let end = this.groups.length;
-		let i=0;
-		if (!timers.preload) {
-			timers.preload = setInterval(() => {
-				if(i < end){
-					try{
-						if (this.groups[i].cover_img == null && i > ppt.showAllItem - 1) {
-							if (this.groups[i].load_requested == 0) {
-								g_image_cache.preload(i);
-							};
-						}
-					}catch(e){
-						clearInterval(timers.preload);
-						timers.preload = null;
-					}
-					i++;
-				} else {
-					clearInterval(timers.preload);
-					timers.preload = null;				
-				}
-			}, 2);
-		}
+		// A rebuilt list (or a fresh disk-cache key list) may be preloadable again
+		var total = this.groups.length;
+		for (var i = 0; i < total; i++) this.groups[i].preload_tried = 0;
+		// Restart the sweep for the current viewport only
+		preload_view(g_start_, g_end_, true);
 	};
 	
 	this.showItemPanelInit = function(){
@@ -1081,8 +1223,7 @@ oBrowser = function() {
 			found = this.groups[a].pl.Find(metadb);
 			if (found != -1) break;
 		};
-		if (found != -1) { // scroll to album and open showlist
-			if (ppt.showAllItem && a == 0) a += 1;
+		if (found != -1 && a < total) { // scroll to album and open showlist
 			if(ppt.sourceMode == 1) avoid_checkscroll =false;
 			if(!avoid_checkscroll){
 			var row = Math.floor(a / this.totalColumns);
@@ -1159,13 +1300,19 @@ oBrowser = function() {
 			found = this.groups[a].pl.Find(metadb);
 			if (found != -1) break;
 		};
-		if (found != -1) { // scroll to album and open showlist
-			if (ppt.showAllItem && a == 0) a += 1;
+		if (found != -1 && a < total) { // scroll to album and open showlist
 			this.playingIndex = a;
 		} else {
 			if(isplaying) this.playingIndex = -1;
 		}
 	};
+
+// Empty metadb handle list. GetPlaylistItems(-1) is not a documented "empty list":
+// a host that maps -1 to the active playlist would pre-fill the container and leak
+// its items into the first group and the ALL group.
+function new_handle_list() {
+	return (typeof fb.CreateHandleList == "function") ? fb.CreateHandleList() : plman.GetPlaylistItems(-1);
+}
 
 	this.init_groups = function() {
 		var handle = null;
@@ -1175,15 +1322,18 @@ oBrowser = function() {
 			t = 0;
 		var arr = ["?", "?"];
 		var tr = [];
-		var pl = plman.GetPlaylistItems(-1);
+		var pl = new_handle_list();
 		var total = this.list.Count;
 		var t_all = 0;
 		var tr_all = [];
-		var pl_all = plman.GetPlaylistItems(-1);
+		var pl_all = new_handle_list();
 		var e = [];
 		var libpaths = null;
 
 		this.groups.splice(0, this.groups.length);
+		// Groups rebuilt: the recorded preload window no longer maps to them
+		g_preload.keep_start = -1;
+		g_preload.keep_end = -1;
 
 		var str_filter = process_string(filter_text);
 		
@@ -1327,39 +1477,26 @@ oBrowser = function() {
 			plman.InsertPlaylistItems(pidx, from, brw.groups[index].pl, false);
 		} else {
 			if (fb.IsPlaying && plman.PlayingPlaylist == pidx) {
-				if (plman.PlayingPlaylist == pidx) { // playing playlist is "Library selection"
-					plman.RenamePlaylist(pidx, "Library View (playing)");
-					if (pfound_playing) {
-						plman.RenamePlaylist(pidx_playing, "Library View");
-						var tot = plman.PlaylistItemCount(pidx_playing);
-						affectedItems.splice(0, affectedItems.length);
-						for (var i = 0; i < tot; i++) {
-							affectedItems.push(i);
-						};
-						plman.SetPlaylistSelection(pidx_playing, affectedItems, true);
-						plman.RemovePlaylistSelection(pidx_playing, false);
-					} else {
-						pidx_playing = pidx + 1;
-						plman.CreatePlaylist(pidx_playing, "Library View");
+				// playing playlist is "Library selection"
+				plman.RenamePlaylist(pidx, "媒体库视图(正在播放)");
+				if (pfound_playing) {
+					plman.RenamePlaylist(pidx_playing, "媒体库视图");
+					var tot = plman.PlaylistItemCount(pidx_playing);
+					affectedItems.splice(0, affectedItems.length);
+					for (var i = 0; i < tot; i++) {
+						affectedItems.push(i);
 					};
-					plman.InsertPlaylistItems(pidx_playing, 0, brw.groups[index].pl, false);
-					plman.MovePlaylist(pidx_playing, pidx);
-					if (pidx_playing < pidx)
-						plman.MovePlaylist(pidx - 1, pidx_playing);
-					else plman.MovePlaylist(pidx + 1, pidx_playing);
+					plman.SetPlaylistSelection(pidx_playing, affectedItems, true);
+					plman.RemovePlaylistSelection(pidx_playing, false);
 				} else {
-					if (pfound) {
-						var tot = plman.PlaylistItemCount(pidx);
-						for (var i = 0; i < tot; i++) {
-							affectedItems.push(i);
-						};
-						plman.SetPlaylistSelection(pidx, affectedItems, true);
-						plman.RemovePlaylistSelection(pidx, false);
-					} else {
-						plman.CreatePlaylist(pidx, "Library View");
-					};
-					plman.InsertPlaylistItems(pidx, 0, brw.groups[index].pl, false);
+					pidx_playing = pidx + 1;
+					plman.CreatePlaylist(pidx_playing, "媒体库视图");
 				};
+				plman.InsertPlaylistItems(pidx_playing, 0, brw.groups[index].pl, false);
+				plman.MovePlaylist(pidx_playing, pidx);
+				if (pidx_playing < pidx)
+					plman.MovePlaylist(pidx - 1, pidx_playing);
+				else plman.MovePlaylist(pidx + 1, pidx_playing);
 			} else {
 				if (pfound) {
 					var tot = plman.PlaylistItemCount(pidx);
@@ -1398,7 +1535,7 @@ oBrowser = function() {
 			var end_ = this.groups.length;
 		} else {
 			var start_ = Math.round(scroll_ / this.rowHeight) * this.totalColumns;
-			var end_ = Math.round((scroll_ + wh + this.rowHeight) / this.rowHeight) * this.totalColumns;
+			var end_ = Math.round((scroll_ + this.h + this.rowHeight) / this.rowHeight) * this.totalColumns;
 			// check values / limits
 			end_ = (this.groups.length < end_) ? this.groups.length : end_;
 			start_ = start_ > 0 ? start_ - this.totalColumns : (start_ < 0 ? 0 : start_);
@@ -1407,6 +1544,9 @@ oBrowser = function() {
 		// save limits calculated into globals var
 		g_start_ = start_;
 		g_end_ = end_;
+
+		// Warm up covers around the viewport and release the far-away ones
+		preload_view(start_, end_);
 	};
 	
 	this.init_swbtn = function(){
@@ -1482,7 +1622,9 @@ oBrowser = function() {
 		var txt_font = g_font;
 		var total = this.groups.length;
 		var all_x = -1,
-			all_y = -1;
+			all_y = -1,
+			all_w = 0,
+			all_h = 0;
 		var coverImg = null;
 		var arr = ["?", "?"];
 
@@ -1507,7 +1649,7 @@ oBrowser = function() {
 				} else {
 					if (this.groups[i].cover_img == null) {
 						if (this.groups[i].load_requested == 0) {
-							this.groups[i].cover_img = g_image_cache._cachelist[brw.groups[i].cachekey];
+							this.groups[i].cover_img = g_image_cache.get(brw.groups[i].cachekey);
 							if(typeof(this.groups[i].cover_img) == "undefined" || this.groups[i].cover_img == null) g_image_cache.hit(i);
 							else brw.groups[i].load_requested = 1;
 						};
@@ -1547,10 +1689,12 @@ oBrowser = function() {
 						var im_w = coverWidth;
 						var im_h = coverWidth;
 					};
-					// save coords ALL cover image:
+					// save coords and size of the ALL cover image:
 					if (ppt.showAllItem && i == 0) {
 						all_x = ax + Math.round((aw - im_w) / 2);
 						all_y = coverTop + coverWidth - im_h;
+						all_w = im_w;
+						all_h = im_h;
 					}
 					let this_x = ax + Math.round((aw - im_w) / 2);
 					let this_y = coverTop + coverWidth - im_h;
@@ -1688,9 +1832,9 @@ oBrowser = function() {
 
 		// fill ALL cover image with the 1st four cover art found
 		// get cover
-		if (all_x > -1 && ppt.showAllItem && g_start_ == 0) {// && total > 1) {
-			var ii_w = Math.floor(im_w / 2);
-			var ii_h = Math.floor(im_h / 2);
+		if (all_x > -1 && all_w > 0 && ppt.showAllItem && g_start_ == 0) {// && total > 1) {
+			var ii_w = Math.floor(all_w / 2);
+			var ii_h = Math.floor(all_h / 2);
 			var ii_x1 = all_x;
 			var ii_x2 = ii_x1 + ii_w;
 			var ii_y1 = all_y;
@@ -1716,9 +1860,9 @@ oBrowser = function() {
 				};
 			};
 			//frames of all items
-			gr.DrawRect(ii_x1, ii_y1, im_w - 2, im_h - 2, 1.0, g_color_line);
-			gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(im_h / 2) - 1, im_w - 3, 1, g_color_line);
-			gr.FillSolidRect(ii_x1 + Math.round(im_w / 2) - 1, ii_y1 + 1, 1,  im_h - 3, g_color_line);
+			gr.DrawRect(ii_x1, ii_y1, all_w - 2, all_h - 2, 1.0, g_color_line);
+			gr.FillSolidRect(ii_x1 + 1, ii_y1 + Math.round(all_h / 2) - 1, all_w - 3, 1, g_color_line);
+			gr.FillSolidRect(ii_x1 + Math.round(all_w / 2) - 1, ii_y1 + 1, 1,  all_h - 3, g_color_line);
 			if (ppt.panelMode > 1) { 
 				if (ppt.showAllItem) {
 					if (this.selectedIndex == 0) {
@@ -1734,7 +1878,7 @@ oBrowser = function() {
 			// redraw hover frame selection on ALL item for Grid view
 			if (ppt.panelMode > 1) { // grid
 				if (g_rightClickedIndex == 0 || this.activeIndex == 0) {
-					gr.DrawRect(all_x + 1, all_y + 1, im_w - 3, im_h - 3, 3.0, g_color_selected_bg);
+					gr.DrawRect(all_x + 1, all_y + 1, all_w - 3, all_h - 3, 3.0, g_color_selected_bg);
 				};
 			};
 		};
@@ -1757,8 +1901,6 @@ oBrowser = function() {
 			boxText = nb_groups + " " +  item_txt[ppt.tagMode + 1] + "  ";
 			break;
 		}
-		try{boxText_len = gr.CalcTextWidth(boxText, g_font_b)}
-		catch (e) {boxText_len = 0;}
 		if (ppt.sourceMode == 0) {
 			var source_name = "Library"
 		} else {
@@ -1965,18 +2107,21 @@ oBrowser = function() {
 		} else {
 			switch (ret) {
 			case 899:
+				// Use the album's own track: the focused item may belong to another album or list
+				var grp_auto = this.groups[albumIndex];
+				var focus = (grp_auto && grp_auto.metadb) ? grp_auto.metadb : fb.GetFocusItem();
 				var pl_n = plman.PlaylistCount;
 				if(ppt.tagMode == 3){
 					if(ppt.dirMode == 1){
-						var string_n = fb.GetLibraryRelativePath(fb.GetFocusItem()).split("\\")[0];
+						var string_n = fb.GetLibraryRelativePath(focus).split("\\")[0];
 						if(string_n != "") plman.CreateAutoPlaylist(pl_n, string_n, "%path%" + " HAS \"\\" + string_n + "\\\"");
 					}else{
-						var string_n = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(fb.GetFocusItem());
-						plman.CreateAutoPlaylist(pl_n, this.groups[albumIndex].groupkey, "%path%" + " HAS \"" + string_n + "\"");
+						var string_n = fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(focus);
+						plman.CreateAutoPlaylist(pl_n, grp_auto.groupkey, "%path%" + " HAS \"" + string_n + "\"");
 					}
 				} else {
-					var string_n = fb.TitleFormat(ppt.tf_autopl).EvalWithMetadb(fb.GetFocusItem());
-					plman.CreateAutoPlaylist(pl_n, this.groups[albumIndex].groupkey, ppt.tf_autopl + " IS \"" + string_n + "\"");
+					var string_n = fb.TitleFormat(ppt.tf_autopl).EvalWithMetadb(focus);
+					plman.CreateAutoPlaylist(pl_n, grp_auto.groupkey, ppt.tf_autopl + " IS \"" + string_n + "\"");
 				}
 				break;
 			case 1010:
@@ -2194,7 +2339,7 @@ oBrowser = function() {
 		// which start point for the search
 		if (total > 1000) {
 			chr = this.groups[Math.floor(total / 2)].groupkey.substring(0, 1);
-			if (first_chr.charCodeAt(first_chr) > chr.charCodeAt(chr)) {
+			if (first_chr.charCodeAt(0) > chr.charCodeAt(0)) {
 				gstart = Math.floor(total / 2);
 			} else {
 				gstart = (ppt.showAllItem ? 1 : 0);
@@ -2206,7 +2351,7 @@ oBrowser = function() {
 		var format_str = "";
 		for (var i = gstart; i < total; i++) {
 			if(ppt.tagMode == 1 && ppt.albumMode == 0) groupkey = this.groups[i].groupkey.split(" ^^ ");
-			else groupkey[0] = this.groups[i].groupkey;
+			else groupkey = [this.groups[i].groupkey];
 			for (var j = 0; j < groupkey.length; j++) {
 				if (len <= groupkey[j].length) {
 					format_str = groupkey[j].substring(0, len);
@@ -2406,7 +2551,7 @@ function on_mouse_lbtn_down(x, y) {
 				timers.mouseDown = window.SetTimeout(function() {
 					window.ClearTimeout(timers.mouseDown);
 					timers.mouseDown = false;
-					if (Math.abs(cTouch.y_start - m_y) > 015) {
+					if (Math.abs(cTouch.y_start - m_y) > 15) {
 						cTouch.down = true;
 					} else {
 						brw.on_mouse("down", x, y);
@@ -2458,7 +2603,7 @@ function on_mouse_lbtn_up(x, y) {
 	if (timers.mouseDown) {
 		window.ClearTimeout(timers.mouseDown);
 		timers.mouseDown = false;
-		if (Math.abs(cTouch.y_start - m_y) <= 030) {
+		if (Math.abs(cTouch.y_start - m_y) <= 30) {
 			brw.on_mouse("down", x, y);
 		};
 	};
@@ -2468,9 +2613,9 @@ function on_mouse_lbtn_up(x, y) {
 		cTouch.down = false;
 		cTouch.y_end = y;
 		cTouch.scroll_delta = scroll - scroll_;
-		if (Math.abs(cTouch.scroll_delta) > 015) {
+		if (Math.abs(cTouch.scroll_delta) > 15) {
 			cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
-			cTouch.delta = Math.round((cTouch.scroll_delta) / 015);
+			cTouch.delta = Math.round((cTouch.scroll_delta) / 15);
 			if (cTouch.multiplier < 1) cTouch.multiplier = 1;
 			if (cTouch.timer) window.ClearInterval(cTouch.timer);
 			cTouch.timer = window.SetInterval(function() {
@@ -2531,7 +2676,7 @@ function on_mouse_move(x, y) {
 			if (x < brw.w) {
 				scroll -= cTouch.y_move;
 				cTouch.scroll_delta = scroll - scroll_;
-				if (Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
+				if (Math.abs(cTouch.scroll_delta) < 30) cTouch.y_start = cTouch.y_current;
 				cTouch.y_prev = cTouch.y_current;
 			};
 		} else {
@@ -2551,7 +2696,7 @@ function on_mouse_wheel(step) {
 	};
 
 	if (utils.IsKeyPressed(VK_SHIFT)) { // zoom cover size only
-		var zoomStep = Math.round(ppt.thumbnailWidthMin / 4);
+		var zoomStep = Math.round(ppt.default_thumbnailWidthMin / 4);
 		var previous = ppt.default_thumbnailWidthMin;
 		if (!timers.mouseWheel) {
 			ppt.default_thumbnailWidthMin += step * zoomStep;
@@ -2693,7 +2838,6 @@ function get_font() {
 	g_font_b = GdiFont(g_fname, g_fsize, 1);
 	g_font_s = GdiFont(g_fname, g_fsize - 1, 0);
 	g_font_bb = GdiFont(g_fname, g_fsize + 1, 1);
-	g_font_lock = GdiFont(g_fname, g_fsize*2, 1);
 	cList.incsearch_font = GdiFont(g_fname, g_fsize + 10, 1);
 	g_fnico1 = GdiFont("remixicon", g_font.Size+4, 0);
 	g_fnico2 = GdiFont("remixicon", z(17), 0);
@@ -2726,12 +2870,16 @@ function get_colors() {
 };
 
 function on_script_unload() {
+	if (timers.preload) {
+		window.ClearInterval(timers.preload);
+		timers.preload = false;
+	}
 	if (cover_worker) {
 		cover_worker.terminate();
 		cover_worker = null;
 	}
-	brw.g_time && window.ClearInterval(brw.g_time);
-	brw.g_time = false;
+	if (brw && brw.g_time) window.ClearInterval(brw.g_time);
+	if (brw) brw.g_time = false;
 };
 
 //=================================================// Keyboard Callbacks
@@ -2761,10 +2909,6 @@ function on_key_down(vkey) {
 		case VK_BACK:
 			if (cList.search_string.length > 0) {
 				cList.inc_search_noresult = false;
-				brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length * 13) + (10 * 2)) / 2);
-				brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
-				brw.tt_w = ((cList.search_string.length * 13) + (10 * 2));
-				brw.tt_h = 60;
 				cList.search_string = cList.search_string.substring(0, cList.search_string.length - 1);
 				brw.repaint();
 				cList.clear_incsearch_timer && window.ClearTimeout(cList.clear_incsearch_timer);
@@ -2780,12 +2924,9 @@ function on_key_down(vkey) {
 			break;
 		case VK_ESCAPE:
 		case 222:
-			brw.tt_x = ((brw.w) / 2) - (((cList.search_string.length * 13) + (10 * 2)) / 2);
-			brw.tt_y = brw.y + Math.floor((brw.h / 2) - 30);
-			brw.tt_w = ((cList.search_string.length * 13) + (10 * 2));
-			brw.tt_h = 60;
+			// tt_* still holds the rect computed by the last draw pass
+			if (cList.search_string.length > 0) window.RepaintRect(0, brw.tt_y - 2, brw.w, brw.tt_h + 4);
 			cList.search_string = "";
-			window.RepaintRect(0, brw.tt_y - 2, brw.w, brw.tt_h + 4);
 			break;
 		case VK_UP:
 			if (brw.rowsCount > 0 && !cScrollBar.timerID) {
@@ -3026,7 +3167,7 @@ function on_playlists_changed() {
 		}
 	}
 	// refresh playlists list
-	pman.populate(exclude_active = false, reset_scroll = false);
+	pman.populate(false, false);
 };
 
 function on_playlist_switch() {
@@ -3039,7 +3180,7 @@ function on_playlist_switch() {
 		brw.populate();
 	};
 	// refresh playlists list
-	pman.populate(exclude_active = false, reset_scroll = false);
+	pman.populate(false, false);
 };
 
 function on_playlist_items_added(playlist_idx) {
@@ -3100,6 +3241,7 @@ function on_metadb_changed(handles, fromhook) {
 		}
 		if(found > -1){
 			brw.groups[found].load_requested = 0;
+			brw.groups[found].preload_tried = 0;
 			brw.groups[found].cover_img = null;
 		}
 		if(_repaint) brw.repaint();
@@ -3117,7 +3259,7 @@ function on_focus(is_focused) {
 //=================================================// Custom functions
 
 function match(input, str) {
-	var temp = "";
+	input = input.toLowerCase();
 	input = input.toLowerCase();
 	for (var j in str) {
 		if (input.indexOf(str[j]) < 0) return false;
@@ -3126,13 +3268,11 @@ function match(input, str) {
 };
 
 function process_string(str) {
-	str_ = [];
-	str = str.toLowerCase();
-	while (str != (temp = str.replace("  ", " ")))
-	str = temp;
-	var str = str.split(" ").sort();
-	for (var i in str) {
-		if (str[i] != "") str_[str_.length] = str[i];
+	var str_ = [];
+	str = str.toLowerCase().replace(/ {2,}/g, " ");
+	var arr = str.split(" ").sort();
+	for (var i in arr) {
+		if (arr[i] != "") str_[str_.length] = arr[i];
 	};
 	return str_;
 };
@@ -3227,13 +3367,6 @@ function on_notify_data(name, info) {
 };
 
 // ======================================================================================================================= //
-
-function path_img(path) {
-	var file_ext =path.substring(path.length - 4);
-	if(file_ext == ".jpg" || file_ext == ".png") return true;
-	else return false;
-}
-
 function get_tagprop(){
 	switch (ppt.tagMode) {
 	case 1:
@@ -3300,6 +3433,7 @@ function get_tagprop(){
 
 function reset_this_cache(idx, crc){
 	brw.groups[idx].load_requested = 0;
+	brw.groups[idx].preload_tried = 0;
 	g_image_cache.reset(crc);
 	brw.groups[idx].cover_img = null;
 	if (crclist[crcidx]) {
@@ -3322,6 +3456,7 @@ function refresh_cover(resetcache) {
 	var total = brw.groups.length;
 	for (var i = 0; i < total; i++) {
 		brw.groups[i].load_requested = 0;
+		brw.groups[i].preload_tried = 0;
 		brw.groups[i].cover_img = null;
 	};
 	brw.repaint();

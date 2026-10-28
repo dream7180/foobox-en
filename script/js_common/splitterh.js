@@ -1,4 +1,4 @@
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
 window.DlgCode = DLGC_WANTALLKEYS;
 let ww = 0, wh = 0, minw = 1;
 let m_x = 0, m_y = 0;
@@ -59,13 +59,11 @@ function on_paint(gr) {
 function on_mouse_move(x, y) {
 	if(m_x == x && m_y == y) return;
 	if(x > minw && y > 0 && x < ww - minw && y < wh) {
-		window.SetCursor(32644);//IDC_SIZE
+		window.SetCursor(32644);//IDC_SIZEWE
 		if(sp_drag){
 			PLeft.Move(0, 0, x, wh);
 			PRight.Move(x + 2, 0, ww - x - 2, wh);
 			window.Repaint();
-			leftratio = PLeft.Width/(ww -2);
-			window.SetProperty("LeftPane.Ratio", Math.round(leftratio*100000)/100000);
 		}
 	}
 	m_x = x;
@@ -77,7 +75,15 @@ function on_mouse_lbtn_down(x, y) {
 }
 
 function on_mouse_lbtn_up(x, y) {
-	sp_drag = false;
+	if(sp_drag){
+		sp_drag = false;
+		leftratio = PLeft.Width/(ww - 2);
+		window.SetProperty("LeftPane.Ratio", Math.round(leftratio*100000)/100000); // write once on release, avoid disk write every frame while dragging
+	}
+}
+
+function on_mouse_leave() {
+	if(!sp_drag) window.SetCursor(32512);//IDC_ARROW
 }
 
 function on_mouse_rbtn_up() {

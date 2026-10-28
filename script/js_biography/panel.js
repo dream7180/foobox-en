@@ -16,8 +16,6 @@ class Panel {
 			y: -1
 		}
 
-		this.notifyTimestamp = Date.now();
-		window.NotifyOthers(`bio_notServer${ppt.serverName}`, this.notifyTimestamp);
 		this.tf = {};
 		this.w = 0;
 
@@ -82,7 +80,6 @@ class Panel {
 			loadTimestamp: Date.now(),
 			lyricsSource: false,
 			nowplayingSource: false,
-			numServersChecked: false,
 			propsSource: false,
 			tr: '',
 			curTr: ''
@@ -249,10 +246,9 @@ class Panel {
 	}
 
 	callServer(force, focus, notify, type) {
-		if (!this.id.numServersChecked) this.checkNumServers();
 		switch (type) {
 			case 0:
-				if ($.server) server.download(force, {
+				server.download(force, {
 					ix: this.art.ix,
 					focus: focus,
 					arr: this.art.list.slice(0)
@@ -261,15 +257,6 @@ class Panel {
 					focus: focus,
 					arr: this.alb.list.slice(0)
 				}, notify);
-				if (!$.server || ppt.multiServer) window.NotifyOthers(notify, [{
-					ix: this.art.ix,
-					focus: focus,
-					arr: this.art.list.slice(0)
-				}, {
-					ix: this.alb.ix,
-					focus: focus,
-					arr: this.alb.list.slice(0)
-				}]);
 				break;
 			case 1:
 				server.download(force, {
@@ -287,7 +274,7 @@ class Panel {
 
 	changed() {
 		if (this.id.focus || !fb.IsPlaying) this.callServer(false, this.id.focus, 'bio_lookUpItem', 0);
-		else if ($.server) this.callServer(false, this.id.focus, '', 1);
+		else this.callServer(false, this.id.focus, '', 1);
 	}
 	
 	checkRefreshRates() {
@@ -323,12 +310,6 @@ class Panel {
 		this.lookUpServer = $.debounce(() => {
 			this.callServer(false, this.id.focus, 'bio_lookUpItem', 0);
 		}, ppt.lookUpServerRate);
-	}
-
-	checkNumServers() {
-		ppt.multiServer = false;
-		window.NotifyOthers('bio_checkNumServers', 0);
-		this.id.numServersChecked = true;
 	}
 
 	changeView(x, y, menu) {
@@ -599,15 +580,10 @@ class Panel {
 	}
 
 	exportStyle(n) {
-		const continue_confirmation = (status, confirmed) => {
-			if (confirmed) {
-				window.NotifyOthers('bio_customStyle', JSON.stringify(this.style.free[n - 6]));
-			}
-		}
 		const caption = 'Export Current Style To Other Biography Panels';
 		const prompt = 'Export: ' + this.style.name[n];
-		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation) : true;
-		if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
+		const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', null) : false;
+		if (wsh) { /* no-op in single panel mode */ }
 	}
 
 	getItem() {

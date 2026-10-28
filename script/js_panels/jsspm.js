@@ -1,14 +1,29 @@
 ﻿//foobox https://github.com/dream7180, jsspm http://br3tt.deviantart.com
 window.DefinePanel('JS Smooth Playlist Manager', {author: 'Br3tt, Asion, dreamawake, always_beta(CN)', version: '20151115-1000-151', features: {drag_n_drop: true} });
-include(fb.ProfilePath + 'foobox\\script\\js_common\\getconfig.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\common.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JScommon.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JSinputbox.js');
-include(fb.ProfilePath + 'foobox\\script\\js_common\\JScomponents.js');
-include(fb.ProfilePath + 'foobox\\script\\js_panels\\search.js');
-var sys_scrollbar =  Number(common_cfg_map.sys_scrollbar);
+include(fb.ProfilePath + 'foobox\\js_common\\getconfig.js');
+include(fb.ProfilePath + 'foobox\\js_common\\common.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JScommon.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JSinputbox.js');
+include(fb.ProfilePath + 'foobox\\js_common\\JScomponents.js');
+include(fb.ProfilePath + 'foobox\\js_panels\\search.js');
+var sys_scrollbar = cfg_map.sys_scrollbar;
 var zdpi = 1, dark_mode = 0;
 var default_sort =  window.GetProperty("_PROPERTY: New playlist sortorder", "%album% | %discnumber% | %tracknumber% | %title%");
+// Preset autoplaylists (shared by context_menu items 150-161)
+var presetAutoPls = {
+	150: { name: "Library", query: "ALL", sort: default_sort, flags: 0 },
+	151: { name: "Never played", query: "%play_count% IS 0", sort: default_sort, flags: 1 },
+	152: { name: "History", query: "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", sort: "", flags: 1 },
+	153: { name: "Played often", query: "%play_count% GREATER 0 SORT DESCENDING BY %play_count%", sort: "", flags: 1 },
+	154: { name: "Recently added", query: "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", sort: "", flags: 1 },
+	155: { name: "Favorites", query: "%mood% GREATER 0", sort: default_sort, flags: 0 },
+	156: { name: "Rated 5", query: "%rating% IS 5", sort: default_sort, flags: 0 },
+	157: { name: "Rated 4", query: "%rating% IS 4", sort: default_sort, flags: 0 },
+	158: { name: "Rated 3", query: "%rating% IS 3", sort: default_sort, flags: 0 },
+	159: { name: "Rated 2", query: "%rating% IS 2", sort: default_sort, flags: 0 },
+	160: { name: "Rated 1", query: "%rating% IS 1", sort: default_sort, flags: 0 },
+	161: { name: "Unrated", query: "%rating% MISSING", sort: default_sort, flags: 0 }
+};
 var g_font, g_font_b, g_font_track;
 var g_color_line, g_color_line_div, g_color_playing_txt = c_white;
 var plIco = {
@@ -22,16 +37,6 @@ var brw = null;
 var isScrolling = false;
 
 // --- Playlist Group 虚拟分组 ---
-// 安全解析 JSON 属性，非法/为空时回退默认值
-function parsePropJson(name, fallback) {
-	var val = window.GetProperty(name, fallback);
-	if (typeof val !== "string" || val.trim() === "") val = fallback;
-	try {
-		return JSON.parse(val);
-	} catch (e) {
-		return JSON.parse(fallback);
-	}
-}
 // 白名单：永远不参与分组的播放列表名
 var nonGrouped = [];
 // 虚拟分组列表：[{id, name, collapsed}]
@@ -39,7 +44,7 @@ var Groups = [];
 // 分组映射：{ playlistGuid: groupId }
 var GroupMap = {};
 
-var pm_db_path = fb.ProfilePath + "foobox\\config\\pm.db";
+var pm_db_path = fb.ProfilePath + "foobox\\data\\pm.db";
 var pm_radio_rows = [];
 
 get_gdata();
@@ -230,9 +235,9 @@ var g_start_ = 0, g_end_ = 0;
 var radiom3u = [], radioname = [];
 
 var ppt = {
-	defaultRowHeight: Number(common_cfg_map.LineHeight),
+	defaultRowHeight: cfg_map.LineHeight,
 	rowHeight: 0,
-	rowScrollStep: Number(common_cfg_map.ScrollStep),
+	rowScrollStep: cfg_map.ScrollStep,
 	scrollSmoothness: 2.0,
 	refreshRate: 20,
 	showFilter: window.GetProperty("_DISPLAY: Show Filter", true),
@@ -243,7 +248,7 @@ var ppt = {
 	confirmRemove: window.GetProperty("_PROPERTY: Confirm Before Removing", true),
 	enableTouchControl: window.GetProperty("_PROPERTY: Touch control", true)
 };
-var common_cfg_map = {};
+cfg_map = {};
 var rowScrollStep_org = ppt.rowScrollStep;
 
 var cPlaylistManager = {
@@ -313,6 +318,18 @@ var timers = {
 	movePlaylist: false
 };
 
+// Create a preset autoplaylist and insert it at the target position (shared by context_menu presets)
+function createPresetAutoPl(preset, pl_idx, newPlGroup) {
+	var total = plman.PlaylistCount;
+	plman.CreateAutoPlaylist(total, preset.name, preset.query, preset.sort, preset.flags);
+	plman.MovePlaylist(total, pl_idx);
+	if (newPlGroup !== -1) {
+		GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
+		save_gdata();
+	}
+	plman.ActivePlaylist = pl_idx;
+}
+
 function isPlaylistNameTaken(name, excludeIdx) {
     var total = plman.PlaylistCount;
     for (var i = 0; i < total; i++) {
@@ -351,13 +368,23 @@ function getUniquePlaylistName(baseName, excludeIdx) {
 }
 
 //=================================================// Extra functions for playlist manager panel
- function renamePlaylist(autopl_pending) {
+function renamePlaylist(autopl_pending) {
 	// 输入框越界保护
 	if (brw.inputboxID === -1 || !brw.rows[brw.inputboxID]) {
 		brw.inputboxID = -1;
 		return;
 	}
-	
+	var row = brw.rows[brw.inputboxID];
+	// 输入期间行集可能被外部增删/移动重建：用 callRename 时的快照复核，
+	// 防止 RenamePlaylist 落到别的列表上
+	if (brw.inputboxTarget) {
+		if (brw.inputboxTarget.type === "group") {
+			if (!row.isVGroup || row.groupId !== brw.inputboxTarget.id) { brw.inputboxID = -1; return; }
+		} else {
+			if (row.idx < 0 || findPlIndexByGuid(brw.inputboxTarget.guid) !== row.idx) { brw.inputboxID = -1; return; }
+		}
+	}
+
 	let org_name = brw.rows[brw.inputboxID].raw_name;
 	let rowid = brw.rows[brw.inputboxID].idx;
 	let isGroup = brw.rows[brw.inputboxID].isGroup;
@@ -466,12 +493,13 @@ function HtmlDialog(msg_title, msg_content, btn_yes_label, btn_no_label, confirm
 	// report a scale multiplier (e.g. 1.5) instead - the dialog handles both.
 	var dpi = 96;
 	try { if (typeof window.DPI === 'number' && window.DPI > 0) dpi = window.DPI; } catch (e) {}
-	utils.ShowHtmlDialog(window.ID, `file://${fb.ProfilePath}foobox\\script\\html\\ConfirmDialog.html`, {
+	utils.ShowHtmlDialog(window.ID, `file://${fb.ProfilePath}foobox\\html\\ConfirmDialog.html`, {
 		data: [msg_title, msg_content, btn_yes_label, btn_no_label, confirm_callback, dpi],
 	});
 }
 
 function moveGroup(rowId, direction) {
+    // 局限：向上移动跨过空分组时无视觉效果（空分组没有 plman 条目，仅按锚点渲染，顺序不动）
     if (brw.is_moving_group) return;
     var group = brw.rows[rowId];
     if (!group || !group.isGroup) return;
@@ -889,9 +917,8 @@ function sortGroupChildren(groupRowId, sortType) {
 }
 
 //==============Objects======================================================
-var oPlaylist = function(idx, rowId, name) {
+var oPlaylist = function(idx, name) {
 	this.idx = idx;
-	this.rowId = rowId;
 	this.raw_name = name;
 
 	this.isGroup = false; // 虚拟群头由 init_groups 设置
@@ -905,13 +932,17 @@ var oPlaylist = function(idx, rowId, name) {
 	this.level = 0; // 0 为父级 (或独立列表), 1 为子级
 	this.groupId = null;
 	this.isExpanded = true;
+	this.trackCount = 0;
 };
 
-oBrowser = function() {
+var oBrowser = function() {
 	this.rows = [];
+	this.rowsCount = 0;
+	this.filterCount = 0;
 	this.scrollbar = new oScrollbar();
 	this.inputbox = null;
 	this.inputboxID = -1;
+	this.inputboxTarget = null;
 	this.actionRows = [];
 	this.new_bt = null;
 
@@ -1013,7 +1044,7 @@ oBrowser = function() {
 						if (Groups[g].id === groupId) { grp = Groups[g]; break; }
 					}
 					if (grp) {
-						var header = new oPlaylist(-1, rowId, grp.name);
+						var header = new oPlaylist(-1, grp.name);
 						header.isGroup = true;
 						header.isVGroup = true;
 						header.groupId = grp.id;
@@ -1033,14 +1064,16 @@ oBrowser = function() {
 					if (i === plman.PlayingPlaylist) hdr.containsPlaying = true;
 				}
 				if (hdr && !hdr.isExpanded && !hasFilter) continue;
-				var p = new oPlaylist(i, rowId, name);
+				var p = new oPlaylist(i, name);
 				p.level = 1;
 				p.groupId = groupId;
+				p.trackCount = plman.PlaylistItemCount(i);
 				this.rows.push(p);
 				rowId++;
 			} else {
-				var p = new oPlaylist(i, rowId, name);
+				var p = new oPlaylist(i, name);
 				p.level = 0;
+				p.trackCount = plman.PlaylistItemCount(i);
 				this.rows.push(p);
 				rowId++;
 			}
@@ -1050,7 +1083,7 @@ oBrowser = function() {
 		for (var g = 0; g < Groups.length; g++) {
 			if (!seenGroups[Groups[g].id]) {
 				if (hasFilter && !groupMatchesFilter[Groups[g].id]) continue;
-				var header = new oPlaylist(-1, rowId, Groups[g].name);
+				var header = new oPlaylist(-1, Groups[g].name);
 				header.isGroup = true;
 				header.isVGroup = true;
 				header.groupId = Groups[g].id;
@@ -1102,6 +1135,17 @@ oBrowser = function() {
 			}
 		}
 		this.rowsCount = rowId;
+		// 过滤计数缓存（draw 每帧直接读取，避免滚动时对全部列表重复匹配）
+		if (hasFilter) {
+			var fc = 0;
+			for (var fi = 0; fi < total; fi++) {
+				var fId = GroupMap[plman.GetGUID(fi)];
+				if (match(plman.GetPlaylistName(fi), str_filter) || (fId && groupMatchesFilter[fId])) fc++;
+			}
+			this.filterCount = fc;
+		} else {
+			this.filterCount = total;
+		}
 		this.getlimits();
 	};
 
@@ -1199,6 +1243,10 @@ oBrowser = function() {
 		
 		this.inputbox = new oInputbox(tw, rh, actual_name, "", g_color_normal_txt, g_color_normal_bg, c_black, g_color_selected_bg, autopl_pending ? "renamePlaylist(true)" : "renamePlaylist(false)", "brw");
 		this.inputboxID = id;
+		// 快照重命名目标（分组 id / 列表 GUID），renamePlaylist 时复核
+		if (this.rows[id] && this.rows[id].isVGroup) this.inputboxTarget = { type: "group", id: this.rows[id].groupId };
+		else if (pl_idx >= 0) this.inputboxTarget = { type: "pl", guid: plman.GetGUID(pl_idx) };
+		else this.inputboxTarget = null;
 		// activate inputbox for edit
 		this.inputbox.on_focus(true);
 		this.inputbox.edit = true;
@@ -1332,8 +1380,8 @@ oBrowser = function() {
 
 						var tx = icon_x + rh + 4 * zdpi;
 
-						// 分组行显示组内合计曲数，列表行显示自身曲数
-						var track_total = this.rows[i].isGroup ? this.rows[i].groupTrackCount : plman.PlaylistItemCount(this.rows[i].idx);
+						// 分组行显示组内合计曲数，列表行显示自身曲数（曲目数在 init_groups 时缓存）
+					var track_total = this.rows[i].isGroup ? this.rows[i].groupTrackCount : this.rows[i].trackCount;
 						track_total = track_total.toString();
 						var track_total_w = gr.CalcTextWidth(track_total, font);
 						
@@ -1351,26 +1399,8 @@ oBrowser = function() {
 			gr.FillSolidRect(0, 0, ww, ppt.SearchBarHeight - 2, g_color_topbar);
 			gr.FillGradRect(0, 0, 1, ppt.headerBarHeight+1, 0, g_color_normal_bg, g_color_normal_bg, 1);//bug of win10 border
 			if(ppt.showFilter){
-				var boxText;
-				if (filter_text.length > 0) {
-					var str_filter = process_string(filter_text);
-					var count = 0;
-					var gMatch = {};
-					for (var gi = 0; gi < Groups.length; gi++) {
-						gMatch[Groups[gi].id] = match(Groups[gi].name, str_filter);
-					}
-					for (var i = 0; i < plman.PlaylistCount; i++) {
-						var name = plman.GetPlaylistName(i);
-						var guid = plman.GetGUID(i);
-						var gId = GroupMap[guid];
-						var nameHit = match(name, str_filter);
-						var groupHit = gId ? !!gMatch[gId] : false;
-						if (nameHit || groupHit) count++;
-					}
-					boxText = count.toString();
-				} else {
-					boxText = plman.PlaylistCount.toString();
-				}
+				// 计数已在 init_groups 缓存，此处仅读取（原逻辑每帧对全部列表重复匹配）
+				var boxText = String(this.filterCount);
 				var tw = gr.CalcTextWidth(boxText+" ", g_font_track);
 				gr.GdiDrawText(boxText, g_font_track, g_color_normal_txt, this.w - tw, 0, tw, ppt.headerBarHeight + ppt.SearchBarHeight - 1, rc_txt);
 			}
@@ -1439,7 +1469,7 @@ oBrowser = function() {
 						if(rid < 0) {
 							if(!this.rows[this.activeRow].islocked) this.actionRows.push(this.activeRow);
 						}
-						else if(rid != cid) this.actionRows.splice(rid, 1);
+						else if(rid != cid) this.actionRows.splice(rid, 1); // 注：点击当前活动列表行且已在选中集时无法取消选中（保留原行为）
 					} else if(utils.IsKeyPressed(VK_SHIFT)){
 						var cid = this.getRowIdFromIdx(plman.ActivePlaylist);
 						if(cid > this.activeRow){
@@ -1674,21 +1704,8 @@ oBrowser = function() {
 									if (members.length > 0) {
 										cPlaylistManager.drag_target_plidx = useAbove ? members[0] : (members[members.length - 1] + 1);
 									} else {
-										var anchorAbove = -1;
-										var anchorBelow = -1;
-										for (var s = tId - 1; s >= 0; s--) {
-											var r = brw.rows[s];
-											if (r && !r.isGroup && r.idx >= 0) { anchorAbove = r.idx; break; }
-										}
-										for (var s2 = tId + 1; s2 < brw.rows.length; s2++) {
-											var r2 = brw.rows[s2];
-											if (r2 && !r2.isGroup && r2.idx >= 0) { anchorBelow = r2.idx; break; }
-										}
-										if (useAbove) {
-											cPlaylistManager.drag_target_plidx = (anchorAbove !== -1) ? (anchorAbove + 1) : (anchorBelow !== -1 ? anchorBelow : plman.PlaylistCount);
-										} else {
-											cPlaylistManager.drag_target_plidx = (anchorBelow !== -1) ? anchorBelow : (anchorAbove !== -1 ? (anchorAbove + 1) : plman.PlaylistCount);
-										}
+										// 空分组：复用锚点换算（与 findAnchorPlIdx 同口径）
+										cPlaylistManager.drag_target_plidx = findAnchorPlIdx(tId, useAbove);
 									}
 								} else {
 									// 普通列表：按与源锚的相对前后推断插入方向（与绘制端一致）
@@ -1846,7 +1863,6 @@ oBrowser = function() {
 								timers.movePlaylist = window.SetInterval(function() {
 									scroll -= ppt.rowHeight;
 									scroll = check_scroll(scroll);
-									var rowsCount = brw.rowsCount;
 									cPlaylistManager.drag_target_id = cPlaylistManager.drag_target_id > -1 ? cPlaylistManager.drag_target_id - 1 : -1;
 								}, 100);
 							}
@@ -2013,8 +2029,6 @@ oBrowser = function() {
 		var _restorepl = window.CreatePopupMenu();
 		var _radiolist = window.CreatePopupMenu();
 		var idx;
-		var total_area, visible_area;
-		var bout, z;
 		var add_mode = (id == null || id < 0);
 		var total = plman.PlaylistCount;
 		
@@ -2300,7 +2314,7 @@ oBrowser = function() {
 			break;
 		case (idx == 29):
 			// 临时生成电台列表文本 → 编辑对话框 → 回读存入 radio 表 → 删除临时文件（与 menu 162 同模式）
-			var radiolist = fb.ProfilePath + "foobox\\config\\radio.list";
+			var radiolist = fb.ProfilePath + "foobox\\data\\radio.list";
 			var rlLines = [];
 			for (var rli = 0; rli < radioname.length; rli++) rlLines.push(radioname[rli] + ": " + radiom3u[rli]);
 			utils.WriteTextFile(radiolist, rlLines.join("\r\n"));
@@ -2584,69 +2598,13 @@ oBrowser = function() {
 			break;
 		case (idx == 150):
 			if (ppt.lockReservedPlaylist) checkMediaLibrayPlaylist();
-			else {
-				var total = plman.PlaylistCount;
-				plman.CreateAutoPlaylist(total, "Library", "ALL", default_sort, 0);
-				plman.MovePlaylist(total, pl_idx);
-				if (newPlGroup !== -1) {
-					GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-					save_gdata();
-				}
-				plman.ActivePlaylist = pl_idx;
-			}
+			else createPresetAutoPl(presetAutoPls[150], pl_idx, newPlGroup);
 			break;
-		case (idx == 151):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Never played", "%play_count% IS 0", default_sort, 1);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 152):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "History", "%last_played% DURING LAST 1 WEEK SORT DESCENDING BY %last_played%", "", 1);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 153):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Played often", "%play_count% GREATER 0 SORT DESCENDING BY %play_count%", "", 1);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 154):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Recently added", "%added% DURING LAST 12 WEEKS SORT DESCENDING BY %added%", "", 1);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 161):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Unrated", "%rating% MISSING", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
+		case (idx >= 151 && idx <= 161 && presetAutoPls[idx]):
+			createPresetAutoPl(presetAutoPls[idx], pl_idx, newPlGroup);
 			break;
 		case (idx == 162):
-			var ngFile = fb.ProfilePath + "foobox\\config\\nongrouped";
+			var ngFile = fb.ProfilePath + "foobox\\data\\nongrouped";
 			utils.WriteTextFile(ngFile, nonGrouped.join("\r\n"));
 			utils.EditTextFile(ngFile);
 			var ngContent = utils.ReadTextFile(ngFile, 0);
@@ -2660,66 +2618,6 @@ oBrowser = function() {
 			nonGrouped = ngNew;
 			save_gdata();
 			try { utils.RemovePath(ngFile); } catch(e) {}
-			break;
-		case (idx == 160):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Rated 1", "%rating% IS 1", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 159):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Rated 2", "%rating% IS 2", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 158):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Rated 3", "%rating% IS 3", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 157):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Rated 4", "%rating% IS 4", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 156):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Rated 5", "%rating% IS 5", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
-			break;
-		case (idx == 155):
-			var total = plman.PlaylistCount;
-			plman.CreateAutoPlaylist(total, "Favorites", "%mood% GREATER 0", default_sort, 0);
-			plman.MovePlaylist(total, pl_idx);
-			if (newPlGroup !== -1) {
-				GroupMap[plman.GetGUID(pl_idx)] = newPlGroup;
-				save_gdata();
-			}
-			plman.ActivePlaylist = pl_idx;
 			break;
 		case (idx == 900):
 			var affectedItems = Array();
@@ -2743,6 +2641,8 @@ oBrowser = function() {
 
 function on_init() {
 	window.DlgCode = DLGC_WANTALLKEYS;
+	window.MinWidth = ppt.SearchBarHeight;
+	window.MinHeight = ppt.SearchBarHeight;
 	get_font();
 	get_colors();
 	get_metrics();
@@ -2777,8 +2677,6 @@ function on_size() {
 	ww = window.Width;
 	wh = window.Height;
 	if (!ww || !wh) return;
-	window.MinWidth = ppt.SearchBarHeight;
-	window.MinHeight = ppt.SearchBarHeight;
 	cFilterBox.w = Math.floor(ww * 0.6);
 	cSearchBox.w = ww - brw.images.topbar_btn.Width * 2 - cSearchBox.x;
 	// set Size of browser
@@ -2821,7 +2719,7 @@ function on_mouse_lbtn_down(x, y) {
 				timers.mouseDown = window.SetTimeout(function() {
 					window.ClearTimeout(timers.mouseDown);
 					timers.mouseDown = false;
-					if (Math.abs(cTouch.y_start - m_y) > 015) {
+					if (Math.abs(cTouch.y_start - m_y) > 13) {
 						cTouch.down = true;
 					}
 					else {
@@ -2848,7 +2746,7 @@ function on_mouse_lbtn_up(x, y) {
 	if (timers.mouseDown) {
 		window.ClearTimeout(timers.mouseDown);
 		timers.mouseDown = false;
-		if (Math.abs(cTouch.y_start - m_y) <= 030) {
+		if (Math.abs(cTouch.y_start - m_y) <= 24) {
 			brw.on_mouse("down", x, y);
 		};
 	};
@@ -2857,9 +2755,9 @@ function on_mouse_lbtn_up(x, y) {
 		cTouch.down = false;
 		cTouch.y_end = y;
 		cTouch.scroll_delta = scroll - scroll_;
-		if (Math.abs(cTouch.scroll_delta) > 030) {
+		if (Math.abs(cTouch.scroll_delta) > 24) {
 			cTouch.multiplier = ((1000 - cTouch.t1.Time) / 20);
-			cTouch.delta = Math.round((cTouch.scroll_delta) / 030);
+			cTouch.delta = Math.round((cTouch.scroll_delta) / 24);
 			if (cTouch.multiplier < 1) cTouch.multiplier = 1;
 			if (cTouch.timer) window.ClearInterval(cTouch.timer);
 			cTouch.timer = window.SetInterval(function() {
@@ -2909,7 +2807,7 @@ function on_mouse_move(x, y) {
 		if (x < brw.w) {
 			scroll -= cTouch.y_move;
 			cTouch.scroll_delta = scroll - scroll_;
-			if (Math.abs(cTouch.scroll_delta) < 030) cTouch.y_start = cTouch.y_current;
+			if (Math.abs(cTouch.scroll_delta) < 24) cTouch.y_start = cTouch.y_current;
 			cTouch.y_prev = cTouch.y_current;
 		};
 	}
@@ -2924,12 +2822,6 @@ function on_mouse_wheel(step) {
 		cTouch.timer = false;
 	};
 	if (brw.rowsCount >0) {
-		/*var g_start_y = brw.rows[g_start_].y;
-		if(g_start_ && g_start_y) {
-			var voffset = g_start_y - ppt.rowHeight - ppt.headerBarHeight;
-			scroll -= step * ppt.rowHeight * (ppt.rowScrollStep - step/Math.abs(step)) - voffset;
-		}
-		else */
 		scroll -= step * ppt.rowHeight * ppt.rowScrollStep;
 		scroll = check_scroll(scroll);
 	}
@@ -3147,7 +3039,7 @@ function on_key_down(vkey) {
 			case VK_DELETE:
 				if(ppt.showFilter && g_filterbox.inputbox.edit) return;
 				if (brw.rowsCount > 0) {
-					if(!brw.actionRows.length && brw.activeRow > -1 && brw.activeRow < brw.rowsCount) brw.actionRows.push(brw.activeRow);
+					if(!brw.actionRows.length && brw.activeRow > -1 && brw.activeRow < brw.rowsCount && !brw.rows[brw.activeRow].islocked) brw.actionRows.push(brw.activeRow);
 					if(ppt.confirmRemove){
 					DeletePlaylist();
 				} else {
@@ -3280,12 +3172,13 @@ function on_playlist_switch() {
 	brw.repaint();
 };
 
+// 曲目增删后分组头的合计曲数需要重算（init_groups 内累加），populate 同时刷新显示
 function on_playlist_items_added(playlist_idx) {
-	brw.repaint();
+	brw.populate(true);
 };
 
 function on_playlist_items_removed(playlist_idx, new_count) {
-	brw.repaint();
+	brw.populate(true);
 };
 
 function on_focus(is_focused) {
@@ -3330,12 +3223,16 @@ function get_gdata(){
 	}
 }
 
+var pm_db = null;
 function pm_db_create() {
-	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\config")) utils.CreateFolder(fb.ProfilePath + "foobox\\config");
-	var db = utils.OpenDatabase(pm_db_path);
-	db.Exec('CREATE TABLE IF NOT EXISTS "groups" (name TEXT PRIMARY KEY, value TEXT)');
-	db.Exec('CREATE TABLE IF NOT EXISTS "radio" (idx INTEGER PRIMARY KEY, name TEXT, url TEXT)');
-	return db;
+	if (!utils.IsDirectory(fb.ProfilePath + "foobox\\data")) utils.CreateFolder(fb.ProfilePath + "foobox\\data");
+	// 缓存句柄：建表只跑一次，避免分组操作频繁 OpenDatabase
+	if (!pm_db) {
+		pm_db = utils.OpenDatabase(pm_db_path);
+		pm_db.Exec('CREATE TABLE IF NOT EXISTS "groups" (name TEXT PRIMARY KEY, value TEXT)');
+		pm_db.Exec('CREATE TABLE IF NOT EXISTS "radio" (idx INTEGER PRIMARY KEY, name TEXT, url TEXT)');
+	}
+	return pm_db;
 }
 
 function save_gdata(){

@@ -2,6 +2,17 @@
 // Playlist object by Br3tt aka Falstaff (c)2015, mod for foobox https://github.com/dream7180
 // *****************************************************************************************************************************************
 
+// cached TitleFormat objects, avoids recreating them per frame / per row
+var tf_info_filename = fb.TitleFormat("%filename_ext%");
+var tf_info_path = fb.TitleFormat("$directory_path(%path%)");
+var tf_info_title = fb.TitleFormat("$if2(%title%,)");
+var tf_info_artist = fb.TitleFormat("$if2(%artist%,)");
+var tf_info_album = fb.TitleFormat("$if2(%album%,)");
+var tf_info_codec = fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz");
+var tf_info_size = fb.TitleFormat("%filesize_natural%");
+var tf_plain_title = fb.TitleFormat("%title%");
+var tf_plain_album = fb.TitleFormat("%album%");
+
 oGroup = function(index, start, count, total_time_length, focusedTrackId, iscollapsed, handle) {
 	this.index = index;
 	this.start = start;
@@ -38,14 +49,6 @@ oGroup = function(index, start, count, total_time_length, focusedTrackId, iscoll
 
 	this.totalPreviousRows = 0;
 
-	this.collapse = function() {
-		this.collapse = true;
-	};
-
-	this.expand = function() {
-		this.collapse = false;
-	};
-	
 	if (handle) {
 		var tf_crc;
 		switch (layout.pattern_idx) {
@@ -397,8 +400,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						this.text_colour = g_color_normal_txt;
 					};
 				};
-			}
-			else {};
+			};
 
 			// Draw Track content
 			// ==================
@@ -492,7 +494,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			// draw group item
 			// ===============
 			if (this.obj) {
-				if (!p.headerBar.columns[0].w > 0 || (p.headerBar.columns[0].w > 0 && this.obj.collapsed)) {
+				if (p.headerBar.columns[0].w <= 0 || this.obj.collapsed) {
 					if (this.heightInRow > 1 && cover.show) {
 						cover.h = this.heightInRow * cTrack.height;
 						cover.w = cover.h;
@@ -605,7 +607,7 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 			// Draw cover art
 			// ==============
 			if (this.obj) {
-				if (!p.headerBar.columns[0].w > 0 || (p.headerBar.columns[0].w > 0 && this.obj.collapsed)) {
+				if (p.headerBar.columns[0].w <= 0 || this.obj.collapsed) {
 					if (this.heightInRow > 1 && cover.show) {
 						// cover bg
 						var cv_x = Math.floor(this.x + cover.margin);
@@ -861,12 +863,12 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						let handle_list = new FbMetadbHandleList(this.metadb);
 						// Rate to database statistics brought by foo_playcount.dll
 						if (this.l_rating != this.rating) {
-							if (rating2tag && this.tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : this.l_rating}));
+							if (cfg_map.rating2tag && this.tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : this.l_rating}));
 							fb.RunContextCommandWithMetadb("Playback Statistics/Rating/" + ((this.l_rating == 0) ? "<not set>" : this.l_rating), this.metadb);
 							this.rating = this.l_rating;
 						}
 						else {
-							if (rating2tag && this.tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : ""}));
+							if (cfg_map.rating2tag && this.tracktype < 2) handle_list.UpdateFileInfoFromJSON(JSON.stringify({"RATING" : ""}));
 							fb.RunContextCommandWithMetadb("Playback Statistics/Rating/<not set>", this.metadb);
 							this.rating = 0;
 						};
@@ -988,43 +990,10 @@ oItem = function(playlist, row_index, type, handle, track_index, group_index, tr
 						p.list.selEndId = this.track_index;
 					}
 					else { // group header
+						// a group header row always ends the selection on the previous row
+						// (three always-false conditions were merged into this single branch)
 						if (this.track_index > 0) {
-							if (y > p.list.selY) {
-								if (p.list.selStartId <= p.list.selEndId) {
-									if (this.track_index == this.track_index + 1) {
-										p.list.selEndId = this.track_index - 0;
-									}
-									else {
-										p.list.selEndId = this.track_index - 1;
-									};
-								}
-								else {
-									if (this.track_index == this.track_index + 1) {
-										p.list.selEndId = this.track_index - 1;
-									}
-									else {
-										p.list.selEndId = this.track_index - 0;
-									};
-								};
-							}
-							else {
-								if (p.list.selStartId < p.list.selEndId) {
-									if (this.track_index == this.track_index + 1) {
-										p.list.selEndId = this.track_index - 0;
-									}
-									else {
-										p.list.selEndId = this.track_index - 1;
-									};
-								}
-								else {
-									if (this.track_index == this.track_index + 1) {
-										p.list.selEndId = this.track_index - 1;
-									}
-									else {
-										p.list.selEndId = this.track_index - 0;
-									};
-								};
-							};
+							p.list.selEndId = this.track_index - 1;
 						};
 					};
 
@@ -1217,11 +1186,9 @@ oList = function(object_name, playlist) {
 
 	this.getTotalRows = function() {
 		var ct = 0;
-		var cv = 0;
 		var fin = this.groups.length;
 		for (var i = 0; i < fin; i++) {
 			this.groups[i].totalPreviousRows += ct;
-			this.groups[i].totalPreviousTracks += cv;
 			if (this.groups[i].collapsed) {
 				ct += cGroup.collapsed_height;
 			}
@@ -1229,8 +1196,6 @@ oList = function(object_name, playlist) {
 				ct += this.groups[i].count + cGroup.expanded_height;
 				ct += this.groups[i].rowsToAdd;
 			};
-			cv += this.groups[i].count;
-			cv += this.groups[i].rowsToAdd;
 		};
 		return ct;
 	};
@@ -1381,7 +1346,7 @@ oList = function(object_name, playlist) {
 						clearInterval(cover.preload_timer);
 						cover.preload_timer = null;				
 					}
-				}, 2);
+				}, 30);
 			}
 		}
 	};
@@ -1578,6 +1543,7 @@ oList = function(object_name, playlist) {
 		var mediane = 0;
 		var deb = 0;
 		var fin = this.groups.length - 1;
+		var grp_height, grp_size;
 		while (deb <= fin) {
 			mediane = Math.floor((fin + deb) / 2);
 			grp_height = this.groups[mediane].collapsed ? cGroup.collapsed_height : cGroup.expanded_height;
@@ -1934,7 +1900,7 @@ oList = function(object_name, playlist) {
 		if (this.count > 1000) {
 			albumartist = tf_albumartist.EvalWithMetadb(this.handleList[Math.floor(this.count / 2)]);
 			chr = albumartist.substring(0, 1);
-			if (first_chr.charCodeAt(first_chr) > chr.charCodeAt(chr)) {
+			if (first_chr.charCodeAt(0) > chr.charCodeAt(0)) {
 				gstart = Math.floor(this.count / 2);
 			}
 			else {
@@ -1973,7 +1939,7 @@ oList = function(object_name, playlist) {
 			// 2nd search on "title" TAG
 			var format_str = "";
 			for (var i = gstart; i < this.count; i++) {
-				title = fb.TitleFormat("%title%").EvalWithMetadb(this.handleList[i]);
+				title = tf_plain_title.EvalWithMetadb(this.handleList[i]);
 				format_str = title.substring(0, len).toLowerCase();
 				if (format_str == osearch_string) {
 					pid = i;
@@ -1986,7 +1952,7 @@ oList = function(object_name, playlist) {
 			// from 0 to gstart
 			var format_str = "";
 			for (var i = 0; i < gstart; i++) {
-				title = fb.TitleFormat("%title%").EvalWithMetadb(this.handleList[i]);
+				title = tf_plain_title.EvalWithMetadb(this.handleList[i]);
 				format_str = title.substring(0, len).toLowerCase();
 				if (format_str == osearch_string) {
 					pid = i;
@@ -1999,7 +1965,7 @@ oList = function(object_name, playlist) {
 			// 3rd search on "album" TAG
 			var format_str = "";
 			for (var i = gstart; i < this.count; i++) {
-				title = fb.TitleFormat("%album%").EvalWithMetadb(this.handleList[i]);
+				title = tf_plain_album.EvalWithMetadb(this.handleList[i]);
 				format_str = title.substring(0, len).toLowerCase();
 				if (format_str == osearch_string) {
 					pid = i;
@@ -2012,7 +1978,7 @@ oList = function(object_name, playlist) {
 			// from 0 to gstart
 			var format_str = "";
 			for (var i = 0; i < gstart; i++) {
-				title = fb.TitleFormat("%album%").EvalWithMetadb(this.handleList[i]);
+				title = tf_plain_album.EvalWithMetadb(this.handleList[i]);
 				format_str = title.substring(0, len).toLowerCase();
 				if (format_str == osearch_string) {
 					pid = i;
@@ -2063,12 +2029,12 @@ oList = function(object_name, playlist) {
 		_menu.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
 		_menu.AppendMenuSeparator();
 		Context.BuildMenu(_menu, 3, -1);
-		if(track_edit_app != ""){
+		if(cfg_map.track_edit_app != ""){
 			if(g_track_type < 2){
-				_apps = track_edit_app.split("; ");
+				_apps = cfg_map.track_edit_app.split("; ");
 				if(_apps.length == 1){
 					_menu.AppendMenuSeparator();
-					let arr = utils.SplitFilePath(track_edit_app);
+					let arr = utils.SplitFilePath(cfg_map.track_edit_app);
 					_menu.AppendMenuItem(MF_STRING, 1012, "Open with "+arr[1]);
 				} else {
 					_child04.AppendTo(_menu, MF_STRING, "Open with...");
@@ -2089,7 +2055,6 @@ oList = function(object_name, playlist) {
 			_child01.AppendTo(_menu, MF_STRING, "Selection...");
 			_child01.AppendMenuItem(MF_STRING, 1200, "Reset cover cache");
 			_child01.AppendMenuSeparator();
-			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1011, "Remove");
 			_child01.AppendMenuItem(plman.IsAutoPlaylist(this.playlist) ? MF_DISABLED | MF_GRAYED : MF_STRING, 1010, "Crop");
 			if(pl_count > 1 && pl_count < 51){
 				let addSep = true;
@@ -2203,13 +2168,13 @@ oInfoPane = function(){
 	this.c_border = RGBA(0, 0, 0, 120);
 	this.draw = function(gr){
 		var l=[];
-		l.push(fb.TitleFormat("%filename_ext%").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("$directory_path(%path%)").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("$if2(%title%,)").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("$if2(%artist%,)").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("$if2(%album%,)").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("%codec% | $if2(%codec_profile% | ,)$info(encoding) | %channels% | $if2($info(bitspersample) bits | ,)%bitrate% kbps | %samplerate% Hz").EvalWithMetadb(this.metadb));
-		l.push(fb.TitleFormat("%filesize_natural%").EvalWithMetadb(this.metadb));
+		l.push(tf_info_filename.EvalWithMetadb(this.metadb));
+		l.push(tf_info_path.EvalWithMetadb(this.metadb));
+		l.push(tf_info_title.EvalWithMetadb(this.metadb));
+		l.push(tf_info_artist.EvalWithMetadb(this.metadb));
+		l.push(tf_info_album.EvalWithMetadb(this.metadb));
+		l.push(tf_info_codec.EvalWithMetadb(this.metadb));
+		l.push(tf_info_size.EvalWithMetadb(this.metadb));
 		var clw = gr.CalcTextWidth("Folder name: ", g_font);
 		var maxl = gr.CalcTextWidth(l[0], g_font);
 		for(var i = 1; i < 6; i++) {

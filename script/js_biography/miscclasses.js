@@ -154,18 +154,15 @@ class Timers {
 	}
 	
 	image() {
-		if (!$.server) return;
 		this.clear(this.img);
 		this.img.id = setInterval(() => {
 			img.fresh();
 			men.fresh();
-			window.NotifyOthers('bio_imgChange', 0);
-		}, 1000);
+		}, 2000);
 	}
 
 	res(force) {
-		window.NotifyOthers('bio_getImg', force);
-		if ($.server) img.grab(force);
+		img.grab(force);
 	}
 	
 	tooltip() {
@@ -193,17 +190,11 @@ class PopUpBox {
 	}
 
 	getHtmlCode() {
-		//let cssPath = `${my_utils.packagePath}/assets/html/`;
-		//if (this.getWindowsVersion() === '6.1') {
-		//	cssPath += 'styles7.css';
-		//} else {
-		//	cssPath += 'styles10.css';
-		//}
-		let cssPath = `${my_utils.packagePath}/assets/html/styles.css`;
+		let cssPath = `file://${fb.ProfilePath}foobox/js_biography/html/styles.css`;
 		const dpiFontScript = this.getDpiFontScript();
-		this.configHtmlCode = my_utils.getAsset('\\html\\config.html').replace(/href="styles.css"/i, `href="${cssPath}"`).replace(/<\/head>/i, dpiFontScript + '</head>');
-		this.inputHtmlCode = my_utils.getAsset('\\html\\input.html').replace(/href="styles.css"/i, `href="${cssPath}"`).replace(/<\/head>/i, dpiFontScript + '</head>');
-		this.confirmHtmlCode = my_utils.getAsset('\\html\\confirm.html').replace(/href="styles.css"/i, `href="${cssPath}"`).replace(/<\/head>/i, dpiFontScript + '</head>');
+		this.configHtmlCode = utils.ReadTextFile(fb.ProfilePath + 'foobox\\js_biography\\html\\config.html').replace(/href="styles.css"/i, `href="${cssPath}"`).replace(/<\/head>/i, dpiFontScript + '</head>');
+		this.inputHtmlCode = utils.ReadTextFile(fb.ProfilePath + 'foobox\\js_biography\\html\\input.html').replace(/href="styles.css"/i, `href="${cssPath}"`).replace(/<\/head>/i, dpiFontScript + '</head>');
+		this.confirmHtmlCode = utils.ReadTextFile(fb.ProfilePath + 'foobox\\js_biography\\html\\confirm.html').replace(/href="styles.css"/i, `href="${cssPath}"`).replace(/<\/head>/i, dpiFontScript + '</head>');
 	}
 
 	// Embedded MSHTML (IE=edge) renders explicit px sizes at 96dpi without DPI
@@ -225,23 +216,7 @@ class PopUpBox {
 		const fontSize = Math.round(FONT_BASE * scale);
 		return `<script>(function(){var fs=${fontSize};function addStyle(f){try{var st=document.createElement('style');var rule='body,input,label,button,textarea,select,.container{font-size:'+f+'px !important;}';if(st.styleSheet){st.styleSheet.cssText=rule;}else{st.appendChild(document.createTextNode(rule));}document.getElementsByTagName('head')[0].appendChild(st);}catch(e){}}addStyle(fs);})();</script>`;
 	}
-	/*
-	getWindowsVersion() {
-		let version = '';
 
-		try {
-			version = (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMajorVersionNumber')).toString();
-			version += '.';
-			version += (WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentMinorVersionNumber')).toString();
-			return version;
-		} catch (e) {}
-		try {
-			version = WshShell.RegRead('HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentVersion');
-			return version;
-		} catch (e) {}
-		return '6.1';
-	}
-	*/
 	config(ppt, cfg, dialogWindow, ok_callback, lang, recycler) {
 		utils.ShowHtmlDialog(0, this.configHtmlCode, {
 			data: [ppt, cfg, dialogWindow, window.IsTransparent, ok_callback, this.tf_callback, lang, recycler],

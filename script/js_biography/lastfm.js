@@ -47,7 +47,6 @@ class DldLastfmBio {
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = this.searchBio == 3 ? 'https://' + server.lfm.server + '/music/' + encodeURIComponent(this.artist) + '/' + encodeURIComponent(this.itemValue[0]) : this.searchBio == 2 ? 'https://www.last.fm/music/' + encodeURIComponent(this.artist) + '/+albums' : 'https://' + (!this.retry ? server.lfm.server : 'www.last.fm') + '/music/' + encodeURIComponent(this.artist) + (this.searchBio ? '/+wiki' : '');
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.artist + this.pth_bio + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
@@ -112,15 +111,15 @@ class DldLastfmBio {
 					});
 					this.topTracks = this.topTracks.length ? topTracks[cfg.lang.ix] + this.topTracks.join('\u200b, ') : '';
 					this.tags = this.tags.length ? 'Top Tags: ' + this.tags.join('\u200b, ') : '';
-					if (this.itemValue[1].length) {
+					if (this.itemValue[1] && this.itemValue[1].length) {
 						r1.forEach((v, i) => itemName[1] = itemName[1].replace(RegExp(v, 'i'), r2[i]));
 						this.pop = '\r\n\r\n' + itemName[1] + ': ' + this.itemValue[1];
 					}
-					if (this.itemValue[0].length) {
-						if (!this.itemValue[1].length) {
+					if (this.itemValue[0] && this.itemValue[0].length) {
+						if (!this.itemValue[1] || !this.itemValue[1].length) {
 							r1.forEach((v, i) => itemName[0] = itemName[0].replace(RegExp(v, 'i'), r2[i]));
 						}
-						this.pop += (this.itemValue[1].length ? '; ' : '\r\n\r\n') + $.titlecase(itemName[0]) + ': ' + this.itemValue[0];
+						this.pop += (this.itemValue[1] && this.itemValue[1].length ? '; ' : '\r\n\r\n') + $.titlecase(itemName[0]) + ': ' + this.itemValue[0];
 					}
 					this.simArtists = this.simArtists.length ? server.similar[cfg.lang.ix] + this.simArtists.join('\u200b, ') : '';
 					doc.close();
@@ -204,7 +203,6 @@ class DldLastfmBio {
 		$.save(this.pth_bio, this.con, true);
 		server.res();
 		panel.getList();
-		window.NotifyOthers('bio_getLookUpList', 'bio_getLookUpList');
 	}
 }
 
@@ -292,7 +290,6 @@ class LfmArtImg {
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		const URL = 'https://' + (!this.retry ? server.lfm.server : 'www.last.fm') + '/music/' + encodeURIComponent(this.dl_ar) + '/+images';
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.dl_ar + this.getNo + this.autoAdd + this.img_folder + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
@@ -429,7 +426,6 @@ class LfmAlbum {
 		this.func = null;
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		this.func = this.analyse;
-		if (ppt.multiServer && !force && server.urlDone(utils.MD5(this.albumArtist + this.album + this.albm + this.rev + this.rev_img + (cfg.imgRevHQ || !this.rev_img) + this.pth + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (!this.getStats && this.rev || !this.rev) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
@@ -635,7 +631,6 @@ class LfmTrack {
 		this.func = null;
 		this.xmlhttp = XMLHttpRequest(); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 		this.func = this.analyse;
-		if (ppt.multiServer && !this.force && server.urlDone(utils.MD5(this.artist + this.track + this.pth + URL))) return;
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (!this.getStats && !this.lfm_done) this.xmlhttp.setRequestHeader('User-Agent', 'foobar2000_script');
@@ -880,7 +875,6 @@ class LfmSimilarArtists {
 					$.save(this.fn_sim, JSON.stringify(list), true);
 					if (cfg.lfmSim) {
 						panel.getList();
-						window.NotifyOthers('bio_getLookUpList', 'bio_getLookUpList');
 					}
 				}
 				break;

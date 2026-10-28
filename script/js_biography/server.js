@@ -2,7 +2,6 @@
 
 class Server {
 	constructor() {
-		if (!$.server) return;
 		this.albm = '';
 		this.album = '';
 		this.albumArtist = '';
@@ -12,8 +11,9 @@ class Server {
 		this.auto_corr = 1;
 		this.bioCache = `${cfg.storageFolder}cache_bio.json`;
 		this.disambig = '';
-		this.exp = Math.max(panel.d * cfg.exp / 28, panel.d);
-		if (!this.exp || isNaN(this.exp)) this.exp = panel.d;
+		// cfg.exp = 0: auto-update disabled (existing cache never expires, only missing content is downloaded); > 0: min 30 days
+		this.exp = cfg.exp > 0 ? Math.max(panel.d * cfg.exp / 28, panel.d) : Infinity;
+		if (isNaN(this.exp)) this.exp = panel.d;
 		this.imgToRecycle = [];
 		if ($.file(this.bioCache)) this.imgToRecycle = $.jsonParse(this.bioCache, false, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.langFallback = false;
@@ -27,8 +27,6 @@ class Server {
 			ppt.updateNotFound = false;
 		}
 		this.similar = ['Similar Artists: ', '\u00c4hnliche K\u00fcnstler: ', 'Artistas Similares: ', 'Artistes Similaires: ', 'Artisti Simili: ', '\u4f3c\u3066\u3044\u308b\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8: ', 'Podobni Wykonawcy: ', 'Artistas Parecidos: ', '\u041f\u043e\u0445\u043e\u0436\u0438\u0435 \u0438\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u0438: ', 'Liknande Artister: ', 'Benzer Sanat\u00e7\u0131lar: ', '\u76f8\u4f3c\u827a\u672f\u5bb6: '];
-		this.urlRequested = {};
-
 		this.id = {
 			album: '',
 			title: '',
@@ -101,7 +99,6 @@ class Server {
 
 		if ((cfg.dlLfmRev || cfg.dlWikiRev) && !track_done) {
 			if (ppt.showTrackRevOptions) this.getTrack(tr);
-			else window.NotifyOthers('bio_chkTrackRev', tr);
 		}
 	}
 
@@ -110,7 +107,7 @@ class Server {
 		const m = $.jsonParse(this.notFound, [], 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		if (!Array.isArray(m)) { $.deleteFile(this.notFound, true); return false; } // Regorxxx <- Safecheck against corrupt files
 		const n = Date.now();
-		const r = n - exp;
+		const r = n - (isFinite(exp) ? exp : panel.d); // with auto-update off, negative-cache entries still age out after 28 days so update_bio.json cannot grow forever
 		const u = n - panel.d / 28;
 		let k = m.length;
 		if (m.length && m[0].time < u) {
@@ -567,7 +564,6 @@ class Server {
 	}
 
 	res() {
-		window.NotifyOthers('bio_getText', 'bio_getText');
 		txt.grab();
 	}
 
@@ -604,22 +600,6 @@ class Server {
 			});
 			$.save(this.notFound, JSON.stringify(m, null, 3), true);
 		} else { $.deleteFile(this.notFound, true); }
-	}
-
-	urlDone(n) {
-		const keys = Object.keys(this.urlRequested);
-		const now = Date.now();
-		keys.forEach(v => {
-			if (now - this.urlRequested[v] > 300000) { // keep for 5 min
-				delete this.urlRequested[v];
-			}
-		});
-		const done = this.urlRequested[n] ? true : false;
-		if (!done) {
-			this.urlRequested[n] = now;
-			window.NotifyOthers('bio_webRequest', n);
-		}
-		return done;
 	}
 }
 

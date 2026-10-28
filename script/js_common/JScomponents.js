@@ -109,6 +109,13 @@
 			this.inputbox.check("move", x, y);
 			if (this.inputbox.text.length > 0) this.reset_bt.checkstate("move", x, y);
 			break;
+		case "leave":
+			// Pointer left the panel: drop the hover flag, otherwise a later empty-area
+			// right-click on the list is swallowed by the "cursor over filter box" guard
+			this.inputbox.hover = false;
+			this.inputbox.drag = false;
+			if (this.inputbox.text.length > 0) this.reset_bt.state = ButtonStates.normal;
+			break;
 		};
 	};
 

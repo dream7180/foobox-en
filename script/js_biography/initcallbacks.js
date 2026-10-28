@@ -34,9 +34,7 @@ timer.image();
 
 timer.clear(timer.zSearch);
 timer.zSearch.id = setTimeout(() => {
-		if ($.server) {
 		server.download(false, {ix:0, focus:false}, {ix:0, focus:false}); server.download(false, {ix:0, focus:true}, {ix:0, focus:true});
-		}
 		timer.zSearch.id = null;
 }, 3000);
 
@@ -87,29 +85,20 @@ function on_get_album_art_done(handle, art_id, image, image_path) {
 
 function on_item_focus_change() {
 	if (fb.IsPlaying && !panel.id.focus) return;
-	txt.notifyTags();
 	if (panel.id.lookUp) panel.getList(true, true);
 	else if (!panel.updateNeeded()) return;
-	if (panel.block() && !$.server) {
+	if (panel.block()) {
 		img.get = true;
-		txt.get = panel.id.focus ? 2 : 1;
+		txt.get = 1;
 		img.artistReset();
 		txt.albumReset();
 		txt.artistReset();
 	} else {
-		if (panel.block() && $.server) {
-			img.get = true;
-			txt.get = 1;
-			img.artistReset();
-			txt.albumReset();
-			txt.artistReset();
-		} else {
-			img.get = false;
-			txt.get = 0;
-		}
-		panel.focusLoad();
-		panel.focusServer();
+		img.get = false;
+		txt.get = 0;
 	}
+	panel.focusLoad();
+	panel.focusServer();
 }
 
 function on_key_down(vkey) {
@@ -178,7 +167,7 @@ function on_load_image_done(task_id, image, image_path) {
 
 function on_metadb_changed(handleList, fromhook) {
 	if(fromhook) return;
-	if(panel.isRadio(panel.id.focus) || panel.block() && !$.server || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
+	if(panel.isRadio(panel.id.focus) || !panel.updateNeeded() || txt.lyricsDisplayed()) return;
 	// Regorxxx <- Tag changes affect panel focus
 	const [handle,] = fb.IsPlaying && !panel.id.focus
 		? [fb.GetNowPlaying(), plman.PlayingPlaylist]
@@ -317,149 +306,12 @@ function on_mouse_wheel(step) {
 }
 
 function on_notify_data(name, info) {
-	let clone;
+	/*let clone;
 	if (ui.id.local && name.startsWith('opt_')) {
 		clone = typeof info === 'string' ? String(info) : info;
 		on_cui_notify(name, clone);
-	}
+	}*/
 	switch (name) {
-		case 'bio_chkTrackRev':
-			if (!$.server && ppt.showTrackRevOptions) {
-				clone = JSON.parse(JSON.stringify(info));
-				clone.inclTrackRev = true;
-				window.NotifyOthers('bio_isTrackRev', clone);
-			}
-			break;
-		case 'bio_isTrackRev':
-			if ($.server && info.inclTrackRev == true) {
-				clone = JSON.parse(JSON.stringify(info));
-				server.getTrack(clone);
-			}
-			break;
-		case 'bio_imgChange':
-			img.fresh();
-			men.fresh();
-			break;
-		case 'bio_checkImgArr':
-			clone = JSON.parse(JSON.stringify(info));
-			img.checkArr(clone);
-			break;
-		case 'bio_checkNumServers':
-			window.NotifyOthers('bio_serverName', ppt.serverName);
-			break;
-		case 'bio_serverName':
-			if (info != ppt.serverName) ppt.multiServer = true;
-			break;
-		case 'bio_customStyle':
-			clone = String(info);
-			panel.on_notify(clone);
-			break;
-		case 'bio_forceUpdate':
-			if ($.server) {
-				clone = JSON.parse(JSON.stringify(info));
-				server.download(1, clone[0], clone[1]);
-			}
-			break;
-		case 'bio_getLookUpList':
-			panel.getList('', true);
-			break;
-		case 'bio_getRevImg':
-			if ($.server) {
-				clone = JSON.parse(JSON.stringify(info));
-				server.getRevImg(clone[0], clone[1], clone[2], clone[3], false);
-			}
-			break;
-		case 'bio_getImg':
-			img.grab(info ? true : false);
-			break;
-		case 'bio_getText':
-			txt.grab();
-			break;
-		case 'bio_lookUpItem':
-			if ($.server) {
-				clone = JSON.parse(JSON.stringify(info));
-				server.download(false, clone[0], clone[1], name);
-			}
-			break;
-		case `bio_newCfg${ppt.serverName}`:
-			cfg.updateCfg($.jsonParse(info, {}));
-			break;
-		case `bio_notServer${ppt.serverName}`: {
-			const recTimestamp = info;
-			if (recTimestamp >= panel.notifyTimestamp) {
-				$.server = false;
-				timer.clear(timer.img);
-				timer.clear(timer.zSearch);
-			}
-			break;
-		}
-		case 'bio_blacklist':
-			img.blackList.artist = '';
-			img.check();
-			break;
-		case `bio_scriptUnload${ppt.serverName}`:
-			$.server = true;
-			timer.image(); // Regorxxx <- Fix image timers being reset on multiple panels usage ->
-			panel.notifyTimestamp = Date.now();
-			window.NotifyOthers(`bio_notServer${ppt.serverName}`, panel.notifyTimestamp);
-			break;
-		case 'bio_refresh':
-			window.Reload();
-			break;
-		case 'bio_reload':
-			if (panel.stndItem()) window.Reload();
-			else {
-				txt.artistFlush();
-				txt.albumFlush();
-				txt.grab();
-				if (ppt.text_only) txt.paint();
-			}
-			break;
-		/*case 'bio_followSelectedTrack':
-			if (!panel.id.lyricsSource && !panel.id.nowplayingSource) { // if enabled, panel has to be in prefer nowplaying mode
-				if (panel.id.focus !== info) {
-					panel.id.focus = ppt.focus = info;
-					panel.changed();
-					txt.on_playback_new_track();
-					img.on_playback_new_track();
-				}
-			}
-			break;*/
-		case 'bio_syncTags':
-			if ($.server) {
-				tag.force = true;
-				const focus = info;
-				server.call(focus);
-			}
-			break;
-		case 'bio_webRequest':
-			clone = String(info);
-			server.urlRequested[clone] = Date.now(); // if multiServer enabled, limit URL requests for same item to one
-			break;
-		case 'newThemeColours':
-			if (!ppt.themed) break;
-			ppt.theme = info.theme;
-			ppt.themeBgImage = info.themeBgImage;
-			ppt.themeColour = info.themeColour;
-			on_colours_changed();
-			break;	
-		case 'Sync col': {
-			if (!ppt.themed) break;
-			const themeLight = ppt.themeLight;
-			if (themeLight != info.themeLight) {
-				ppt.themeLight = info.themeLight;
-				on_colours_changed();
-			}
-			break;
-		}
-		case 'Sync image':
-			if (!ppt.themed) break;
-			sync.img = {image: new GdiBitmap(info.image), id: info.id};
-			if (!panel.block()) {
-				sync.image(sync.img.image, sync.img.id);
-				sync.get = false;
-			} else sync.get = true;
-			break;
 		case "color_scheme_updated":
 			let c_h = false, c_bg = false;
 			if(info) {
@@ -474,9 +326,6 @@ function on_notify_data(name, info) {
 			txt.albCalc();
 			txt.artCalc();
 			txt.paint();
-			break;
-		case "bgcolour_to_change":
-			switchbgcolour = info;
 			break;
 	}
 }
@@ -497,7 +346,6 @@ function on_paint(gr) {
 function on_playback_dynamic_info_track() {
 	txt.rev.amFallback = true;
 	txt.rev.wikiFallback = true;
-	if ($.server) server.downloadDynamic();
 	txt.reader.lyrics3Saved = false;
 	txt.reader.ESLyricSaved = false;
 	txt.reader.trackStartTime = fb.PlaybackTime;
@@ -506,7 +354,7 @@ function on_playback_dynamic_info_track() {
 }
 
 function on_playback_new_track() {
-	if ($.server) server.call();
+	server.call();
 	if (panel.id.focus) return;
 	txt.rev.amFallback = true;
 	txt.rev.wikiFallback = true;
@@ -561,21 +409,17 @@ function on_playlist_switch() {
 }
 
 function on_script_unload() {
-	if ($.server) {
-		window.NotifyOthers(`bio_scriptUnload${ppt.serverName}`, 0);
-		timer.clear(timer.img);
-	}
+	['dl', 'img', 'lyrics', 'sim1', 'sim2', 'source', 'transition', 'tt', 'zSearch'].forEach(v => timer.clear(timer[v])); // clear all timers to avoid callbacks firing after unload
 	[...XMLHttpRequests].forEach((request) => request.abort()); // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available ->
 	but.on_script_unload();
 	txt.deactivateTooltip();
 }
 
-const windowMetricsPath = `${fb.ProfilePath}settings\\themed\\windowMetrics.json`;
 function on_size() {
 	txt.repaint = false;
 	panel.w = window.Width;
 	panel.h = window.Height;
-	if (!window.IsVisible && ui.pss.installed && !ppt.themed) {
+	if (!window.IsVisible && ui.pss.installed) {
 		ui.pss.checkOnSize = true;
 		return;
 	}
@@ -587,23 +431,10 @@ function on_size() {
 	panel.calcText = true;
 	txt.on_size();
 
-	if (ppt.themed && (ppt.theme || ppt.themeBgImage)) {
-		const themed_image = `${fb.ProfilePath}settings\\themed\\themed_image.bmp`;	
-		if ($.file(themed_image) && !panel.block()) sync.image(gdi.Image(themed_image));
-	}
 	img.on_size();
 	filmStrip.on_size();
 	txt.repaint = true;
 	img.art.displayedOtherPanel = null;
-
-	if (!ppt.themed) return;
-	let windowMetrics = $.jsonParse(windowMetricsPath, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-	if (typeof windowMetrics !== 'object' || Array.isArray(windowMetrics)) { windowMetrics = {}; } // Regorxxx <- Safecheck against corrupt files ->
-	windowMetrics[window.Name] = {
-		w: panel.w,
-		h: panel.h
-	}
-	$.save(windowMetricsPath, JSON.stringify(windowMetrics, null, 3), true);
 }
 
 // Regorxxx <- Http Requests when utils.HTTPRequestAsync is available

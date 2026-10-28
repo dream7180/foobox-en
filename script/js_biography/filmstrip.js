@@ -480,7 +480,7 @@ class FilmStrip {
 		switch (ppt.artistView) {
 			case true: {
 				keys = Object.keys(this.scroll.pos.art);
-				if (keys.length > 25) delete this.scroll.pos.art[keys[0]];
+				while (keys.length > 25) delete this.scroll.pos.art[keys.shift()];
 				v = img.artist;
 				if (!this.scroll.pos.art[v]) this.scroll.pos.art[v] = {
 					images: []

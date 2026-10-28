@@ -13,7 +13,6 @@ class Images {
 		this.nh = 10;
 		this.nw = 10;
 		this.removed = 0;
-		this.themed = null;
 		this.x = 0;
 		this.y = 0;
 		this.exclArr = [6467, 6473, 6500, 24104, 24121, 34738, 29520, 35875, 37235, 47700, 52526, 68626, 86884, 92172];
@@ -310,7 +309,7 @@ class Images {
 	}
 
 	blurCheck() {
-		if (!(ppt.covBlur && ui.style.isBlur) && !ppt.imgSmoothTrans || ppt.themed) return;
+		if (!(ppt.covBlur && ui.style.isBlur) && !ppt.imgSmoothTrans) return;
 		this.id.curBlur = this.id.blur;
 		this.id.blur = name.albID(panel.id.focus, 'stnd');
 		this.id.blur += ppt.covType;
@@ -366,14 +365,23 @@ class Images {
 				} else g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height, 0, ui.blur.blendAlpha); // no blur
 			} else {
 				if (ppt.theme == 1 || ppt.theme == 3) {
+					// JSplitter D2D constraint (#675/#680): StackBlur recreates the bitmap, so blurring
+					// the target being drawn to is illegal and silently fails. Blur the source instead.
+					// Perf: blur a downscaled copy and let DrawImage scale it back up; the blur radius
+					// is scaled by the same factor so the visual result stays the same at a fraction
+					// of the cost (level defaults to blurTemp * 2 = 180 on a panel-sized bitmap).
+					if (ui.blur.level > 1) {
+						const f = Math.min(1, 600 / Math.max(image.Width, image.Height));
+						if (f < 1) {
+							image = image.Resize(Math.max(Math.round(image.Width * f), 1), Math.max(Math.round(image.Height * f), 1), 2);
+							image.StackBlur(Math.max(1, Math.round(ui.blur.level * f)));
+						} else {
+							image = image.Clone(0, 0, image.Width, image.Height); // guard shared cache: format('blurAutofill') may return the source uncloned
+							image.StackBlur(ui.blur.level);
+						}
+					}
 					g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height);
-					if (ui.blur.level > 1) gi.StackBlur(ui.blur.level);
 					g.FillSolidRect(0, 0, panel.w, panel.h, this.isImageLight(gi) ? ui.col.bg_light : ui.col.bg_dark);
-				}
-				if (ppt.theme == 4) {
-					g.FillSolidRect(0, 0, panel.w, panel.h, this.getRandomCol());
-					g.DrawImage(image, 0, 0, panel.w, panel.h, 0, 0, image.Width, image.Height, 0, this.getImgAlpha(image));
-					if (ui.blur.level > 1) gi.StackBlur(ui.blur.level);
 				}
 			}
 		});
@@ -436,7 +444,6 @@ class Images {
 		if (this.art.images[this.art.ix] != info[2] && !this.id.w2 && this.art.checkNo < 10) {
 			this.art.checkNo++;
 			this.art.checkArr = [window.ID, this.art.images[this.art.ix], this.art.displayedOtherPanel];
-			window.NotifyOthers('bio_checkImgArr', this.art.checkArr);
 		}
 		if (window.ID > info[0]) return;
 		if (this.art.images[this.art.ix] == this.art.displayedOtherPanel && this.art.validate.length < 2) this.changePhoto(1);
@@ -551,17 +558,15 @@ class Images {
 	}
 
 	draw(gr) {
-		if (sync.get && sync.img) {
-			sync.image(sync.img.image, sync.img.id);
-			sync.get = false;
-		}
 		if (ppt.text_only && !ui.style.isBlur) {
 			if (ppt.showFilmStrip && this.get) this.getImgFallback();
 			return;
 		}
 		if (ui.style.isBlur) {
-			const bImg = !this.themed ? this.blur : this.themed;
-			if (bImg) gr.DrawImage(bImg, 0, 0, panel.w, panel.h, 0, 0, bImg.Width, bImg.Height);
+			const bImg = this.blur;
+			if (bImg) {
+				gr.DrawImage(bImg, 0, 0, panel.w, panel.h, 0, 0, bImg.Width, bImg.Height);
+			}
 		}
 		if (this.get) return this.getImgFallback();
 		if (!ppt.text_only && this.cur) {
@@ -664,7 +669,7 @@ class Images {
 	}
 
 	fresh() {
-		this.counter++;
+		this.counter += 2; // 2s tick: keeps cycle time in sync with timer.image() interval
 		if (this.counter < ppt.cycTimePic || panel.id.lyricsSource && lyrics.display() && lyrics.scroll) return;
 		this.counter = 0;
 		if (panel.block() || !ppt.cycPic || ppt.text_only || seeker.dn || panel.zoom()) return;
@@ -675,23 +680,6 @@ class Images {
 			if (this.cov.images.length < 2 || Date.now() - this.timeStamp.cov < this.style.delay || panel.alb.ix) return;
 			this.changeCov(1);
 		}
-	}
-
-	getImgAlpha(image) {
-		const colorSchemeArray = JSON.parse(image.GetColourSchemeJSON(15));
-		let rTot = 0;
-		let gTot = 0;
-		let bTot = 0;
-		let freqTot = 0;
-		colorSchemeArray.forEach(v => {
-			const col = $.toRGB(v.col);
-			rTot += col[0] ** 2 * v.freq;
-			gTot += col[1] ** 2 * v.freq;
-			bTot += col[2] ** 2 * v.freq;
-			freqTot += v.freq;
-		});
-		const avgCol = ($.clamp(Math.round(Math.sqrt(rTot / freqTot)), 0, 255) + $.clamp(Math.round(Math.sqrt(gTot / freqTot)), 0, 255) + $.clamp(Math.round(Math.sqrt(bTot / freqTot)), 0, 255)) / 3;
-		return $.clamp(avgCol * -0.32 +  128, 64, 128);
 	}
 
 	getArtImages() {
@@ -837,8 +825,7 @@ class Images {
 				if (pth.fe != this.cov.done && cfg.dlRevImg) {
 					const pth_cov = pth.pe[!cfg.supCache ? 0 : 1];
 					const fn_cov = pth_cov + pth.fe;
-					if ($.server) server.getRevImg(a, l, pth_cov, fn_cov, false);
-					else window.NotifyOthers('bio_getRevImg', [a, l, pth_cov, fn_cov]);
+					server.getRevImg(a, l, pth_cov, fn_cov, false);
 					this.cov.done = pth.fe;
 				}
 				this.setStub(cov, this.stub[0].path, false, 0, this.stub[0].user);
@@ -973,15 +960,6 @@ class Images {
 		}
 	}
 
-	getRandomCol() {
-		const rc = () => {
-			return Math.floor(Math.random() * 256);
-		};
-		let c = [rc(), rc(), rc()];
-		while (!this.isColOk(c)) c = [rc(), rc(), rc()];
-		return $.RGBAtoRGB(RGBA(c[0], c[1], c[2], Math.min(80 / ui.blur.alpha, 255)), RGB(0, 0, 0));
-	}
-
 	grab(force) {
 		if (panel.block()) return this.get = true;
 		this.getArtImg(true);
@@ -993,15 +971,6 @@ class Images {
 		if (this.art.cusPhotoLocation) return /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v));
 		const fileSize = utils.GetFileSize(v);
 		return (name.isLfmImg(fso.GetFileName(v), this.artist) || !ppt.imgFilterLfm && /(?:jpe?g|png|webp|gif|bmp)$/i.test(fso.GetExtensionName(v)) && !/ - /.test(fso.GetBaseName(v))) && !this.exclArr.includes(fileSize) && !this.blackListed(v);
-	}
-
-	isColOk(c) {
-		const brightness = Math.sqrt(
-			0.299 * (c[0] * c[0]) +
-			0.587 * (c[1] * c[1]) +
-			0.114 * (c[2] * c[2])
-		);
-		return brightness > 55;
 	}
 
 	isEmbedded(type, ix) { // also identifies yt etc
@@ -1107,8 +1076,7 @@ class Images {
 				if (pth.fe != this.cov.done && cfg.dlRevImg) {
 					const pth_cov = pth.pe[!cfg.supCache ? 0 : 1];
 					const fn_cov = pth_cov + pth.fe;
-					if ($.server) server.getRevImg(a, l, pth_cov, fn_cov, false);
-					else window.NotifyOthers('bio_getRevImg', [a, l, pth_cov, fn_cov]);
+					server.getRevImg(a, l, pth_cov, fn_cov, false);
 					this.cov.done = pth.fe;
 				}
 				this.setStub(cov, this.stub[0].path, false, 0, this.stub[0].user);
@@ -1398,7 +1366,7 @@ class Images {
 				this.im.h = this.nh;
 				break;
 		}
-		return this.format(image, n, type, this.im.w, this.im.h, 'img', o, !ppt.themed ? this.style.blur : false, this.style.border, this.style.fade, this.style.reflection);
+		return this.format(image, n, type, this.im.w, this.im.h, 'img', o, this.style.blur, this.style.border, this.style.fade, this.style.reflection);
 	}
 
 	processSizeFilter() {
@@ -1590,7 +1558,6 @@ class Images {
 
 	setCheckArr(arr_ix) {
 		this.art.checkArr = [window.ID, arr_ix, this.art.displayedOtherPanel];
-		window.NotifyOthers('bio_checkImgArr', this.art.checkArr);
 	}
 
 	setCrop(sz) {

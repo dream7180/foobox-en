@@ -95,7 +95,7 @@
 	}
 
 	/* An absolutely positioned box with a fixed height becomes an invisible mask over the "save folder" inputs below: IE has no pointer-events, so use size/visibility instead */
-	.cacheInfo {position:absolute; width:25%; height:auto; left:33%; top:14.4%; padding-left:0.5em;}
+	.cacheInfo {position:absolute; width:auto; height:auto; left:33%; right:0; top:14.4%; padding-left:0.5em;}
 	.pad {height:1.57em;}
 	.padMedium {height:10em;}
 	.top {display:block; margin-top:1.57em;}
@@ -149,6 +149,9 @@
 		display:inline-block; vertical-align:middle;
 	}
 	.input99 {display:inline-block; vertical-align:middle; width:98%; border:none !important; background:none;}
+	/* cache root: block level so it lines up with the "Root path" label; the width is measured by fitCacheRoot()
+	   against the reference text on the right. border-box makes the px width the outer width, so the right edge matches exactly */
+	.inputRoot {display:block; box-sizing:border-box; width:60%;}
 
 	.inp_label1 {display:block; margin:0.31em 0;}
 	.inp_label2 {padding-left:0.46em;}
@@ -265,7 +268,7 @@
 			<div class="column50">
 				<div class="div_text6">Layout</div>
 				<div id="layout"></div>
-				<div class="div_text6">Look-up button</div>
+				<div class="div_text6">Available content</div>
 				<div id="look_up"></div>
 				<div class="div_text12">Scroll</div>
 				<span class="info3">Bar:</span>
@@ -437,8 +440,8 @@
 			<div class="column31">
 				<div class="div_text6">Main image</div>
 				<div id="mainImage"></div>
-					<div class="div_text9">Filter</div>
-					<div class="info2"><i>Applies to last.fm photo download folder</i></div>
+					<div class="div_text9">Image filter</div>
+					<div class="info2"><i>For last.fm download / custom photos</i></div>
 					<div class="info5"><b>Type</b></div>
 					<div id="input_cntf1"></div>
 					<div class="info5"><b>Size</b></div>
@@ -479,7 +482,7 @@
 				</span>
 				<div id="reflectionMetrics"></div>
 				<div class="div_text9">Stub</div>
-				<div class="info2">Stubs are normally set in fb2k preferences>display. They can also be set in panel properties ("Stub..."), which is checked first. If neither are set, a biography-styled stub is used.</div>
+				<div class="info2">Stubs are set in fb2k preferences>display. If not set, a biography-styled stub is used.</div>
 		</div>
 		</div>
 		</div>
@@ -634,7 +637,6 @@ Font style codes: 0 regular, 1 bold, 2 italic,  3 bold italic, 4 underline
 				<div id="cusScroll"></div>
 				<div class="info2"><b>Scrollbar</b></div>
 				<div id="scrollbar"></div>
-				<div class="info2" style="padding-right:15%"><i>*Select in 'Behaviour Tab' under 'Scroll: Arrows' (N/A if windows scrollbar set). Ensure icon is supported by font.</i></div>
 			</div>
 					
 			<div class="column50">
@@ -645,6 +647,8 @@ Font style codes: 0 regular, 1 bold, 2 italic,  3 bold italic, 4 underline
 				<div id="smoothTransLevel"></div>
 				<div class="info2"><b>Playlist interaction: selection change</b></div>
 				<div id="loadDelay"></div>
+				<div class="info2"><b>Last.fm stats</b></div>
+				<div id="statsShow"></div>
 		</div>
 
 		</div>
@@ -658,7 +662,7 @@ Font style codes: 0 regular, 1 bold, 2 italic,  3 bold italic, 4 underline
 			<div class="info8">
 The variables are used in searching, & should be used in save folder paths and headings to ensure correct functionality.
 
-An advanced radio stream parser designed for use with streams that contain the artist name and song title in a non-standard format is located in foo_uie_jsplitter\package_data\{BA9557CE-7B4B-4E0E-9373-99F511E81252}. It's user configurable (open in a text editor).
+An advanced radio stream parser designed for use with streams that contain the artist name and song title in a non-standard format is located in %profile%\foobox\data\biography. It's user configurable (open in a text editor).
 </div>
 			<div style="clear:both;"></div>
 			<div class="div_text11">Classical music extension</div>
@@ -677,7 +681,7 @@ If preferred, composer can be used by changing %BIO_ALBUMARTIST% above so $meta(
 			<div class="div_text1">Auto-download</div>
 			</div>
 			<div class="column25">
-			<div id="cacheLocation" class="div_text1">Cache location</div>
+			<div id="cacheLocation" class="div_text1">Save location</div>
 			<a id="hide_folders" href="#" onclick="showSaveFolders();return false;">Hide folders</a>
 			</div>
 			<div class="column40">
@@ -698,17 +702,14 @@ If preferred, composer can be used by changing %BIO_ALBUMARTIST% above so $meta(
 			<div id="wikipedia"></div>
 			<div id="savefolder3" class="info7">File names are auto-generated</div>
 			<div style="clear:both;"></div>
-			<div id="supplCache0" class="div_text10">Supplementary cache</div>
-			<div id="supplemental"></div>
-			<div id="supplCache1" class="info4">Look-up items like similar artists and top albums can be saved separately. Find and replace is applied to the save folders above. Preview shows result for last.fm biography.</div>
-			<div style="clear:both;"></div>
 			<div id="savePreview" class="div_text3">Preview</div>
 			<div id="prev"></div>
 			<div style="clear:both;"></div>
 			<div id="cacheInfo" class="cacheInfo">
 			<div id="cache0"></div>
 			<div id="cache1"></div>
-			<a id="save_folders" style="display:block; padding-top:1em;" href="#" onclick="showSaveFolders();return false;">Configure custom cache</a>
+			<div id="cacheRootBox"></div>
+			<a id="save_folders" style="display:block; padding-top:1em;" href="#" onclick="showSaveFolders();return false;">Detailed save paths</a>
 			</div>
 			<div id="pad" class="pad"></div>
 		</div>
@@ -725,9 +726,6 @@ If preferred, composer can be used by changing %BIO_ALBUMARTIST% above so $meta(
 			<div class="div_text7">Limit per artist</div>
 			<div id="photo_limit"></div>
 			<div class="info10">Limit is designed for use with auto-add new. If set, new images replace old. Excess are moved to the recycler. 0 = No limit.</div>
-						<div class="div_text7">Custom load folder</div>
-			<div id="artCusImgFolder"></div>
-			<div class="info4">An alternative load folder for artist photos (load only: no images are saved here). Enable on menu > sources > photo. If enabled, the custom folder is checked first. If no images are found, the last.fm photo download folder is checked.</div>
 			<div id="pad" class="pad"></div>
 			<div style="padding:1.25em 0;"><a id="setSize" href="#" onclick="showPhotoSyntax();return false;">Display of downloaded artist photos in other artwork viewers and playlists</a></div>
 			<div id="photo_help" style="display: none;">
@@ -759,9 +757,6 @@ To get ...*YOUR PATH*..., use sources > open file location > image. Copy the par
 			<div class="info4">Covers for music files are normally obtained through fb2k (Preferences: Display) or from saved locations. Enabling auto-download can obtain missing covers.</div>
 			<div id="cov"></div>
 			<div style="clear:both;"></div>
-			<div class="div_text3">Covers: cycle folder</div>
-			<div id="covCycleFolder"></div>
-			<div class="info4">Folder that enables cycling through images in album view. Default loads artist photos. Select on menu > sources > cover.</div>
 			<div class="div_text3">Covers: custom paths</div>
 			<div id="covCustom"></div>
 			<div class="info4">Most users should not need this feature as covers are auto-loaded by fb2k (Preferences: Display) or from save locations. Enable if required. Use full path minus extension.</div>
@@ -821,9 +816,7 @@ To add to the whitelist, enter comma separated genres below:
 		<div style="clear:both;"></div>
 
 		<div id="misc" class="tabcontent">
-				<div class="div_text3">Site display names</div>
-				<div id="siteNames"></div>
-				<div class="div_text1" style="padding:1.25em 0 0.15em;">Miscellaneous</div>
+				<div class="div_text1">&nbsp;</div><!-- heading removed, this line is kept as a spacer so the elements below stay in place -->
 				<div id="miscellaneous"></div>
 				<div id="miscl"></div>
 				<div id="fuzzyLevel"></div>
@@ -936,6 +929,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var barH = window.btn_cnt_right ? window.btn_cnt_right.offsetHeight : 0;
 				var h = Math.round(document.documentElement.clientHeight - top - barH);
 				cur.style.height = (h > 60 ? h : 60) + "px";
+				fitCacheRoot(); // page switch / window resize: re-measure the cache-root box against its new reference position
 			}
 
 			function openPage(pageName,elmnt,color) {
@@ -988,16 +982,6 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 			function getPreview(id, value) {
 				var ev;
 				if (cur.page == "title_format" || cur.page == "download" || cur.page == "cover" || cur.page == "textreader" && id.slice(-1) < 8) {
-					var sFind = null;
-					var sReplace = null;
-					if (id == 'dld_container11') {
-						sFind = value;
-						sReplace = document.getElementById('dld_container12').value;
-					}
-					if (id == 'dld_container12') {
-						sFind = document.getElementById('dld_container11').value;
-						sReplace = value;
-					}
 					var tf = /tf_/.test(id);
 					var excludeStream = id == 'cov_container0';
 					var tfAll = '';
@@ -1005,7 +989,8 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 						tfAll += document.getElementById('tf_container' + i).value;
 						if (i < 4) tfAll += '~#~'
 					}
-					ev = tf_callback && tf_callback(value, tfAll, excludeStream, sFind, sReplace);
+					// the callback dies when the panel reloads (e.g. after a cache-mode change) and calling it raises an error: swallow it and leave the preview empty
+					try { ev = tf_callback && tf_callback(value, tfAll, excludeStream); } catch (e) { ev = ''; }
 					if (tf) ev = ev.slice(0, -1);
 					if (cur.page == "title_format" && document.getElementById("tf_preview") && id != "tf_preview") document.getElementById("tf_preview").value = ev;
 					if (cur.page == "download" && document.getElementById("dld_preview") && id != "dld_preview") document.getElementById("dld_preview").value = ev;
@@ -1017,7 +1002,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					var t_id = id.slice(-1);
 					var artistType = t_id < 2;
 					var trackType = t_id > 1;
-					ev = tf_callback && tf_callback(value, null, null, null, null, artistType, trackType);
+					try { ev = tf_callback && tf_callback(value, null, null, artistType, trackType); } catch (e) { ev = ''; }
 					if (document.getElementById("tf_heading_preview") && id != "tf_heading_preview") document.getElementById("tf_heading_preview").value = ev;
 				}
 			}
@@ -1028,10 +1013,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 
 				var el = document.activeElement;
 				var id = el.id;
-				if (/scrollbar_container6/.test(id)) {
-					window.scrollbar_container5.style.fontFamily = window.scrollbar_container6.value;
-				}
-				
+
 				var previewable = /tf_|dld_|cov_|cusText_/.test(id);
 				if (previewable) {
 					getPreview(id, el.value);
@@ -1133,7 +1115,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var covLabels = ['Auto-download [lastfm best quality]', 'Save folder', 'Save file name', 'Check custom paths', 'Custom path'];
 				var cusScrollLabels = ['Step (0 = page)', 'Smooth duration max (ms)', 'Touch duration max (ms)', 'Touch sensitivity 0-10'];
 				var cusTextLabels = ['Supports tags or full paths: text, lyrics and item properties. Uses first found for each view.', 'Preview', 'Synchronise with newly downloaded', 'Scroll synced', 'Scroll unsynced'];
-				var dlLabels = ['Custom', 'Default (package data)', 'Review', 'Biography', 'Photo', 'Review albumart', 'Similar artists', 'Review', 'Biography', 'Enable'];
+				var dlLabels = ['Custom', 'Default', 'Review', 'Biography', 'Photo', 'Review albumart', 'Similar artists', 'Review', 'Biography'];
 				var dropShadowLevelLabels = [0, 1, 2, 3];
 				var filmStripLabels = ['Flush', 'Align with image', 'Apply image margins','Align with text', 'Apply text margins', ]
 				var filterLabels = ['KB max size', 'KB min size', 'PX min resolution', 'Min number (top priority)'];
@@ -1147,7 +1129,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var highlightLabels = ['Button', 'Heading', 'Line', 'Image border', 'Overlay border', 'Rating stars', 'Subheadings', 'Summary', 'Text'];
 				var langLabels = ['English', 'Deutsch', 'Espa\u00f1ol', 'Fran\u00e7ais', 'Italiano', '\u65e5\u672c\u8a9e', 'Polski', 'Portugu\u00eas', '\u0420\u0443\u0441\u0441\u043a\u0438\u0439', 'Svenska', 'T\u00fcrk\u00e7e', '\u7b80\u4f53\u4e2d\u6587'];
 				var layoutLabels = ['Double-click toggle', 'Same layout for artist & album'];
-				var lookupLabels = ['Hide', 'Top left', 'Prefer heading', 'Auto-cycle time (seconds; min 30)'];
+				var lookUpCycleTimeLabel = 'Auto-cycle time (seconds; min 30)';
 				var lineLabels = ['None', 'Bottom', 'Center'];
 				var lyricsScrollMethodLabels = ['Scroll time average (ms)', 'Scroll time max (ms)'];
 				var mainImgLabels = ['Enlarge on hover', 'Smooth transition', 'Auto-cycle time (seconds)'];
@@ -1158,13 +1140,12 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var ratingTextPosLabels = ['Auto', 'Embed', 'Own line'];
 				var reflPosLabels = ['Auto-position', 'Top', 'Right', 'Bottom', 'Left', 'Strength % [shift + wheel over <i>main</i> image]', 'Size %', 'Gradient level %'];	
 				var sbarColLabels = ['Grey', 'Blend'];
-				var sbarIconLabels = ['Arrows', 'Triangles', 'Custom'];
+				var sbarIconLabels = ['Arrows', 'Triangles'];
 				var sbarShowLabels = ['Hide', 'Auto', 'Show'];
 				var sbarTypeLabels = ['Default', 'Styled', 'Windows Light Mode', 'Windows Dark Mode'];
-				var scrollbarLabels = ['Bar Width', 'Narrow bar width (0 = auto)', 'Arrow width', 'Arrow padding (+/-)', 'Grip min height', 'Custom icon*', 'Custom icon font name', 'Custom icon offset (%)', 'Prefer full height scrollbar'];				
+				var scrollbarLabels = ['Bar Width', 'Narrow bar width (0 = auto)', 'Arrow width', 'Arrow padding (+/-)', 'Grip min height', 'Prefer full height scrollbar'];				
 				var scrollLabels = ['Windows metrics', 'Rounded grip', 'Smooth scroll', 'Touch control'];
 				var seekerLabels = ['Counter', 'Seeker', 'Bar', 'Dots'];
-				var siteNameLabels = ['Last.fm', 'Wikipedia'];
 				var summaryLabels = ['Genres', 'Dates', 'Locale*', 'Popular now (last.fm)', 'Latest release (wikipedia)', 'Other'];
 				var tagLabel = ['Album genre', 'Album statistics', 'Artist genre', 'Artist statistics', 'Locale', 'Similar artists', 'Album genre', 'Artist genre', '', 'Show confirm popup before tagging files'];
 				var textStyleLabels = ['Top align', 'Expand lists', 'Auto-optimise if multiple items shown'];
@@ -1209,47 +1190,47 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
 					},
 					advanced: {
-						name: ['scrollStep', 'durationScroll', 'durationTouchFlick', 'flickDistance', 'sbarWidth', 'narrowSbarWidth', 'sbarArrowWidth', 'sbarPad', 'sbarGripHeight', 'arrowSymbol', 'butCustIconFont', 'sbarButPad', 'blurTemp', 'blurAlpha', 'transLevel', 'focusLoadRate'],
-						type : ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'text', 'text', 'float', 'float', 'float', 'float', 'float']
+						name: ['scrollStep', 'durationScroll', 'durationTouchFlick', 'flickDistance', 'sbarWidth', 'narrowSbarWidth', 'sbarArrowWidth', 'sbarPad', 'sbarGripHeight', 'blurTemp', 'blurAlpha', 'transLevel', 'focusLoadRate'],
+						type : ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'float']
 					},
 					title_format: {
 						name: ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle', 'tfComposition'],
 						type : ['text', 'text', 'text', 'text', 'text']
 					},
-					download: {
-						name: ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'supFind', 'supReplace'],
-						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'text']
-					},
+					// the 7 detailed save paths are read-only display fields (derived from the cache root, never
+					// written to config): not part of input.all / editable inputs; this list feeds the display
+					// loops in dld_container2-8 order
+					download_ro: ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foLfmSim', 'foWikiRev', 'foWikiBio'],
 					photo: {
-						name: ['photoNum', 'photoLimit', 'foCycPhoto'],
-						type : ['int', 'int', 'text']
+						name: ['photoNum', 'photoLimit'],
+						type : ['int', 'int']
 					},
 					cover: {
-						name: ['foImgCov', 'fnImgCov', 'foCycCov', 'cusCov0'],
-						type : ['text', 'text', 'text', 'text']
+						name: ['foImgCov', 'fnImgCov', 'cusCov0'],
+						type : ['text', 'text', 'text']
 					},
-					tagger: {
-						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagName6', 'tagName7', 'tagEnabled8', 'customGenres', 'translate'],
-						type : ['text', 'text', 'text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text']
+					tagger: { // order must match the DOM order of the tagger_input fields: tagName0-5, similar artists number, the two wikipedia rows, custom genres, translate
+						name: ['tagName0', 'tagName1', 'tagName2', 'tagName3', 'tagName4', 'tagName5', 'tagEnabled8', 'tagName6', 'tagName7', 'customGenres', 'translate'],
+						type : ['text', 'text', 'text', 'text', 'text', 'text', 'float', 'text', 'text', 'text', 'text']
 					},
 					misc: {
-						name: ['lfmDisplayName', 'wikiDisplayName', 'exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
-						type : ['text', 'text', 'int', 'int', 'text', 'int', 'int', 'int']
+						name: ['exp', 'menuSimilarNum', 'va', 'fuzzyMatchReview', 'fuzzyMatchTrack', 'fuzzyMatchComposition'],
+						type : ['int', 'int', 'text', 'int', 'int', 'int']
 					},
 					all: {}
 				}
-				input.all.name = input.behaviour.name.concat(input.display.name, input.headings.name, input.image.name, input.textreader.name, input.custom.name, input.advanced.name, input.title_format.name, input.download.name, input.photo.name, input.cover.name, input.tagger.name, input.misc.name);
-				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.textreader.type, input.custom.type, input.advanced.type, input.title_format.type, input.download.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
+				input.all.name = input.behaviour.name.concat(input.display.name, input.headings.name, input.image.name, input.textreader.name, input.custom.name, input.advanced.name, input.title_format.name, input.photo.name, input.cover.name, input.tagger.name, input.misc.name);
+				input.all.type = input.behaviour.type.concat(input.display.type, input.headings.type, input.image.type, input.textreader.type, input.custom.type, input.advanced.type, input.title_format.type, input.photo.type, input.cover.type, input.tagger.type, input.misc.type);
 				var box = {
 					behaviour: ['dblClickToggle', 'sameStyle', 'sbarWinMetrics', 'sbarGripRounded', 'smooth', 'touchControl'],
 					display: ['topAlign', 'expandLists', 'autoOptimiseText', 'covBlur', 'swapCol', 'highlightHdBtn', 'highlightHdText', 'highlightHdLine', 'highlightImgBor', 'highlightOvBor', 'highlightStars', 'highlightSubHd', 'highlightSummary', 'highlightText', 'colLineDark', 'lfmRating', 'summaryGenre', 'summaryDate', 'summaryLocale', 'summaryPopNow', 'summaryLatest', 'summaryOther'],
 					headings: ['hdShowTitle', 'hdBtnShow', 'fullWidthHeading', 'hdShowBtnBg', 'hdShowRedLfm', 'bioFlagShow', 'revFlagShow'],
-					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'autoFilm', 'imgCounter', 'imgSeeker', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
-					textreader: ['txtReaderEnable', 'useTxtReader0', 'lyricsTxtReader0', 'useTxtReader1', 'lyricsTxtReader1', 'useTxtReader2', 'lyricsTxtReader2', 'useTxtReader3', /*'lyricsTxtReader3', */'useTxtReader4', 'lyricsTxtReader4', 'useTxtReader5', 'lyricsTxtReader5', 'useTxtReader6', 'lyricsTxtReader6', 'useTxtReader7', /*'lyricsTxtReader7', */'largerSyncLyricLine', 'syncTxtReaderLyrics', 'scrollSynced', 'scrollUnsynced', 'rowStripes', 'lineDividers', 'vCenter', 'hCenter'],
+					image: ['autoEnlarge', 'imgSmoothTrans', 'imgFilterLfm', 'imgFilterMaxSzEnabled', 'imgFilterMinSzEnabled', 'imgFilterMinPxEnabled', 'imgFilterBothPx', 'autoFilm', 'imgCounter', 'imgSeeker', 'artReflDual', 'covReflDual', 'artReflImgOnly', 'covReflImgOnly', 'artBorderDual', 'covBorderDual', 'artBorderImgOnly', 'covBorderImgOnly', 'artShadowDual', 'covShadowDual', 'artShadowImgOnly', 'covShadowImgOnly'],
+					textreader: ['txtReaderEnable', 'useTxtReader0', 'lyricsTxtReader0', 'useTxtReader1', 'lyricsTxtReader1', 'useTxtReader2', 'lyricsTxtReader2', 'useTxtReader3', 'useTxtReader4', 'lyricsTxtReader4', 'useTxtReader5', 'lyricsTxtReader5', 'useTxtReader6', 'lyricsTxtReader6', 'useTxtReader7', 'largerSyncLyricLine', 'syncTxtReaderLyrics', 'scrollSynced', 'scrollUnsynced', 'rowStripes', 'lineDividers', 'vCenter', 'hCenter'],
 					custom: ['custFontUse', 'custHeadFontUse', 'textUse', 'text_hUse', 'headingBtnUse', 'headingTextUse', 'starsUse', 'summaryUse', 'rectOvUse', 'rectOvBorUse', 'bgUse', 'lineUse', 'bgTransUse', 'frameUse'],
-					advanced: ['sbarFullHeight', 'blurAutofill', 'focusLoadImmediate'],
+					advanced: ['sbarFullHeight', 'blurAutofill', 'focusLoadImmediate', 'stats'],
 					title_format: ['classicalModeEnable'],
-					download: ['languageFallback', 'wikipediaEnGenres', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio', 'supCache'],
+					download: ['languageFallback', 'wikipediaEnGenres', 'dlLfmRev', 'dlLfmBio', 'dlArtImg', 'dlRevImg', 'dlLfmSim', 'dlWikiRev', 'dlWikiBio'],
 					photo: ['photoAutoAdd'],
 					cover: ['dlLfmCov', 'cusCov'],
 					tagger: ['tagEnabled0', 'tagEnabled1', 'tagEnabled2', 'tagEnabled3', 'tagEnabled4', 'tagEnabled5', 'tagEnabled6', 'tagEnabled7', 'taggerConfirm'],
@@ -1257,7 +1238,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				}
 				box.all = box.behaviour.concat(box.display, box.headings, box.image, box.textreader, box.custom, box.advanced, box.title_format, box.download, box.photo, box.cover, box.tagger, box.misc);
 				var radio = {
-					behaviour: ['lookUp', 'menuShowPaste', 'menuShowTagger', 'menuShowMissingData'],
+					behaviour: ['menuShowPaste', 'menuShowTagger', 'menuShowMissingData'],
 					display: ['star'],
 					headings: ['hdPos', 'hdShowBtnLabel', 'hdLine'],
 					image: ['imgSeekerDots', 'artStyleDual', 'covStyleDual', 'artStyleImgOnly', 'covStyleImgOnly', 'filmPhotoStyle', 'filmCoverStyle'],
@@ -1522,8 +1503,10 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					window.sbarCol_dropdown.innerHTML = sbarColLabels[ppt['sbarCol_internal'].value];
 					for (i = 0; i < 2; i++) {window.sbarCol.insertAdjacentHTML('beforeend', '<a onclick="setSbarCol(' + i + ');">'+sbarColLabels[i]+'</a>');}
 					sbar_col_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
-					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[ppt['sbarButType_internal'].value];
-					for (i = 0; i < 3; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
+					var sbarIconIx = Math.min(ppt['sbarButType_internal'].value, sbarIconLabels.length - 1);
+					ppt['sbarButType_internal'].value = sbarIconIx;
+					window.sbarIcon_dropdown.innerHTML = sbarIconLabels[sbarIconIx];
+					for (i = 0; i < 2; i++) {window.sbarIcon.insertAdjacentHTML('beforeend', '<a onclick="setSbarIcon(' + i + ');">'+sbarIconLabels[i]+'</a>');}
 					sbar_icon_dropdown.style.display = ppt['sbarType_internal'].value < 2 ? "inline-block" : "none";
 					for (i = 0; i < 4; i++) {window.scrolling.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scroll_checkbox'+i+'" name="behaviour_checkbox" style="'+cbox+'" type="checkbox" /><label for="scroll_checkbox'+i+'" class="checkbox_label">'+scrollLabels[i]+'</label></div>');}
 
@@ -1531,8 +1514,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					for (i = 0; i < 5; i++) {window.overlayType.insertAdjacentHTML('beforeend', '<a onclick="setOverlayType(' + i + ');">'+overlayLabels[i]+'</a>');}
 					for (i = 5; i < 8; i++) {window.overlayMetrics.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="overlayMetrics_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input3" /><label for="overlayMetrics_container'+i+'" class="inp_label2">'+overlayLabels[i]+'</label></div>');}
 					generateTable('menu');
-					for (i = 0; i < 3; i++) {window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="lookUp'+i+'" name="lookUp" style="'+cbox+'" type="radio" /><label for="lookUp'+i+'" id="lookUpState'+i+'" class="checkbox_label">'+lookupLabels[i]+'</label></div>');}
-					i = 3; window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="itemCycleTime_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input2" /><label for="itemCycleTime'+i+'" class="inp_label2">'+lookupLabels[i]+'</label></div>');
+					i = 3; window.look_up.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="itemCycleTime_container'+i+'" name="behaviour_input" style="padding:0; margin:0;" class="input2" /><label for="itemCycleTime'+i+'" class="inp_label2">'+lookUpCycleTimeLabel+'</label></div>');
 				}
 
 				function setDisplay() {
@@ -1619,6 +1601,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					var cboxMargin = "width:" + cbox_w + "px; height:" + cbox_h + "px; margin-right:5px;"
 					window.input_cntf1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="f_checkbox1" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><label for="f_checkbox1" class="checkbox_label">Last.fm photos only</label></div>');
 					for (i = 0; i < 3; i++) {window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');}
+					window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="filterBoth_checkbox" style="'+cboxMargin+'" name="image_checkbox" type="checkbox" /><label for="filterBoth_checkbox" class="checkbox_label">Both must meet the minimum</label></div>');
 					i = 3; window.input_cntf2.insertAdjacentHTML('beforeend', '<div class="input_cnt4"><input id="filterCheckbox'+i+'" style="'+cboxMargin+'; visibility:hidden;" name="image_checkbox_hidden" type="checkbox" /><input id="filter_container'+i+'" class="input50" name="image_input"></input><label for="filter_container'+i+'" class="inp_label5">'+filterLabels[i]+'</label></div>');
 					generateTable('imageFormat');
 					
@@ -1679,15 +1662,13 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				function setAdvanced() {
 					for (i = 0; i < 4; i++) {window.cusScroll.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scroll_container'+i+'" name="advanced_input" class="input35" /><label for="scroll_container'+i+'" class="inp_label2">'+cusScrollLabels[i]+'</label></div>');}
 					for (i = 0; i < 5; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
-					var fFamily = ppt['butCustIconFont_internal'].value;
-					i = 5; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" style="font-family:'+fFamily+'" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');
-					for (i = 6; i < 8; i++) {window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="scrollbar_container'+i+'" name="advanced_input" class="input35" /><label for="scrollbar_container'+i+'" class="inp_label2">'+scrollbarLabels[i]+'</label></div>');}
-					i = 8; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scrollbar_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="scrollbar_checkbox'+i+'" class="checkbox_label">'+scrollbarLabels[i]+'</label></div>');
+					i = 5; window.scrollbar.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="scrollbar_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="scrollbar_checkbox'+i+'" class="checkbox_label">'+scrollbarLabels[i]+'</label></div>');
 					i = 0; window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="themeBlur_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="themeBlur_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
 					for (i = 1; i < 3; i++) {window.themeBlur.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="themeBlur_container'+i+'" name="advanced_input" class="input35" /><label for="themeBlur_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');}
 					i = 3; window.smoothTransLevel.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="smoothing_container'+i+'" name="advanced_input" class="input3" /><label for="smoothing_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
 					i = 4; window.loadDelay.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="loadDelay_container'+i+'" name="advanced_input" class="input3" /><label for="loadDelay_container'+i+'" class="inp_label2">'+themeBlurLabels[i]+'</label></div>');
 					i = 5; window.loadDelay.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="loadDelay_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="loadDelay_checkbox'+i+'" class="checkbox_label">'+themeBlurLabels[i]+'</label></div>');
+					i = 6; window.statsShow.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="stats_checkbox'+i+'" name="advanced_checkbox" style="'+cbox+'" type="checkbox" /><label for="stats_checkbox'+i+'" class="checkbox_label">Show scrobbles &amp; listeners</label></div>');
 					}
 
 				function setServer() {
@@ -1699,25 +1680,23 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					i = 0; window.classicalMode.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="t_checkbox'+i+'" name="tf_checkbox" type="checkbox" /><label for="t_checkbox'+i+'" class="checkbox_label">Enable</label></div>');
 					i = 4; window.classicalModeTitleformat.insertAdjacentHTML('beforeend', '<div class="input_cnt6"><label for="tf_container'+i+'" class="inp_label1">'+tfServLabels[i]+'</label><input id="tf_container'+i+'" name="title_format_input" class="input98" /></div>');
 
-					i = 0; window.cache0.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[i]+'</label></div>');
-					i = 1; window.cache1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[i]+'</label></div>');
+					// Default on top, Custom below: the DOM index is the property value, so 0 = Default, 1 = Custom
+					i = 0; window.cache0.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[1]+'</label></div>');
+					i = 1; window.cache1.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="autoCache'+i+'" name="autoCache" style="'+cbox+'" type="radio" /><label for="autoCache'+i+'" class="checkbox_label">'+dlLabels[0]+'</label></div>');
+					window.cacheRootBox.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="cacheRoot" class="inp_label1">Root path</label><input id="cacheRoot" name="cacheRoot" class="inputRoot" /></div>');
+					setCacheRoot();
 					window.fallback.insertAdjacentHTML('beforeend', '<div class="input_cnt3" style="padding:0;"><input id="lang_checkbox0" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox0" style="padding-right:0.75em;" class="checkbox_label">Fallback to English server&nbsp</label><input id="lang_checkbox1" name="download_checkbox" style="'+cbox+'" type="checkbox" /><label for="lang_checkbox1" class="checkbox_label">Wikipedia genres: English</label></div>');
 					for (i = 2; i < 7; i++) {
-						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+						window.lastfm.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_ro" class="input82" readonly /></div>');
 					}
 					for (i = 7; i < 9; i++) {
-						window.wikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_input" class="input82" /></div>');
+						window.wikipedia.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="dnld_checkbox'+i+'" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox'+i+'" class="checkbox_label">'+dlLabels[i]+'</label><input id="dld_container'+i+'" name="download_ro" class="input82" readonly /></div>');
 					}
-
-					window.supplemental.insertAdjacentHTML('beforeend', '<div class="row"><div class="column19"><input id="dnld_checkbox11" name="download_checkbox" type="checkbox" /><label for="dnld_checkbox11" class="checkbox_label">'+dlLabels[i]+'</label></div><div class="column40"><label for="dld_container11" class="inp_label3">Find what:</label><input id="dld_container11" name="download_input" class="input76" /></div><div class="column40"><label for="dld_container12" class="inp_label3">Replace with:</label><input id="dld_container12" name="download_input" class="input76" /></div></div>');
-
 					window.photo_num.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container0" name="photo_input" class="input98" /></div>');
 					window.photo_limit.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container1" name="photo_input" class="input98" /></div>');
-					window.artCusImgFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="photo_container2" name="photo_input" class="input98" /></div>')
-					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox0" name="cover_checkbox" type="checkbox" /><label for="input_checkbox0" class="checkbox_label">'+covLabels[0]+'</label></div>')	
+					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox0" name="cover_checkbox" type="checkbox" /><label for="input_checkbox0" class="checkbox_label">'+covLabels[0]+'</label></div>')
 					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><label for="cov_container0" class="inp_label3">'+covLabels[1]+'</label><input id="cov_container0" name="cover_input" class="input82" /></div>')
 					window.cov.insertAdjacentHTML('beforeend', '<div class="input_cnt3""><label for="tf_cov_container" class="inp_label3">'+covLabels[2]+'</label><input id="tf_cov_container" name="cover_input" class="input82" /></div>')
-					window.covCycleFolder.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container2" name="cover_input" class="input82" /></div>')
 					window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="input_checkbox1" name="cover_checkbox" type="checkbox" /><label for="input_checkbox1" class="checkbox_label">'+covLabels[3]+'</label></div>')
 					i = 3; window.covCustom.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="cov_container3" name="cover_input" class="input82" /><label for="cov_container3" class="inp_label3">'+covLabels[4]+'</label></div>');
 					for (i = 0; i < 6; i++) {
@@ -1731,9 +1710,6 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 					for (i = 0; i < 2; i++) {window.whitelist.insertAdjacentHTML('beforeend', '<div class="input_cnt2"><input id="useWhitelist'+i+'" name="useWhitelist" style="'+cbox+'" type="radio" /><label for="useWhitelist'+i+'" class="checkbox_label">'+whitelistLabels[i]+'</label></div>');}
 					i = 0; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
 					i = 1; window.lfmGenreTag.insertAdjacentHTML('beforeend', '<div class="input_cnt1"><label for="lfmGenreTag_container'+i+'" class="inp_label1">Translate:</label><input id="lfmGenreTag_container'+i+'" name="tagger_input" class="input96" /></div>');
-					for (i = 0; i < 2; i++) {	
-						window.siteNames.insertAdjacentHTML('beforeend', '<div class="input_cnt5"><input id="siteNames_container'+i+'" name="misc_input" style="padding:0;" class="input21" /><label for="siteNames_container'+i+'" class="inp_label2">'+siteNameLabels[i]+'</label></div>');
-					}
 					for (i = 0; i < 4; i++) {	
 						window.miscl.insertAdjacentHTML('beforeend', '<div class="input_cnt3"><input id="misc_checkbox'+i+'" name="misc_checkbox" type="checkbox" /><label for="misc_checkbox'+i+'" class="checkbox_label">'+miscLabels[i]+'</label></div>');
 					}
@@ -1767,6 +1743,11 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				setRadioBtns('all', 'value');
 				setInputs('all', 'value');
 				setCheckboxStates();
+				// Baseline = the state right after initialisation: initialisation itself normalises some
+				// display values, and that must not be reported as a user change.
+				getValues();
+				parsed_args[0] = JSON.stringify(ppt);
+				parsed_args[1] = JSON.stringify(cfg);
 				document.getElementById("btn_apply").disabled = true;
 			}
 
@@ -1778,44 +1759,96 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				setPthHints();
 			}
 
-			// when a path setting is empty, show the path actually in use as a grey hint (placeholder, never saved)
-			function setPthHints() {
-				if (!cfg.dispPth) return;
-				var names = input.download.name;
-				for (var k = 0; k < names.length; k++) {
-					var el = document.getElementById('dld_container' + (k < 7 ? k + 2 : k + 4));
-					if (!el || !cfg.dispPth[names[k]]) continue;
-					bindPthHint(el, cfg.dispPth[names[k]]);
+			// cache root box: show the default text while empty or unchanged, read it back as empty in that case
+			function setCacheRoot() {
+				var el = document.getElementById('cacheRoot');
+				if (!el) return;
+				var val = cfg['cacheRoot_internal'] ? cfg['cacheRoot_internal'].value : '';
+				var hint = val ? '' : (cfg.dispCacheRoot || ''); // never treat a custom value as the default text, it would be wiped
+				el.__pthHint = hint;
+				el.title = 'Default path: ' + (cfg.cacheRootDefaultDisp || hint);
+				el.value = val || hint;
+				// remember the root actually in use when the dialog opened; later root edits are compared against it
+				cacheRootShown = (val || cfg.dispCacheRoot || '').replace(/[\\/]+$/, '');
+			}
+
+			// the cache root currently in effect (for display, no trailing slash): with "Default" selected the
+			// content of the root box does not apply and the built-in default is used
+			function currentCacheRoot() {
+				var el = document.getElementById('cacheRoot');
+				var typed = el ? pthValue(el).replace(/[\\/]+$/, '') : '';
+				if (window.autoCache0 && window.autoCache0.checked) typed = '';
+				return typed || (cfg.cacheRootDefaultDisp || '').replace(/[\\/]+$/, '');
+			}
+
+			// "Default" selected: reset the root box to the built-in default, so switching back to
+			// "Custom" shows the default path instead of the previously used custom folder
+			function resetCacheRootToDefault() {
+				var def = (cfg.cacheRootDefaultDisp || '').replace(/[\\/]+$/, '');
+				var el = document.getElementById('cacheRoot');
+				if (el) {
+					el.__pthHint = def;
+					el.title = 'Default path: ' + def;
+					el.value = def;
+					cacheRootShown = def;
+				}
+				if (!cfg.tails) return;
+				var i, node;
+				for (i = 0; i < input.download_ro.length; i++) { // detailed paths: back to the default root + built-in tail
+					node = document.getElementById('dld_container' + (i + 2));
+					if (node) setPthField(node, def + '\\' + cfg.tails[input.download_ro[i]], 'Current path: ');
 				}
 			}
 
-			// the grey hint is copyable: on focus it becomes real text; on blur, if it was not edited, it fades back to a hint
-			function bindPthHint(el, hint) {
-				el.__pthHint = hint;
-				el.placeholder = hint;
-				el.title = 'Default path: ' + hint;
-				if (el.__pthBound) return;
-				el.__pthBound = true;
-				el.__pthLive = false; // true = the current text is still the hint itself, not a user edit
-				el.onfocus = function () {
-					if (this.value === '' && this.__pthHint) {
-						this.value = this.__pthHint; // materialise so it can be selected and copied
-						this.placeholder = '';
-						this.__pthLive = true;
-						var self = this;
-						setTimeout(function () { if (self.__pthLive) { try { self.select(); } catch (e) {} } }, 0); // select after mouseup so Ctrl+C copies it right away
-					}
-				};
-				el.onblur = function () {
-					if (this.__pthLive && this.value === this.__pthHint) this.value = ''; // untouched -> back to hint
-					if (this.value === '') this.placeholder = this.__pthHint;             // an empty box always shows the hint
-					this.__pthLive = false;
-				};
+			var cacheRootShown; // no initializer: this statement runs after the init block and would wipe the value set by setCacheRoot
+
+			// After a change in the cache-root box: refresh the 7 detailed paths and the cover/photo cycle
+			// folders to the new root (detailed paths are read-only display fields, all derived from the root)
+			function syncCacheRoot() {
+				var root = currentCacheRoot();
+				var from = cacheRootShown || (cfg.dispCacheRoot || '').replace(/[\\/]+$/, '');
+				if (!root || root === from || !cfg.tails) return;
+				var i, node;
+				for (i = 0; i < input.download_ro.length; i++) {
+					node = document.getElementById('dld_container' + (i + 2));
+					if (node) setPthField(node, root + '\\' + cfg.tails[input.download_ro[i]], 'Current path: ');
+				}
+				cacheRootShown = root;
 			}
 
-			// when reading values, treat "still the hint text" as empty so the hint never gets saved as a custom path
+			function setPthField(el, val, tip) {
+				el.__pthHint = val;
+				el.title = (tip || 'Default path: ') + val;
+				el.value = val;
+			}
+
+			// right edge of the cache-root box lines up with the "Wikipedia genres: English" text top-right;
+			// measured, so it stays aligned after resizing or switching pages
+			function fitCacheRoot() {
+				var el = document.getElementById('cacheRoot');
+				var lab = document.querySelector ? document.querySelector('label[for="lang_checkbox1"]') : null;
+				if (!el || !lab) return;
+				var r = el.getBoundingClientRect();
+				if (!r.width && !r.height) return; // hidden ("Default" selected or another page): nothing to measure
+				var w = Math.round(lab.getBoundingClientRect().right - r.left);
+				if (w > 80) el.style.width = w + 'px';
+			}
+
+			// the 7 detailed paths are read-only display boxes (selectable / copyable, not editable):
+			// always recomputed as "current cache root + built-in tail", assigned automatically by the root;
+			// they neither read from nor write to the config. Changing the root applies to all of them.
+			function setPthHints() {
+				if (!cfg.tails) return;
+				var root = currentCacheRoot();
+				for (var k = 0; k < input.download_ro.length; k++) {
+					var el = document.getElementById('dld_container' + (k + 2));
+					if (el) setPthField(el, root + '\\' + cfg.tails[input.download_ro[k]], 'Current path: ');
+				}
+			}
+
+			// when reading values, treat "still the default path text" as empty so it never gets saved as a custom path
 			function pthValue(el) {
-				return el.__pthLive && el.value === el.__pthHint ? '' : el.value;
+				return el.__pthHint && el.value === el.__pthHint ? '' : el.value;
 			}
 
 			function setCheckboxStates() {
@@ -1858,7 +1891,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				window.whitelistInfo.style.display = window.useWhitelist1.checked ? "block" : "none";
 				window.lfmGenreTag.style.display = window.useWhitelist1.checked ? "block" : "none";
 
-				var dnld = document.querySelectorAll("[id^='dld_container'], [id=savePreview], [id=preview_cnt], [id=supplCache0], [id=supplCache1], [id=supplemental], [id^='savefolder']");
+				var dnld = document.querySelectorAll("[id^='dld_container'], [id=savePreview], [id=preview_cnt], [id^='savefolder']");
 				for (i = 0; i < dnld.length; i++) {
 					dnld[i].style.display = cur.displaySaveFolders ? "block" : "none";
 				}
@@ -1867,15 +1900,11 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				window.cache0.style.display = cur.displaySaveFolders ? "none" : "block";
 				window.cache1.style.display = cur.displaySaveFolders ? "none" : "block";
 				window.cacheInfo.style.display = cur.displaySaveFolders ? "none" : "block"; // hide the whole box while editing custom paths so the invisible container cannot cover the inputs
-				window.save_folders.style.display = cur.displaySaveFolders || window.autoCache1.checked ? "none" : "block";
+				window.save_folders.style.display = cur.displaySaveFolders ? "none" : "block"; // read-only detailed paths: viewable in both modes
+				window.cacheRootBox.style.display = cur.displaySaveFolders || window.autoCache0.checked ? "none" : "block"; // the root path only shows while "Custom" is selected
 				window.hide_folders.style.display = cur.displaySaveFolders ? "block" : "none";
+				fitCacheRoot(); // re-measure when the root box just became visible
 			
-				var showsupplCacheOption = false;
-				if (!showsupplCacheOption) {
-					window.supplCache0.style.display = "none";
-					window.supplCache1.style.display = "none";
-					window.supplemental.style.display = "none";
-				}
 			}
 
 			function setLanguage(n) {
@@ -1910,8 +1939,14 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 			}
 
 			function getValues() {
+				var rootEl = document.getElementById('cacheRoot');
+				// while "Default" is selected the root is not stored: switching back must not restore the old custom folder
+				if (rootEl && cfg['cacheRoot_internal']) cfg['cacheRoot_internal'].value = window.autoCache0 && window.autoCache0.checked ? '' : pthValue(rootEl);
 				var inputs = document.querySelectorAll("[name$='_input']");
 				for (i = 0; i < inputs.length; i++) {
+					// still showing the default hint text: the item was not touched, keep the stored value
+					// (cover/photo cycle folders show the new root once a root is set, so their old default must not turn empty)
+					if (inputs[i].__pthHint && inputs[i].value === inputs[i].__pthHint) continue;
 					(ppt[input.all.name[i] + '_internal'] || cfg[input.all.name[i] + '_internal']).value = input.all.type[i] == 'text' ? pthValue(inputs[i]) : input.all.type[i] == 'int' ? parseInt(inputs[i].value) : parseFloat(inputs[i].value);
 				}
 
@@ -1950,6 +1985,9 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				if (new_ppt || new_cfg || new_cur) {
 					sendCallback(new_ppt, new_cfg, '' , new_cur);
 				}
+				// only reset the root box once "Default" has really been applied (a config payload was sent);
+				// merely clicking "Default" keeps the custom path for switching back
+				if (new_cfg && window.autoCache0.checked) resetCacheRootToDefault();
 				close_window();
 			}
 
@@ -1959,6 +1997,9 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 				var new_cfg = JSON.stringify(cfg);
 				if (new_ppt == parsed_args[0]) new_ppt = ''; else parsed_args[0] = new_ppt;
 				if (new_cfg == parsed_args[1]) new_cfg = ''; else parsed_args[1] = new_cfg;
+				// only reset the root box once "Default" has really been applied (a config payload was sent);
+				// merely clicking "Default" keeps the custom path for switching back
+				if (new_cfg && window.autoCache0.checked) resetCacheRootToDefault();
 				if (new_ppt || new_cfg) {
 					sendCallback(new_ppt, new_cfg);
 				}
@@ -1999,7 +2040,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 			}
 
 			window.btn_reset.onclick = function () {
-				var msg = cur.tab == 'PanelCfg' ? 'Reset panel settings to default\nContinue?' : 'Reset server settings to default\n\nOriginal ('+  cfg.cfgBaseName +'.cfg ) will be backed up\\n\\nContinue?';
+				var msg = cur.tab == 'PanelCfg' ? 'Reset panel settings to default\nContinue?' : 'Reset server settings to default\n\nContinue?';
 				if (window.confirm(msg)) {
 					var new_cur = JSON.stringify(cur);
 					if (new_cur == parsed_args[2]) new_cur = '';
@@ -2038,6 +2079,7 @@ Album name auto-clean shouldn't be needed if album version info is in its own ta
 			}
 			
 			function showSaveFolders() {
+				if (!cur.displaySaveFolders) syncCacheRoot(); // carry cache-root edits into the detailed paths before they show
 				cur.displaySaveFolders = !cur.displaySaveFolders;
 			}
 			

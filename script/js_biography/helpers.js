@@ -1,16 +1,17 @@
 ﻿'use strict';
 
-const requiredVersionStr = '1.5.2';
-
-function is_compatible(requiredVersionStr) {
-	const requiredVersion = requiredVersionStr.split('.');
-	const currentVersion = utils.Version.split('.');
-	if (currentVersion.length > 3) currentVersion.length = 3;
-	for (let i = 0; i < currentVersion.length; ++i)
-		if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i];
-	return true;
-}
-if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`Biography requires v${requiredVersionStr}. Current component version is v${utils.Version}.`);
+// SMP version check disabled; original code kept here as text (uncomment to restore)
+// const requiredVersionStr = '1.5.2';
+//
+// function is_compatible(requiredVersionStr) {
+// 	const requiredVersion = requiredVersionStr.split('.');
+// 	const currentVersion = utils.Version.split('.');
+// 	if (currentVersion.length > 3) currentVersion.length = 3;
+// 	for (let i = 0; i < currentVersion.length; ++i)
+// 		if (currentVersion[i] != requiredVersion[i]) return currentVersion[i] > requiredVersion[i];
+// 	return true;
+// }
+// if (!is_compatible(requiredVersionStr)) fb.ShowPopupMessage(`Biography requires v${requiredVersionStr}. Current component version is v${utils.Version}.`);
 
 const doc = new ActiveXObject('htmlfile');
 const fso = new ActiveXObject('Scripting.FileSystemObject');
@@ -344,7 +345,7 @@ save(fn, text, bom) {
 			// Regorxxx <- No file saved on long paths > 255 chars
 			const success = utils.WriteTextFile(fn, text, bom);
 			if (!success && fn.length >= 256) {
-				fb.ShowPopupMessage('Script is trying to save a file in a path containing more than 256 chars which leads to problems on Windows systems.\n\nPath:\n' + fn + '\n\nTo avoid this problem, install your foobar portable installation at another path (with less nesting) or change the the cache folders at \'biography.cfg\'.')
+				fb.ShowPopupMessage('Script is trying to save a file in a path containing more than 256 chars which leads to problems on Windows systems.\n\nPath:\n' + fn + '\n\nTo avoid this problem, install your foobar portable installation at another path (with less nesting) or change the the cache folders at \'server.cfg\'.')
 			}
 			// Regorxxx ->
 		} catch (e) {
@@ -455,6 +456,9 @@ save(fn, text, bom) {
 }
 
 const $ = new Helpers;
+
+// Biography panel data folder (text configs: server.cfg / panel.cfg)
+const bioDataPth = fb.ProfilePath + 'foobox\\data\\biography\\';
 
 function RGB(r, g, b) {
 	return 0xff000000 | r << 16 | g << 8 | b;

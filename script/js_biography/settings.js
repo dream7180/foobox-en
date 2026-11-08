@@ -38,48 +38,51 @@ class Setting {
 }
 
 class Settings {
-	constructor(name) {
+	constructor() {
 		// this.key_list = {}; debug
 
-		this.cfgBaseName = name;
-		this.storageFolder = fb.ProfilePath + 'foobox\\data\\biography\\';
+		this.subPth = 'foobox\\data\\biography\\';
+		this.storageFolder = bioDataPth;
 		$.buildPth(this.storageFolder);
-		this.bio = `${this.storageFolder + this.cfgBaseName}.cfg`;
+		this.cfgFile = `${this.storageFolder}server.cfg`;
 		this.item_properties = `${this.storageFolder}item_properties.json`;
 		this.nowplaying = `${this.storageFolder}nowplaying.txt`;
 
-		this.cfg = $.jsonParse(this.bio, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
+		this.cfg = $.jsonParse(this.cfgFile, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
 		this.lfmSim = true;
-
 		this.lang = {
 			arr: ['EN', 'DE', 'ES', 'FR', 'IT', 'JA', 'PL', 'PT', 'RU', 'SV', 'TR', 'ZH'],
 			ix: 0,
 			ok: false
 		}
-
 		this.remap = {}
 		this.pth = {}
-		this.sup = {}
 		this.tf = {}
 		this.dispPth = {} // path shown as a hint on the settings page when the setting is empty (never saved)
-		// built-in default paths: these 7 settings default to ''; empty means "use the value below"
-		this.defPth = {
-			foLfmRev: '%profile%\\yttm\\review\\lastfm\\$lower($cut(%BIO_ALBUMARTIST%,1))',
-			foLfmBio: '%profile%\\yttm\\biography\\lastfm\\$lower($cut(%BIO_ARTIST%,1))',
-			foWikiRev: '%profile%\\yttm\\review\\wikipedia\\$lower($cut(%BIO_ALBUMARTIST%,1))',
-			foWikiBio: '%profile%\\yttm\\biography\\wikipedia\\$lower($cut(%BIO_ARTIST%,1))',
-			foImgArt: '%profile%\\yttm\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%',
-			foImgRev: '%profile%\\yttm\\rev_img\\$lower($cut(%BIO_ALBUMARTIST%,1))\\%BIO_ALBUMARTIST%',
-			foLfmSim: '%profile%\\yttm\\lastfm\\$lower($cut(%BIO_ARTIST%,1))'
+		this.caPath = `${this.storageFolder}biography-cache`;
+		this.cachePath = `${this.caPath}\\`;
+		this.cacheRootDefaultDisp = `%profile%\\${this.subPth}biography-cache`; // default text in the cache-root box (no trailing slash)
+		this.tails = {
+			foLfmRev: 'review\\lastfm\\$lower($cut(%BIO_ALBUMARTIST%,1))',
+			foLfmBio: 'biography\\lastfm\\$lower($cut(%BIO_ARTIST%,1))',
+			foWikiRev: 'review\\wikipedia\\$lower($cut(%BIO_ALBUMARTIST%,1))',
+			foWikiBio: 'biography\\wikipedia\\$lower($cut(%BIO_ARTIST%,1))',
+			foImgArt: 'art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%',
+			foImgRev: 'rev_img\\$lower($cut(%BIO_ALBUMARTIST%,1))\\%BIO_ALBUMARTIST%',
+			foLfmSim: 'lastfm\\$lower($cut(%BIO_ARTIST%,1))'
 		};
+		this.cycDefault = '%storage_folder%\\biography-cache\\' + this.tails.foImgArt; // built-in default of the photo cycle folder (the cover cycle is fixed to the same path)
+		this.defPth = {}; // default paths actually used at runtime
+		this.defPthDisp = {}; // same paths in %profile% form (settings-page hint only)
+		this.rootPth = this.cachePath;
+		this.rootDisp = `%profile%\\${this.subPth}biography-cache\\`;
+		this.dispCacheRoot = this.cacheRootDefaultDisp;
+		this.buildDefPth();
 
 		this.photoRecycler = `${this.storageFolder}oldPhotosForDeletion\\`;
 		this.settingsKeys = [];
 		this.writeDefer = 0; // > 0: keep changes in memory, flush once when the batch ends
 		this.writeDirty = false;
-		
-		this.caPath = `${this.storageFolder}biography-cache`;
-		this.cachePath = `${this.caPath}\\`;
 		
 		this.suffix = {
 			foLfmRev: ' [Lastfm Review]',
@@ -87,12 +90,14 @@ class Settings {
 			foWikiRev: ' [Wikipedia Review]',
 			foWikiBio: ' [Wikipedia Biography]'
 		}
+		this.lfmDisplayName = 'Last.fm';
+		this.wikiDisplayName = 'Wikipedia';
 	}
 
 	// Methods
 
 	init(settings) {
-		// defaults restored/migrated at startup can be dozens of keys: batch into a single write
+		// dozens of settings may be restored to their defaults at startup: batch into a single write
 		this.beginBatch();
 		try {
 			this.build(settings);
@@ -102,38 +107,12 @@ class Settings {
 	}
 
 	build(settings) {
-		const update = this.checkCfg();
-		// migrate old tag settings (0-4 AllMusic removed; shift 5-13 down by 5)
-		if (this.cfg.tagEnabled13 !== undefined) {
-			for (let j = 0; j < 9; j++) {
-				this.cfg[`tagEnabled${j}`] = this.cfg[`tagEnabled${j + 5}`];
-				if (j < 8) this.cfg[`tagName${j}`] = this.cfg[`tagName${j + 5}`];
-			}
-			for (let j = 9; j < 14; j++) delete this.cfg[`tagEnabled${j}`];
-			for (let j = 8; j < 13; j++) delete this.cfg[`tagName${j}`];
-		}
+		this.checkCfg(settings);
 		this.settingsKeys = settings.map(v => v[3]);
 		settings.forEach(v => {
 			// this.validate(v); debug
 			this.add(v);
 		});
-		// migrate (once): older versions stored the built-in default path in cfg; these settings now default to '',
-		// so clear any value that is exactly the built-in default. A marker prevents wiping the same value if the
-		// user later types it in on purpose.
-		if (!this.cfg.pthEmptyMigrated) {
-			Object.keys(this.defPth).forEach(v => {
-				if (this[v] === this.defPth[v]) this[v] = '';
-			});
-			this.cfg.pthEmptyMigrated = 1;
-			this.writeDirty = true;
-		}
-		if (update) {
-			delete this.cfg.langLfm;
-			delete this.cfg.langLfmFallback;
-			this.autoCache = 0;
-			this.tagName1 = 'Album Statistics Last.fm';
-			this.tagName3 = 'Artist Statistics Last.fm';
-		}
 		this.parse();
 	}
 
@@ -217,50 +196,22 @@ class Settings {
 
 	writeCfg() {
 		this.writeDirty = false;
-		$.save(this.bio, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
+		$.save(this.cfgFile, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
 	}
 
 	toggle(name) {
 		this[name] = !this[name];
 	}
 
-	checkCfg() {
+	checkCfg(settings) {
 		if (!$.file(this.item_properties)) $.save(this.item_properties, item_properties, true);
 		if (!$.file(this.nowplaying)) $.save(this.nowplaying, nowplaying, true);
-		if ($.file(this.bio)) return;
-		const orig_cfg = `${fb.ProfilePath}yttm\\biography.cfg`;
-		if ($.file(orig_cfg)) {
-			try {
-				fso.CopyFile(orig_cfg, this.bio);
-				this.cfg = $.jsonParse(this.bio, {}, 'file-utf8'); // Regorxxx <- Force UTF-8 ->
-				const blacklist_image = `${fb.ProfilePath}yttm\\blacklist_image.json`;
-				if ($.file(blacklist_image)) {
-					fso.CopyFile(blacklist_image, `${cfg.storageFolder}blacklist_image.json`);
-				}
-				return true;
-			} catch (e) {
-				this.createCfg(settings);
-				return false;
-			}
-		} else {
-			this.createCfg(settings);
-			return false;
-		}
-	}
-
-
-	createCfg(settings) {
+		if ($.file(this.cfgFile)) return;
+		// first run: create the config file with default values
 		settings.forEach(v => {
 			this.cfg[v[3]] = v[1];
 		});
-		if (this.cfg.supFo && this.cfg.supFo.includes('>')) {
-			const split = this.cfg.supFo.split('>');
-			if (split[0].length && split[1].length) {
-				this.cfg.supFind = split[0];
-				this.cfg.supReplace = split[1];
-			}
-		}
-		$.save(this.bio, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
+		$.save(this.cfgFile, JSON.stringify($.sortKeys(this.cfg), null, 3), true);
 	}
 
 	getLangIndex(n) {
@@ -288,6 +239,7 @@ class Settings {
 			switch (type) {
 				case 'resetPanelCfg':
 					ui.updateProp(ppt, 'default_value');
+					panelCfg.reset();
 					break;
 				case 'resetServerCfg':
 					this.resetCfg();
@@ -320,15 +272,29 @@ class Settings {
 		dialogWindow = $.jsonParse(dialogWindow);
 		dialogWindow.version = `v${window.ScriptInfo.Version}`;
 		dialogWindow = JSON.stringify(dialogWindow);
-		if (popUpBox.isHtmlDialogSupported()) popUpBox.config(JSON.stringify(ppt), JSON.stringify(cfg), dialogWindow, ok_callback, this.lang.ix, $.folder(cfg.photoRecycler));
-		else {
-			popUpBox.ok = false;
-			$.trace('the options html dialog doesn\'t appear to be available with the current operating system. All settings in options are available elsewhere: 1) panel settings are in panel properties; 2) server settings that apply to all panels are in the cfg file - default settings should be fine for most users, but can be changed by careful editing in a text editor. Common settings are on the menu.');	
-		}
+		popUpBox.config(JSON.stringify(ppt), JSON.stringify(cfg), dialogWindow, ok_callback, this.lang.ix, $.folder(cfg.photoRecycler));
+	}
+
+	// cache root: the value from the settings if set (trailing slashes trimmed), otherwise the built-in
+	// %profile%\\foobox\\data\\biography\\biography-cache\\. Every detailed default path is derived from it,
+	// so changing the root never needs per-item maintenance.
+	buildDefPth() {
+		// the root only applies in "Custom" mode; with "Default" selected the built-in cache folder is always used
+		const raw = this.autoCache ? (this.cacheRoot || '').trim().replace(/\//g, '\\').replace(/\\+$/, '') : '';
+		this.dispCacheRoot = raw || this.cacheRootDefaultDisp;
+		// expand %profile% / %storage_folder% to an absolute path first: the whole prefix is tf-escaped only once
+		const abs = raw.replace(/^%profile%\\?/i, () => fb.ProfilePath).replace(/^%storage_folder%\\?/i, () => this.storageFolder).replace(/\\+$/, '');
+		this.rootPth = raw ? abs + '\\' : this.cachePath;
+		this.rootDisp = raw ? raw + '\\' : `%profile%\\${this.subPth}biography-cache\\`;
+		const caPth = $.tfEscape(this.rootPth); // runtime prefix, tf-escaped once (' ( ) [ ] , % $)
+		Object.keys(this.tails).forEach(k => {
+			this.defPth[k] = caPth + this.tails[k];
+			this.defPthDisp[k] = this.rootDisp + this.tails[k];
+		});
 	}
 
 	parse() {
-		const bioRevItems = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foImgRev', 'foWikiRev', 'foWikiBio'];
+		this.buildDefPth(); // the cache root may have changed: re-derive the defaults of the 7 detailed paths
 		const items = ['foLfmRev', 'foLfmBio', 'foImgArt', 'foLfmSim', 'foWikiRev', 'foWikiBio', 'foImgCov', 'fnImgCov'];
 		const tfIni = ['tfAlbumArtist', 'tfArtist', 'tfAlbum', 'tfTitle', 'tfComposition'];
 		const tfItems = ['albumArtist', 'artist', 'album', 'title', 'composition'];
@@ -347,25 +313,28 @@ class Settings {
 
 		tfItems.forEach(v => this.tf[v] = this.substituteTf(this.tf[v]));
 
-		// built-in default paths live in the "package data" cache folder (%profile%\\yttm\\ -> biography-cache)
-		const cachePth = d => d.replace('%profile%\\yttm\\', $.tfEscape(this.cachePath));
-		const dispCachePth = d => d.replace('%profile%\\yttm\\', '%storage_folder%\\biography-cache\\');
 		this.dispPth = {};
-		items.forEach((v, i) => {
-			const def = this.defPth[v]; // only the 7 path settings have a built-in default; foImgCov/fnImgCov have none
-			const auto = this.autoCache && i <= 5 && !!def;
-			let base;
-			if (!def) base = this[v]; // auto-save cover: no built-in default, use the setting as is
-			else if (auto) {
-				base = cachePth(def);
-				this.remap[v] = base;
-			} else base = this[v] || cachePth(def); // empty -> built-in default (same folder as default mode, so switching modes does not move data)
-			this.pth[v] = this.substituteTf(base);
+		items.forEach(v => {
+			const def = this.defPth[v]; // the 7 paths are always derived from the root, never read from settings; foImgCov/fnImgCov have no default
+			if (!def) {
+				this.pth[v] = this.substituteTf(this[v]); // auto-save cover: still uses the setting as is
+				return;
+			}
+			this.pth[v] = this.substituteTf(def);
+			// remap keeps the raw tf form for per-item substitution elsewhere (radio streams etc.);
+			// %BIO_* normalised by purpose (an identity replacement for the built-in tails)
+			this.remap[v] = v.endsWith('Rev')
+				? def.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%')
+				: def.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%');
 		});
-		// settings page hint: all 7 path settings use "empty -> default cache path" (foImgRev only uses remap, it is not in items)
+		// settings page hint: the 7 paths always show the current root-derived path (foImgRev only uses remap, it is not in items)
 		Object.keys(this.defPth).forEach(v => {
-			this.dispPth[v] = this[v] ? this[v] : dispCachePth(this.defPth[v]);
+			this.dispPth[v] = this.defPthDisp[v];
 		});
+		// foImgRev is not in items (it has no corresponding setting), but review image download/lookup
+		// works via remap only: derive it from the root as well. Missing it yields an empty path, so
+		// downloaded images would be saved relative to the script folder.
+		this.remap.foImgRev = this.defPth.foImgRev.replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
 
 		if (!this.classicalModeEnable) {
 			ppt.classicalMusicMode = false;
@@ -389,8 +358,8 @@ class Settings {
 			this.suffix.foLfmBio = this.suffix.foWikiBio = '';
 		}
 
-		this.albCovFolder = this.substituteTf(this.expandPath(this.foCycCov));
-		this.artCusImgFolder = this.substituteTf(this.expandPath(this.foCycPhoto));
+		// the cover cycle folder is no longer customisable: fixed to the artist photo folder (menu>Sources>Cover>Cycle from artist photos)
+		this.albCovFolder = this.substituteTf(this.expandPath(this.autoCache && this.cacheRoot ? this.rootDisp + this.tails.foImgArt : this.cycDefault));
 
 		this.exp = this.exp > 0 ? Math.max(this.exp, 30) : 0; // 0: auto-update disabled; otherwise min 30 days
 		this.getLangIndex();
@@ -406,31 +375,11 @@ class Settings {
 		this.fuzzyMatchComposition = $.clamp(this.fuzzyMatchComposition, 0, 100);
 		this.partialMatch = this.partialMatchEnabled + '-' + this.fuzzyMatchReview + '-' + this.fuzzyMatchTrack + '-' + this.fuzzyMatchComposition;
 		this.tagEnabled8 = $.clamp(this.tagEnabled8, 1, 6);
-		
-		if (this.autoCache) {
-			this.remap['foImgRev'] = cachePth(this.defPth['foImgRev']);
-		} else {
-			bioRevItems.forEach(v => {
-				this.remap[v] = this[v] || cachePth(this.defPth[v]); // empty -> built-in default
-				if (v.endsWith('Rev')) this.remap[v] = this.remap[v].replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%'); // simplify later substitutions + convert case
-				else this.remap[v] = this.remap[v].replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%'); // simplify later substitutions + convert case
-			});
-		}
 
-		if (this.supCache) { // supplemental
-			let replace = this.supFind.split('|');
-			const arr1 = replace.map(v => v.trim() || 'yttm');
-			replace = this.supReplace.split('|');
-			const arr2 = replace.map(v => v.trim() || 'yttm\\bio_supplemental');
-			bioRevItems.forEach(v => {
-				this.sup[v] = this[v] || cachePth(this.defPth[v]); // empty -> built-in default
-				if (arr1.length == arr2.length) arr1.forEach((w, j) => {
-					this.sup[v] = this.sup[v].replace(RegExp(w, 'gi'), arr2[j]);
-				});
-				if (v.endsWith('Rev')) this.sup[v] = this.sup[v].replace(/%BIO_ALBUMARTIST%|%BIO_ARTIST%/gi, '%BIO_ALBUMARTIST%');
-				else this.sup[v] = this.sup[v].replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%');
-			});
-		}
+		// VA (Various Artists) lookup list: the va setting accepts several values separated by ; or ,
+		// (default "Various Artists; 群星"). Any match counts as a compilation marker: it is kept out of
+		// "More Tags" and Wikipedia searches are done for 'Various Artists' instead.
+		this.vaList = ('' + (this.va || '')).split(/[;,，；、]/).map(v => v.trim().toLowerCase()).filter(v => v);
 
 		const fields = n => n.replace(/\$.*?\(/gi, '').replace(/(,(|\s+)\d+)/gi, '').replace(/[,()[\]%]/gi, '|').split('|');
 		this.albartFields = fields(this.tf.albumArtist).filter(v => v.trim());
@@ -444,12 +393,20 @@ class Settings {
 		}
 	}
 
+	// Various Artists detection: true when the value matches any entry of va (multi-value, see vaList
+	// in parse), ignoring case and surrounding blanks. Used by the "More Tags" filter and by Wikipedia
+	// searches (a match is looked up as 'Various Artists').
+	isVA(n) {
+		if (!n) return false;
+		return (this.vaList || []).indexOf(('' + n).trim().toLowerCase()) != -1;
+	}
+
 	expandPath(pth) {
 		if (/%profile%\\/i.test(pth) && /%storage_folder%\\/i.test(pth)) pth = pth.replace(/%profile%\\/gi, '');
 		return pth.replace(/^%profile%\\?/i, $.tfEscape(fb.ProfilePath)).replace(/^%storage_folder%\\?/i, $.tfEscape(cfg.storageFolder));
 	}
 
-	preview(n, tfAll, excludeStream, sFind, sReplace, artistView, trackReview) {
+	preview(n, tfAll, excludeStream, artistView, trackReview) {
 		if (!tfAll) return txt.tf(n, artistView, trackReview); // heading
 		if (excludeStream) {
 			const handle = $.handle(panel.id.focus, true);
@@ -461,41 +418,30 @@ class Settings {
 		const tf = tfAll.split('~#~');
 		const tfNames = ['%BIO_ALBUMARTIST%', '%BIO_ARTIST%', '%BIO_ALBUM%', '%BIO_TITLE%'];
 
-		if (sFind || sReplace) { // supplemental
-			let replace = sFind.split('|');
-			const arr1 = replace.map(v => v.trim() || 'yttm');
-			replace = sReplace.split('|');
-			const arr2 = replace.map(v => v.trim() || 'yttm\\bio_supplemental');
-			if (arr1.length == arr2.length) {
-				n = this.expandPath(this.dispPth.foLfmBio || this.foLfmBio);
-				arr1.forEach((v, i) => n = n.replace(RegExp(v, 'gi'), arr2[i]));
-			} else n = 'Invalid find and replace'
-			n = n.replace(/%BIO_ARTIST%|%BIO_ALBUMARTIST%/gi, '%BIO_ARTIST%');
-		}
 		tfNames.forEach((v, i) => n = n.replace(RegExp(v, 'gi'), tf[i]));
 
 		const wildCard = /[*?]/.test(n);
 		return !wildCard ? panel.cleanPth(n, false) : panel.cleanPth(n.replace(/\*/g, '@!@').replace(/\?/g, '!@!'), false).replace(/@!@/g, '*').replace(/!@!/g, '?');
 	}
 
-	move(n) {
-		const d = new Date;
-		const timestamp = [d.getFullYear(), $.padNumber((d.getMonth() + 1), 2), $.padNumber(d.getDate(), 2)].join('-') + '_' + [$.padNumber(d.getHours(), 2), $.padNumber(d.getMinutes(), 2), $.padNumber(d.getSeconds(), 2)].join('-');
+	resetCfg() { // Server settings reset: delete server.cfg outright; defaults are rebuilt on next load (no backup)
 		try {
-			const fn = `${this.storageFolder + this.cfgBaseName}_old_${timestamp}.cfg`;
-			if (!$.file(fn)) fso.MoveFile(this.bio, fn);
+			fso.DeleteFile(this.cfgFile);
 		} catch (e) {
-			if (n) fb.ShowPopupMessage(`Unable to reset server settings.\n\n${this.cfgBaseName}.cfg is being used by another program.`, 'Biography');
+			fb.ShowPopupMessage(`Unable to reset server settings.\n\nserver.cfg is being used by another program.`, 'Biography');
+			return;
 		}
-	}
-
-	resetCfg() {
-		cfg.move(true);
 		window.Reload();
 	}
 
 	setCacheMode() {
-		window.Reload();
+		// cache-mode change: updateCfg has already recomputed all paths. No full Reload (it would kill the
+		// config dialog's callbacks and force it closed); just force-refresh text & images of the current
+		// track so the new paths apply immediately. Everything else updates on the next track / refresh event.
+		txt.rev.amFallback = true;
+		txt.rev.wikiFallback = true;
+		txt.on_playback_new_track(true);
+		img.on_playback_new_track(true);
 	}
 
 	setLanguage(i) {
@@ -517,8 +463,8 @@ class Settings {
 		txt.albumReset(true);
 		txt.albumFlush();
 		txt.artistFlush();
-		txt.rev.cur = '';
-		txt.bio.cur = '';
+		txt.rev.cur = -1;
+		txt.bio.cur = -1;
 		
 		txt.bio.loaded = {
 			lfm: false,
@@ -576,7 +522,7 @@ class Settings {
 				}
 				const caption = 'Tag Files:';
 				const prompt = handles.Count < 2000 ? `Update ${handles.Count} ${handles.Count > 1 ? 'tracks' : 'track'}.\n\nContinue?` : `Update ${handles.Count} tracks.\n\nADVISORY: This operation analyses a lot of data.\n\nContinue?`;
-				const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation) : true;
+				const wsh = popUpBox.confirm(caption, prompt, 'OK', 'Cancel', '', '', continue_confirmation);
 				if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 				break;
 			}
@@ -594,7 +540,7 @@ class Settings {
 		}
 	}
 }
-const cfg = new Settings('biography');
+const cfg = new Settings();
 
 let settings = [
 	['Album Review [Lastfm] Auto-Download', false, 'boolean', 'dlLfmRev'],
@@ -617,15 +563,8 @@ let settings = [
 	['Lastfm & Wikipedia Language Fallback To English', false, 'boolean', 'languageFallback'],
 	['Wikipedia English Genres', true, 'boolean', 'wikipediaEnGenres'],
 
-	['Album Review [Lastfm] Folder', '', 'text', 'foLfmRev'],
-	['Biography [Lastfm] Folder', '', 'text', 'foLfmBio'],
-	['Album Review [Wikipedia] Folder', '', 'text', 'foWikiRev'],
-	['Biography [Wikipedia] Folder', '', 'text', 'foWikiBio'],
-	['Image [Artist] Folder', '', 'text', 'foImgArt'],
-	['Image [Review] Folder', '', 'text', 'foImgRev'],
-
-	['Auto Cache', 1, 'num', 'autoCache'],
-	['Save Folder', '', 'text', 'foLfmSim'],
+	['Cache Root', '', 'text', 'cacheRoot'],
+	['Auto Cache', 0, 'num', 'autoCache'], // 0 = Default (built-in cache folder), 1 = Custom
 
 	['Image [Artist] Initial Download Number (1-20)', 5, 'num', 'photoNum'],
 	['Image [Artist] Auto-Add New', true, 'boolean', 'photoAutoAdd'],
@@ -635,28 +574,23 @@ let settings = [
 	['Auto-Save Folder', '$directory_path(%path%)', 'text', 'foImgCov'],
 	['Auto-Save File Name', 'cover', 'text', 'fnImgCov'],
 
-	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycCov'],
-	['Folder', '%storage_folder%\\biography-cache\\art_img\\$lower($cut(%BIO_ARTIST%,1))\\%BIO_ARTIST%', 'text', 'foCycPhoto'],
 	['Album Name Auto-Clean', false, 'boolean', 'albStrip'],
 	['Auto-Update Interval (days: min 30, 0 disables auto-update)', 0, 'num', 'exp'],
 
-	['Review Image Quality 0-Medium 1-High', false, 'boolean', 'imgRevHQ'],
+	['Review Image Quality 0-Medium 1-High', true, 'boolean', 'imgRevHQ'],
 	['Search: Include Partial Matches', true, 'boolean',  'partialMatchEnabled'],
 	['Search: Fuzzy Match Level Review', 80, 'num',  'fuzzyMatchReview'],
 	['Search: Fuzzy Match Level Track', 80, 'num',  'fuzzyMatchTrack'],
 	['Search: Fuzzy Match Level Composition', 66, 'num',  'fuzzyMatchComposition'],
 	['Similar Artists: Number to Display(0-10)', 6, 'num', 'menuSimilarNum'],
-	['Various Artists', 'Various Artists', 'text', 'va'],
-
-	['Site Display Name Last.fm', 'Last.fm', 'text', 'lfmDisplayName'],
-	['Site Display Name Wikipedia', 'Wikipedia', 'text', 'wikiDisplayName'],
+	['Various Artists', 'Various Artists; 群星', 'text', 'va'],
 
 	['Write Tag: Album Genre Last.fm', true, 'boolean', 'tagEnabled0'],
 	['Write Tag: Album Statistics Last.fm', false, 'boolean', 'tagEnabled1'],
 	['Write Tag: Artist Genre Last.fm', true, 'boolean', 'tagEnabled2'],
 	['Write Tag: Artist Statistics Last.fm', false, 'boolean', 'tagEnabled3'],
 	['Write Tag: Locale Last.fm', true, 'boolean', 'tagEnabled4'],
-	['Write Tag: Similar Artists Last.fm', true, 'boolean', 'tagEnabled5'],
+	['Write Tag: Similar Artists Last.fm', false, 'boolean', 'tagEnabled5'],
 	['Write Tag: Album Genre Wikipedia', true, 'boolean', 'tagEnabled6'],
 	['Write Tag: Artist Genre Wikipedia', true, 'boolean', 'tagEnabled7'],
 	['Write Tag: Similar Artists Last.fm: Number to Write (0-100)', 5, 'num', 'tagEnabled8'],
@@ -679,13 +613,6 @@ let settings = [
 	['Image [Cover] Check Custom Paths', false, 'boolean', 'cusCov'],
 	['Image [Cover] Custom Path [Full Path Minus Extension]', '', 'text', 'cusCov0'],
 
-	['Use Supplemental Cache', false, 'boolean', 'supCache'],
-	['Supplemental Cache [Use Find>Replace on SAVE paths]', 'yttm>yttm\\bio_supplemental', 'text', 'supFo'],
-	['Supplemental Cache Find', 'yttm', 'text', 'supFind'],
-	['Supplemental Cache Replace', 'yttm\\bio_supplemental', 'text', 'supReplace'],
-
-	['Configuration Width', 67, 'num', 'configWidth'],
-	['Configuration Height', 85, 'num', 'configHeight'],
 	['Show console messages', true, 'boolean', 'showConsoleMessages']
 ];
 

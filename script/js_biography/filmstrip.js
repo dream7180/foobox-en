@@ -4,7 +4,9 @@ class FilmStrip {
 	constructor() {
 		this.accessed = 0;
 		this.blockSize = 80;
+		this.borderStale = false; // true while the film strip border is being dragged
 		this.cache = {};
+		this.dragSize = null; // uncommitted filmStripSize while dragging, written back on mouse up
 		this.h = 0;
 		this.hand = false;
 		this.im_w = 80;
@@ -30,7 +32,7 @@ class FilmStrip {
 		}
 
 		this.cachesize = {
-			max: 200,
+			max: 120,
 			min: 20
 		}
 		
@@ -76,8 +78,7 @@ class FilmStrip {
 		this.sizeDebounce = $.debounce(() => {
 			if (!ppt.showFilmStrip) return;
 			this.logScrollPos();
-			this.clearCache();
-			this.setSize();
+			this.setSize(); // master copies are size-independent: no cache wipe / re-decode on resize
 			this.check();
 			txt.refresh(0);
 		}, 100);
@@ -93,11 +94,39 @@ class FilmStrip {
 		if (o && o.img == 'called') this.cacheIt(image, key, o.style);
     }
 
+	// base size for the cached master copy: 200 = reference size at 100% scaling, multiplied by the DPI
+	// scale so it keeps the same physical size. A lower bound only (real master = max(this, display
+	// size)) and window-independent, so cache keys survive a resize and nothing is read from disk again.
+	masterSize() {
+		return Math.round(200 * ($.scale || 1));
+	}
+
+	// scale the master copy down/up to the current thumbnail size (memory only, no disk read).
+	// img.format's 'default' branch writes img.im.w/h; keep and restore them so the main image layout is untouched.
+	formatThumb(image, style, size) {
+		const w = img.im.w;
+		const h = img.im.h;
+		const out = img.format(image, 1, ['default', 'crop', 'circular'][style], size, size, 'filmStrip');
+		img.im.w = w;
+		img.im.h = h;
+		return out;
+	}
+
+	feedMaster(image, image_path) { // the main image has decoded this file: build the thumb master from it instead of decoding it twice
+		if (!image || !panel.style.showFilmStrip) return;
+		const list = ppt.artistView ? img.art.images : img.cov.images; // img's own list is always current (this.images is stale until filmStrip.check runs)
+		if (!list.includes(image_path)) return; // main-image stubs etc. are not in the list: leave them to the film strip's own loading
+		const key = this.getKey(image_path);
+		const o = this.cache[key];
+		if (o && o.img != 'called') return; // a real master is already cached, don't overwrite (the late async result drops out on its own)
+		this.cacheIt(image, key, this.style.image[Number(ppt.artistView)]);
+	}
+
 	cacheIt(image, key, style) {
 		try {
 			if (image) {
 				if (img.filter.size && ppt.artistView && (!ppt.imgFilterBothPx ? image.Width < img.filter.minPx && image.Height < img.filter.minPx : image.Width < img.filter.minPx || image.Height < img.filter.minPx) && img.art.images.length > img.filter.minNo) {
-					const image_path = key.replace(/^\d+/, '');
+					const image_path = this.keyPath(key);
 					const rem_ix = img.art.images.findIndex(v => v == image_path);
 					if (rem_ix != -1) img.art.images.splice(rem_ix, 1);
 					this.trimCache(image_path);
@@ -108,7 +137,7 @@ class FilmStrip {
 					return;
 				}
 				if (img.filter.size && !ppt.artistView && img.artFolder && (!ppt.imgFilterBothPx ? image.Width < img.filter.minPx && image.Height < img.filter.minPx : image.Width < img.filter.minPx || image.Height < img.filter.minPx) && img.cov.images.length > img.filter.minNo + 1) {
-					const image_path = key.replace(/^\d+/, '');
+					const image_path = this.keyPath(key);
 					const rem_ix = img.cov.images.findIndex(v => v == image_path);
 					if (rem_ix != -1) {
 						img.cov.list.splice(rem_ix, 1);
@@ -123,16 +152,20 @@ class FilmStrip {
 				}
 			} else if (!image) image = img.stub.default[!key.includes('noitem') ? ppt.artistView ? 1 : 0 : 2];
 			if (image) {
-				image = img.format(image, 1, ['default', 'crop', 'circular'][style], this.im_w, this.im_w, 'filmStrip');
+				// decode once, build one master copy (fixed upper bound); every size is scaled from it later
+				const m = Math.min(Math.max(this.masterSize(), this.im_w), Math.min(image.Width, image.Height)); // at least the current size, never upscaled
+				const master = this.formatThumb(image, style, m);
 				this.checkCache();
 				this.cache[key] = {
-					img: image,
+					img: null,
+					master: master,
+					sized: -1,
 					style: style,
 					accessed: ++this.accessed
 				}
 			}
 		} catch (e) {
-			const image_path = key.replace(/^\d+/, '');
+			const image_path = this.keyPath(key);
 			if (ppt.artistView) {
 				const rem_ix = img.art.images.findIndex(v => v == image_path);
 				if (rem_ix != -1) img.art.images.splice(rem_ix, 1);
@@ -203,8 +236,8 @@ class FilmStrip {
 				this.setSize(); // check required for initially hidden panels
 				txt.albumFlush(); // handle track change no filmStrip to needed
 				txt.artistFlush();
-				txt.rev.cur = '';
-				txt.bio.cur = '';
+				txt.rev.cur = -1;
+				txt.bio.cur = -1;
 				this.setFilmStripSize(); // check required for initially hidden panels
 				panel.setStyle(resize.down); // if clear: called by refresh(0)
 				panel.checkFilm(); // if clear: refresh(0) does text
@@ -273,11 +306,25 @@ class FilmStrip {
 				const sel = (!ppt.text_only || ui.style.isBlur) && this.blocks.length > 1 && this.images[i] == img.cur_pth();
 				const x = box_x + Math.round((this.blockSize - iw) / 2);
 				const y = box_y + Math.round((this.blockSize - ih) / 2);
-				let bor = !sel ? this.blocks.style[imgStyle].bor[1] : this.blocks.style[imgStyle].bor[2];
-				if (imgStyle != 2 && !sel && (this.style.gap || this.style.fit && i == this.blocks.end - 2 && i != this.blocks.length - 2 || i == this.blocks.length - 1)) bor = this.blocks.style[imgStyle].bor[0];
+				let bor = this.borderStale ? null : (!sel ? this.blocks.style[imgStyle].bor[1] : this.blocks.style[imgStyle].bor[2]);
+				if (!this.borderStale && imgStyle != 2 && !sel && (this.style.gap || this.style.fit && i == this.blocks.end - 2 && i != this.blocks.length - 2 || i == this.blocks.length - 1)) bor = this.blocks.style[imgStyle].bor[0];
 				!this.style.horizontal ? this.drawVerticalStrip(gr, im, bor, box_x, box_y, x, y, ih, iw, imgStyle) : this.drawhorizontalStrip(gr, im, bor, box_x, box_y, x, y, ih, iw, imgStyle);
+				if (this.borderStale) this.drawFrame(gr, box_x, box_y, sel, imgStyle);
 			} else this.noIm(gr, box_x, box_y, imgStyle);
 		}
+	}
+
+	drawFrame(gr, box_x, box_y, sel, imgStyle) { // stand-in for the cached border bitmaps while dragging
+		const l = Math.max(box_x, this.x);
+		const t = Math.max(box_y, this.y);
+		const w = Math.min(box_x + this.blockSize, this.x + this.w) - l - 2;
+		const h = Math.min(box_y + this.blockSize, this.y + this.h) - t - 2;
+		if (w < 2 || h < 2) return;
+		if (imgStyle == 2) {
+			gr.SetSmoothingMode(2);
+			gr.DrawEllipse(l + 1, t + 1, w, h, ui.style.l_w, sel ? ui.col.accent : ui.col.imgBor);
+			gr.SetSmoothingMode(0);
+		} else gr.DrawRect(l + 1, t + 1, w, h, ui.style.l_w, sel ? ui.col.accent : ui.col.imgBor);
 	}
 
 	drawhorizontalStrip(gr, im, bor, box_x, box_y, x, y, ih, iw, imgStyle) {
@@ -333,6 +380,10 @@ class FilmStrip {
 		const o = this.cache[this.getKey(this.images[i])];
 		if (!o || o.img == 'called') return undefined;
 		o.accessed = ++this.accessed;
+		if (o.sized !== this.im_w) {
+			o.img = this.formatThumb(o.master, o.style, this.im_w); // size changed: rescale only, no re-decode
+			o.sized = this.im_w;
+		}
 		return o.img;
 	}
 
@@ -386,14 +437,20 @@ class FilmStrip {
 		this.imageDebounce();
 	}
 	
+	// cache key = style + '|' + path; this returns the path part only
+	keyPath(key) {
+		const i = key.indexOf('|');
+		return i < 0 ? key : key.slice(i + 1);
+	}
+
 	getKey(pth) {
-		return (this.im_w * 100 + this.style.image[Number(ppt.artistView)] + pth);
+		return (this.style.image[Number(ppt.artistView)] + '|' + pth); // no size in the key: still hit after a resize
 	}
 
 	getLoadKey(pth) {
 		let key = '';
 		this.style.image.some(v => {
-			key = this.im_w * 100 + v + pth; // * 100 to fix occasional auto-fit clashes
+			key = v + '|' + pth;
 			const o = this.cache[key];
 			return o && o.img == 'called';
 		});
@@ -592,7 +649,7 @@ class FilmStrip {
 				}
 				const caption = 'Reset Filmstrip To Default Size';
 				const prompt = 'Continue?';
-				const wsh = popUpBox.isHtmlDialogSupported() ? popUpBox.confirm(caption, prompt, 'Yes', 'No', '', '', continue_confirmation) : true;
+				const wsh = popUpBox.confirm(caption, prompt, 'Yes', 'No', '', '', continue_confirmation);
 				if (wsh) continue_confirmation('ok', $.wshPopup(prompt, caption));
 				break;
 			}
@@ -606,8 +663,9 @@ class FilmStrip {
 		this.paint();
 	}
 
-	setSize() {
+	setSize(drag) {
 		if (!ppt.showFilmStrip) return;
+		const size = drag && this.dragSize != null ? this.dragSize : ppt.filmStripSize; // avoid a SetProperty per mouse move
 		this.style.auto = ppt.autoFilm;
 		this.style.fit = ppt.filmStripAutofit;
 		this.style.gap = ppt.thumbNailGap;
@@ -631,7 +689,7 @@ class FilmStrip {
 				this.x = !filmStripOverlay ? (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borL : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textL : spacer) : panel.img.l + bor;
 				this.w = !filmStripOverlay ? (panel.w - this.x - (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borR : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textR : spacer)) : ppt.style == 0 || ppt.style == 2 || ppt.style > 3 || ppt.img_only ? panel.w - panel.img.l - panel.img.r - bor * 2 : panel.style.imgSize - bor * 2;
 				this.max_sz = Math.min(max_h - 5, this.w);
-				this.blockSize = Math.round(ppt.filmStripSize * panel.h);
+				this.blockSize = Math.round(size * panel.h);
 				if (this.style.fit) {
 					this.blockSize = Math.floor(this.w / Math.max(Math.round(this.w / this.blockSize), 1));
 					this.h = this.blockSize = Math.min(this.blockSize, this.max_sz);
@@ -655,7 +713,7 @@ class FilmStrip {
 				this.y = !filmStripOverlay ? (this.text_y || (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borT : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textT : spacer)) : panel.img.t + bor;
 				this.h = !filmStripOverlay ? (panel.h - this.y - (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borB : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textB : spacer)) : ppt.style == 0 || ppt.style == 2 ? panel.style.imgSize - bor * 2 : ppt.style > 3 ? (panel.clip ? panel.style.imgSize - ppt.borT : panel.h - panel.img.t - panel.img.b - bor * 2) : panel.h - panel.img.t - panel.img.b - bor * 2;
 				this.max_sz = Math.min(max_w - 5, this.h)
-				this.blockSize = Math.round(ppt.filmStripSize * panel.w);
+				this.blockSize = Math.round(size * panel.w);
 				if (this.style.fit) {
 					this.blockSize = Math.floor(this.h / Math.max(Math.round(this.h / this.blockSize)), 1);
 					this.w = this.blockSize = Math.min(this.blockSize, this.max_sz);
@@ -681,7 +739,7 @@ class FilmStrip {
 				this.x = !filmStripOverlay ? (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borL : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textL : spacer) : panel.img.l + bor;
 				this.w = !filmStripOverlay ? (panel.w - this.x - (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borR : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textR : spacer)) : ppt.style == 0 || ppt.style == 2 || ppt.style > 3 || ppt.img_only ? panel.w - panel.img.l - panel.img.r - bor * 2 : panel.style.imgSize - bor * 2;
 				this.max_sz = Math.min(max_h - 5, this.w);
-				this.blockSize = Math.round(ppt.filmStripSize * panel.h);
+				this.blockSize = Math.round(size * panel.h);
 				if (this.style.fit) {
 					this.blockSize = Math.floor(this.w / Math.max(Math.round(this.w / this.blockSize), 1));
 					this.h = this.blockSize = Math.min(this.blockSize, this.max_sz);
@@ -707,7 +765,7 @@ class FilmStrip {
 				this.y = !filmStripOverlay ? (this.text_y || (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borT : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textT : spacer)) : panel.img.t + bor;
 				this.h = !filmStripOverlay ? (panel.h - this.y - (ppt.filmStripMargin == 1 || ppt.filmStripMargin == 2 ? ppt.borB : ppt.filmStripMargin == 3 || ppt.filmStripMargin == 4 ? ppt.textB : spacer)) : ppt.style == 0 || ppt.style == 2 ? panel.style.imgSize - bor * 2 : ppt.style > 3 ? (panel.clip ? panel.style.imgSize - ppt.borT : panel.h - panel.img.t - panel.img.b - bor * 2) : panel.h - panel.img.t - panel.img.b - bor * 2;
 				this.max_sz = Math.min(max_w - 5, this.h);
-				this.blockSize = Math.round(ppt.filmStripSize * panel.w);
+				this.blockSize = Math.round(size * panel.w);
 				if (this.style.fit) {
 					this.blockSize = Math.floor(this.h / Math.max(Math.round(this.h / this.blockSize)), 1);
 					this.w = this.blockSize = Math.min(this.blockSize, this.max_sz);
@@ -728,14 +786,18 @@ class FilmStrip {
 		this.blocks.drawn = Math.floor((this.style.horizontal ? this.w : this.h) / this.blockSize);
 		this.im_w = Math.round(Math.max(this.blockSize - Math.round(this.style.gap), 10));
 
-		this.cachesize.max = Math.max(this.blocks.drawn * 6, 200);
+		this.cachesize.max = Math.max(this.blocks.drawn * 6, 120);
 		this.cachesize.min = this.blocks.drawn * 3;
 
 		this.noimg.xy = Math.round((this.blockSize - this.im_w) / 2) + 3;
 		this.noimg.wh = this.im_w - 6;
 
 		if (this.scrollerType().scroll > this.scrollerType().max_scroll) this.scrollerType().checkScroll(this.scrollerType().max_scroll);
-		this.createBorder();
+		if (drag) this.borderStale = true; // 9 bitmaps per rebuild: during a drag draw plain frames instead
+		else {
+			this.borderStale = false;
+			this.createBorder();
+		}
 	}
 
 	showImage(i) {
